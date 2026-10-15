@@ -23,6 +23,7 @@ import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
@@ -69,8 +70,8 @@ class TestRiskingService @Inject() (
           fileContents <-
             Future.traverse(unprocessedFilenames): filename =>
               testRiskingConnector.viewRiskingResultsFile(filename).map: maybeContent =>
-                filename -> maybeContent.getOrElse(
-                  throw new IllegalStateException(s"Expected unprocessed risking results file '${filename.value}' to exist")
+                filename -> maybeContent.getOrThrowExpectedDataMissing(
+                  s"unprocessed risking results file '${filename.value}' to exist"
                 )
           combinedFilename = TestRiskingResultsFilename.combined()
           combinedRecords = TestRiskingService.combineResultsJson(fileContents)
@@ -149,7 +150,7 @@ object TestRiskingService:
 
   private[testonly] def combineResultsJson(fileContents: Seq[(RiskingResultsFilename, String)]): JsArray = JsArray(fileContents.flatMap(parseRecords))
 
-  private def parseRecords(file: (RiskingResultsFilename, String)): scala.collection.immutable.IndexedSeq[JsValue] =
+  private def parseRecords(file: (RiskingResultsFilename, String)): Seq[JsValue] =
     val (filename, content) = file
     Json.parse(content).validate[JsArray].fold(
       errors =>

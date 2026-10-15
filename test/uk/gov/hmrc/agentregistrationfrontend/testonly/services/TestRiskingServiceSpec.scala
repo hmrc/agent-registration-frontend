@@ -33,6 +33,7 @@ extends UnitSpec:
 
       val combined = TestRiskingService.combineResultsJson(Seq(
         entityFilename ->
+          // language=JSON
           """[
             |  {
             |    "recordType": "Entity",
@@ -41,6 +42,7 @@ extends UnitSpec:
             |  }
             |]""".stripMargin,
         individualFilename ->
+          // language=JSON
           """[
             |  {
             |    "recordType": "Individual",
@@ -89,8 +91,8 @@ extends UnitSpec:
       val filename = RiskingResultsFilename("test-only-bad-file")
 
       val thrown = intercept[IllegalArgumentException]:
+        // language=JSON
         TestRiskingService.combineResultsJson(Seq(filename -> """{"recordType":"Entity"}"""))
 
       thrown.getMessage should include(filename.value)
       thrown.getMessage should include("did not contain a JSON array")
-
