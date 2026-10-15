@@ -53,6 +53,7 @@ extends ControllerSpec:
       method = "POST",
       url = path
     )
+    AppRoutes.apply.ConfirmDeleteAndStartAgainController.submit.url shouldBe AppRoutes.apply.ConfirmDeleteAndStartAgainController.show.url
 
   s"GET $path when risked application exists should render the confirm delete and start again page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterRisking)

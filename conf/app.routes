@@ -11,6 +11,7 @@ GET         /timed-out                                                 uk.gov.hm
 
 GET         /application-status                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationStatus
 GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewSubmittedApplication
+GET         /application-deleted                                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationDeleted
 
 # Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.startRegistration
@@ -26,7 +27,6 @@ GET         /apply/exit                                             uk.gov.hmrc.
 GET         /apply/agent-already-subscribed                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AgentAlreadySubscribedController.show
 GET         /apply/start-again                                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ConfirmDeleteAndStartAgainController.show
 POST        /apply/start-again                                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ConfirmDeleteAndStartAgainController.submit
-GET         /apply/application-deleted                              uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationDeleted
 
 ## About your business routes
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show
