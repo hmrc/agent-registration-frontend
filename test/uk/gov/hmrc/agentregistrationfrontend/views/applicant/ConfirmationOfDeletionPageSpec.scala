@@ -35,7 +35,7 @@ extends ViewSpec:
       s"""
          |We have deleted your application
          |What happens next
-         |If you want to apply for an agent services account again, you can start a new application
+         |If you want to apply for an agent services account again, you can start a new application.
          |Finish and sign out
          |"""
         .stripMargin
