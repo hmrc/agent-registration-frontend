@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
@@ -46,7 +47,7 @@
 @(
         agentApplication: AgentApplication,
         individuals: Seq[IndividualProvidedDetails],
-        submittedRiskingResultsFilenames: List[RiskingResultsFilename],
+        findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse,
         unprocessedRiskingResultsFilenames: List[RiskingResultsFilename])(implicit
         requestHeader: RequestHeader
 )
@@ -77,13 +78,11 @@
 
 @entityCurrentFilename = @{TestRiskingResultsFilename.entity(agentApplication)}
 
-@entitySubmittedFiles = @{
-    submittedRiskingResultsFilenames.filter(_.value.startsWith(s"test-only-entity-${agentApplication.applicationReference.value}"))
-}
+@entityResultsFilename: Option[RiskingResultsFilename] = @{TestRiskingResultsFilename.entityResultsFilename(agentApplication, findRiskingResultsFilesResponse)}
 
-@entityCurrentFileSubmitted = @{submittedRiskingResultsFilenames.contains(entityCurrentFilename)}
+@entityResultsSubmitted: Boolean = @{TestRiskingResultsFilename.entityResultsSubmitted(agentApplication, findRiskingResultsFilesResponse, unprocessedRiskingResultsFilenames)}
 
-@unprocessedRiskingResultsFilenamesSet = @{unprocessedRiskingResultsFilenames.toSet}
+@unprocessedRiskingResultsFilenamesSet: Set[RiskingResultsFilename] = @{unprocessedRiskingResultsFilenames.toSet}
 
 @fileStatusTag(filename: RiskingResultsFilename) = @{
     if (unprocessedRiskingResultsFilenamesSet.contains(filename))
@@ -101,7 +100,7 @@
 
 @showEntityActionLinks = @{
     agentApplication.applicationState match {
-        case ApplicationState.SentToMinerva => !entityCurrentFileSubmitted && entityOutcomeAllowsLinks
+        case ApplicationState.SentToMinerva => !entityResultsSubmitted && entityOutcomeAllowsLinks
         case _ => false
     }
 }
@@ -314,16 +313,12 @@
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.applicationReference, entityCurrentFilename)">fail-non-fixable</a>
                     </p>
                 }
-                @if(entitySubmittedFiles.nonEmpty) {
-                    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Risking results files</h3>
-                    <ul class="govuk-list govuk-!-margin-bottom-2">
-                        @entitySubmittedFiles.map { filename =>
-                            <li>
-                                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"><code>@filename.value</code></a>
-                                @fileStatusTag(filename)
-                            </li>
-                        }
-                    </ul>
+                @entityResultsFilename.map { riskingResultsFilename =>
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Risking results file</h3>
+                    <p class="govuk-body govuk-!-margin-bottom-2">
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(riskingResultsFilename)"><code>@riskingResultsFilename.value</code></a>
+                        @fileStatusTag(riskingResultsFilename)
+                    </p>
                 }
             </dd>
         </div>
@@ -336,7 +331,7 @@
                     <ul class="govuk-list">
                         @individuals.map { individual =>
                             <li class="govuk-!-margin-bottom-4">
-                                @individualTile(individual, agentApplication, submittedRiskingResultsFilenames, unprocessedRiskingResultsFilenames)
+                                @individualTile(individual, agentApplication, findRiskingResultsFilesResponse, unprocessedRiskingResultsFilenames)
                             </li>
                         }
                     </ul>

@@ -108,12 +108,15 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: RequestWithData[List[IndividualProvidedDetails] *: TestOnlyActions.DataWithApplication] =>
         for
-          submittedRiskingResultsFilenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
+          findRiskingResultsFilesResponse <- testRiskingService.findRiskingResultsFilesByReference(
+            applicationReferences = Seq(request.get[AgentApplication].applicationReference),
+            personReferences = request.get[List[IndividualProvidedDetails]].map(_.personReference)
+          )
           unprocessedRiskingResultsFilenames <- testRiskingService.getUnprocessedAvailableFiles()
         yield Ok(showAgentApplicationsTilePage(
           agentApplication = request.get[AgentApplication],
           individuals = request.get[List[IndividualProvidedDetails]],
-          submittedRiskingResultsFilenames = submittedRiskingResultsFilenames,
+          findRiskingResultsFilesResponse = findRiskingResultsFilesResponse,
           unprocessedRiskingResultsFilenames = unprocessedRiskingResultsFilenames
         ))
 

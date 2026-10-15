@@ -18,7 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsRecord
 
 class TestRiskingServiceSpec
 extends UnitSpec:
@@ -96,3 +99,23 @@ extends UnitSpec:
 
       thrown.getMessage should include(filename.value)
       thrown.getMessage should include("did not contain a JSON array")
+
+  "parseRecordReferences should read who each record is about" in:
+    TestRiskingService.parseRecordReferences(
+      RiskingResultsFilename("test-only-combined-20261015T100000000Z"),
+      // language=JSON
+      """[
+        |  { "recordType": "Entity", "applicationReference": "XARN0000001", "failures": [] },
+        |  { "recordType": "Individual", "personReference": "PERS0000001", "failures": [] }
+        |]""".stripMargin
+    ) shouldBe Seq(
+      RiskingResultsRecord.ForApplication(ApplicationReference("XARN0000001")),
+      RiskingResultsRecord.ForPerson(PersonReference("PERS0000001"))
+    )
+
+  "parseRecordReferences should fail on a record of unknown type" in:
+    val thrown = intercept[IllegalArgumentException]:
+      // language=JSON
+      TestRiskingService.parseRecordReferences(RiskingResultsFilename("test-only-bad-file"), """[{"recordType":"Agent"}]""")
+
+    thrown.getMessage shouldBe "Risking results file 'test-only-bad-file' has a record of unknown type 'Agent'"

@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
+import play.api.data.Form
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
+import play.twirl.api.Html
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessType
@@ -31,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectEntityFailuresForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFailuresForm
+import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectRiskingResultsFilesForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -40,10 +43,9 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService.CombinedRiskingResultsFile
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
-import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.CombineRiskingResultsFilesConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingResultsFileRecords
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.DeleteRiskingResultsFilesConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
@@ -61,13 +63,13 @@ import scala.util.Random
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   testOnlyHubPage: TestOnlyHubPage,
-  combineRiskingResultsFilesConfirmationPage: CombineRiskingResultsFilesConfirmationPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
   deleteRiskingResultsFilesConfirmationPage: DeleteRiskingResultsFilesConfirmationPage,
   riskingActionConfirmationPage: RiskingActionConfirmationPage,
   selectEntityFailuresPage: SelectEntityFailuresPage,
   selectIndividualFailuresPage: SelectIndividualFailuresPage,
   submittedRiskingResultsFilesPage: SubmittedRiskingResultsFilesPage,
+  riskingResultsFileRecords: RiskingResultsFileRecords,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -138,25 +140,6 @@ extends FrontendControllerBase(mcc):
       else
         Future.successful(Unauthorized("Reset operation not allowed"))
 
-  def showDeleteAllRiskingResultsFilesConfirmation: Action[AnyContent] = action:
-    implicit request =>
-      if appConfig.TestOnly.allowResetDatabase
-      then Ok(deleteRiskingResultsFilesConfirmationPage())
-      else Unauthorized("Reset operation not allowed")
-
-  def showCombineRiskingResultsFilesConfirmation: Action[AnyContent] = action:
-    implicit request =>
-      if appConfig.TestOnly.allowResetDatabase
-      then Ok(combineRiskingResultsFilesConfirmationPage())
-      else Unauthorized("Reset operation not allowed")
-
-  def deleteAllRiskingResultsFiles: Action[AnyContent] = action.async:
-    implicit request =>
-      if (appConfig.TestOnly.allowResetDatabase)
-        testRiskingService.deleteAllRiskingResultsFiles().map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub))
-      else
-        Future.successful(Unauthorized("Reset operation not allowed"))
-
   def runRisking: Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runRisking().map: _ =>
@@ -220,32 +203,89 @@ extends FrontendControllerBase(mcc):
 
   def showSubmittedRiskingResultsFiles: Action[AnyContent] = action.async:
     implicit request =>
-      for
-        filenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
-        unprocessedFilenames <- testRiskingService.getUnprocessedAvailableFiles()
-      yield Ok(submittedRiskingResultsFilesPage(filenames, unprocessedFilenames))
+      riskingResultsFilesPage(SelectRiskingResultsFilesForm.form).map(Ok(_))
 
-  def combineUnprocessedRiskingResultsFiles: Action[AnyContent] = action.async:
+  def showRiskingResultsFileRecords(filename: RiskingResultsFilename): Action[AnyContent] = action.async:
     implicit request =>
-      if appConfig.TestOnly.allowResetDatabase then
-        testRiskingService.combineUnprocessedRiskingResultsFiles().map:
-          case Some(CombinedRiskingResultsFile(
-                filename,
-                sourceFileCount,
-                recordCount
-              )) =>
-            Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles).flashing(
-              "success" -> (
-                s"Created combined risking results file '${filename.value}' from $sourceFileCount unprocessed file(s) containing $recordCount record(s). " +
-                  "All previous risking results files were replaced so you can now run results file processing against just that one file."
-              )
-            )
-          case None =>
-            Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles).flashing(
-              "success" -> "There are no unprocessed risking results files to combine."
-            )
-      else
-        Future.successful(Unauthorized("Reset operation not allowed"))
+      testRiskingService.getRiskingResultsFileRecords(filename).map:
+        case Some(records) => Ok(riskingResultsFileRecords(records))
+        case None => NotFound(s"Risking results file not found: ${filename.value}")
+
+  def combineRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      testRiskingService.getUnprocessedAvailableFiles().flatMap: unprocessedFilenames =>
+        SelectRiskingResultsFilesForm
+          .combine(unprocessedFilenames)
+          .bindFromRequest()
+          .fold(
+            formWithErrors => riskingResultsFilesPage(formWithErrors).map(BadRequest(_)),
+            filenames =>
+              testRiskingService
+                .combineRiskingResultsFiles(filenames)
+                .map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles))
+          )
+
+  def combineAllUnprocessedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      testRiskingService.getUnprocessedAvailableFiles().flatMap:
+        case unprocessedFilenames if unprocessedFilenames.sizeIs >= 2 =>
+          testRiskingService
+            .combineRiskingResultsFiles(unprocessedFilenames)
+            .map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles))
+        case _ =>
+          riskingResultsFilesPage(
+            SelectRiskingResultsFilesForm
+              .form
+              .bindFromRequest()
+              .withError(SelectRiskingResultsFilesForm.key, "There must be at least 2 unprocessed files to combine.")
+          ).map(BadRequest(_))
+
+  def confirmDeleteSelectedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      testRiskingService.getUnprocessedAvailableFiles().flatMap: unprocessedFilenames =>
+        SelectRiskingResultsFilesForm
+          .delete(unprocessedFilenames)
+          .bindFromRequest()
+          .fold(
+            formWithErrors => riskingResultsFilesPage(formWithErrors).map(BadRequest(_)),
+            filenames => Future.successful(Ok(deleteRiskingResultsFilesConfirmationPage(filenames)))
+          )
+
+  def deleteSelectedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      testRiskingService.getUnprocessedAvailableFiles().flatMap: unprocessedFilenames =>
+        SelectRiskingResultsFilesForm
+          .delete(unprocessedFilenames)
+          .bindFromRequest()
+          .fold(
+            formWithErrors => riskingResultsFilesPage(formWithErrors).map(BadRequest(_)),
+            filenames =>
+              testRiskingService
+                .deleteRiskingResultsFiles(filenames)
+                .map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles))
+          )
+
+  def confirmDeleteAllProcessedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      testRiskingService.listProcessedRiskingResultsFilenames().flatMap:
+        case Nil =>
+          riskingResultsFilesPage(
+            SelectRiskingResultsFilesForm
+              .form
+              .bindFromRequest()
+              .withError(SelectRiskingResultsFilesForm.key, "There are no processed files to delete.")
+          ).map(BadRequest(_))
+        case processedFilenames => Future.successful(Ok(deleteRiskingResultsFilesConfirmationPage(processedFilenames)))
+
+  private def riskingResultsFilesPage(form: Form[Seq[RiskingResultsFilename]])(using request: RequestHeader): Future[Html] =
+    for
+      filenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
+      unprocessedFilenames <- testRiskingService.getUnprocessedAvailableFiles()
+    yield submittedRiskingResultsFilesPage(
+      filenames,
+      unprocessedFilenames,
+      form
+    )
 
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
