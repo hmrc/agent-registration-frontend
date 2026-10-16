@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -41,20 +40,32 @@ class ChangeKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = actions
+  private type DataWithIndividual = IndividualProvidedDetails *: DataWithUnincorporatedPartnershipKeyIndividuals
+
+  private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
     .getKeyIndividualsForUnincorporatedPartnership
+    .refine:
+      implicit request =>
+        request.get[List[IndividualProvidedDetails]].find(_._id === individualProvidedDetailsId) match
+          case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
+          case None =>
+            logger.warn(
+              s"Individual provided details record not found for the provided id ${individualProvidedDetailsId.value} - redirecting as this may be due to a stale link or an attempt to access another record that does not belong to the current application"
+            )
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
+
+  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction(individualProvidedDetailsId)
     .async:
       implicit request =>
         enterIndividualNamePageRenderer
           .render(
-            form = IndividualNameForm.form.fill(keyIndividual(individualProvidedDetailsId).individualName),
+            form = IndividualNameForm.form.fill(request.get[IndividualProvidedDetails].individualName),
             formAction = formAction(individualProvidedDetailsId)
-          )
+          )(using request.delete[IndividualProvidedDetails])
           .map(Ok(_))
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
-    actions
-      .getKeyIndividualsForUnincorporatedPartnership
+    baseAction(individualProvidedDetailsId)
       .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
         form = IndividualNameForm.form,
         resultToServeWhenFormHasErrors =
@@ -63,14 +74,15 @@ extends FrontendController(mcc, actions):
               enterIndividualNamePageRenderer.render(
                 form = formWithErrors,
                 formAction = formAction(individualProvidedDetailsId)
-              )
+              )(using request.delete[IndividualProvidedDetails])
       )
       .async:
         implicit request =>
           val individualNameFromForm: IndividualName = request.get
+          val individualToChange: IndividualProvidedDetails = request.get
           individualProvideDetailsService
             .upsertForApplication(
-              keyIndividual(individualProvidedDetailsId)
+              individualToChange
                 .modify(_.individualName)
                 .setTo(individualNameFromForm)
             )
@@ -84,16 +96,3 @@ extends FrontendController(mcc, actions):
     .nonincorporated
     .ChangeKeyIndividualController
     .submit(individualProvidedDetailsId)
-
-  /** The key individual being changed, from the list the action already loaded. */
-  private inline def keyIndividual[Data <: Tuple](
-    individualProvidedDetailsId: IndividualProvidedDetailsId
-  )(using
-    request: RequestWithData[Data],
-    ev: List[IndividualProvidedDetails] PresentIn Data
-  ): IndividualProvidedDetails = request
-    .get[List[IndividualProvidedDetails]]
-    .find(_._id === individualProvidedDetailsId)
-    .getOrThrowExpectedDataMissing(
-      s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
-    )

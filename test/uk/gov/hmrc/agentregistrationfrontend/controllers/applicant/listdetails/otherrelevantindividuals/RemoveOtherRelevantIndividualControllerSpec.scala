@@ -108,6 +108,36 @@ extends ControllerSpec:
       .title() shouldBe "Confirm that you want to remove Test Name from the list of relevant individuals - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
+  s"GET $path should redirect to check your answers when the individual is not found" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path should redirect to check your answers when the individual is not found" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+
+    val response: WSResponse =
+      post(path)(Map(
+        RemoveKeyIndividualForm.key -> Seq("Yes")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(individualProvidedDetailsId, count = 0)
+
   s"POST $path with blank inputs should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(

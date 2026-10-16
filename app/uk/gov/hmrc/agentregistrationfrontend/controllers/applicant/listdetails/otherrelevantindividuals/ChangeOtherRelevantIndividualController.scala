@@ -46,9 +46,9 @@ class ChangeOtherRelevantIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithList = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
+  private type DataWithIndividual = IndividualProvidedDetails *: IsNotSoleTrader *: DataWithAuth
 
-  private val baseAction: ActionBuilderWithData[DataWithList] = actions
+  private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
@@ -70,23 +70,24 @@ extends FrontendController(mcc, actions):
     .refine:
       implicit request =>
         val agentApplication: IsNotSoleTrader = request.get
-        individualProvideDetailsService.findAllOtherRelevantIndividualsByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-          request.add[List[IndividualProvidedDetails]](individualsList)
+        individualProvideDetailsService
+          .findAllOtherRelevantIndividualsByApplicationId(agentApplication.agentApplicationId)
+          .map(_.find(_._id === individualProvidedDetailsId))
+          .map[RequestWithData[DataWithIndividual] | Result]:
+            case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
+            case None =>
+              logger.warn(
+                s"Individual provided details record not found for the provided id ${individualProvidedDetailsId.value} - redirecting as this may be due to a stale link or an attempt to access another record that does not belong to the current application"
+              )
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
 
-  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
+  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction(individualProvidedDetailsId)
     .async:
       implicit request =>
-        val existingList: List[IndividualProvidedDetails] = request.get
         val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController.submit(
           individualProvidedDetailsId
         )
-        val nameToChange: IndividualName =
-          existingList
-            .find(_._id === individualProvidedDetailsId)
-            .getOrThrowExpectedDataMissing(
-              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
-            )
-            .individualName
+        val nameToChange: IndividualName = request.get[IndividualProvidedDetails].individualName
 
         Future.successful(Ok(enterIndividualNamePage(
           form = OtherRelevantIndividualNameForm.form.fill(nameToChange),
@@ -96,7 +97,7 @@ extends FrontendController(mcc, actions):
         )))
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
-    baseAction
+    baseAction(individualProvidedDetailsId)
       .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
         form = OtherRelevantIndividualNameForm.form,
         resultToServeWhenFormHasErrors =
@@ -118,12 +119,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val individualNameFromForm: IndividualName = request.get
-          val existingList: List[IndividualProvidedDetails] = request.get
-          val individualToChange: IndividualProvidedDetails = existingList
-            .find(_._id === individualProvidedDetailsId)
-            .getOrThrowExpectedDataMissing(
-              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
-            )
+          val individualToChange: IndividualProvidedDetails = request.get
           individualProvideDetailsService.upsertForApplication(
             individualToChange
               .modify(_.individualName)
