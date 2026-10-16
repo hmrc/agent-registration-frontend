@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.components.CompactLink
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(
         appConfig: AppConfig,
@@ -110,12 +111,12 @@
     </p>
     @compactLink(
         label = "Run expiry scheduler",
-        url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler,
+        url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(request.uri)),
         hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period")
     )
     @compactLink(
         label = "Run deletion scheduler",
-        url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler,
+        url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(request.uri)),
         hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals and their AMLS evidence in object-store")
     )
 

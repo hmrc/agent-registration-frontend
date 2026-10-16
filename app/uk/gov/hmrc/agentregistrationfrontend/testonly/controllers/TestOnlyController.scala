@@ -188,27 +188,15 @@ extends FrontendControllerBase(mcc):
       testRiskingService.runResultsFileProcessing().map: _ =>
         Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts))
 
-  def runExpiryScheduler: Action[AnyContent] = action.async:
+  def runExpiryScheduler(redirectUrl: RedirectUrl): Action[AnyContent] = action.async:
     implicit request =>
       testApplicationService.runExpiryScheduler().map: _ =>
-        Ok(riskingActionConfirmationPage(
-          heading = "Expiry scheduler ran",
-          description =
-            "This flips Started and GrsDataReceived applications whose applicationExpiresAt has passed into the Expired state and stamps" +
-              " postExpiryGracePeriodEndsAt = now + post-expiry-grace-period. Runs on agent-registration. In production this runs daily via the scheduler;" +
-              " this test-only endpoint triggers it on demand."
-        ))
+        Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts))
 
-  def runDeletionScheduler: Action[AnyContent] = action.async:
+  def runDeletionScheduler(redirectUrl: RedirectUrl): Action[AnyContent] = action.async:
     implicit request =>
       testApplicationService.runDeletionScheduler().map: _ =>
-        Ok(riskingActionConfirmationPage(
-          heading = "Deletion scheduler ran",
-          description =
-            "This deletes Expired applications whose postExpiryGracePeriodEndsAt has passed, together with their individuals and their AMLS evidence in object-store." +
-              " Runs on agent-registration. In production this runs daily via the scheduler;" +
-              " this test-only endpoint triggers it on demand."
-        ))
+        Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts))
 
   def viewNextRiskingFileContents: Action[AnyContent] = action.async:
     implicit request =>

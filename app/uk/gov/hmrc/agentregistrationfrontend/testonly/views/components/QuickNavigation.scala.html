@@ -32,5 +32,7 @@
         <li><a class="govuk-link" id="quick-nav-view-next-risking-file-contents" href="@AppRoutes.testOnly.TestOnlyController.viewNextRiskingFileContents">View next risking file contents</a></li>
         <li><a class="govuk-link" id="quick-nav-run-results-file-processing" href="@AppRoutes.testOnly.TestOnlyController.runResultsFileProcessingAndRedirect(RedirectUrl(requestHeader.uri))">Run results file processing</a></li>
         <li><a class="govuk-link" id="quick-nav-risking-results-files" href="@AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles">View risking results files</a></li>
+        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-run-expiry-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(requestHeader.uri))">Run expiry scheduler</a></li>
+        <li><a class="govuk-link" id="quick-nav-run-deletion-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(requestHeader.uri))">Run deletion scheduler</a></li>
     </ul>
 </nav>
