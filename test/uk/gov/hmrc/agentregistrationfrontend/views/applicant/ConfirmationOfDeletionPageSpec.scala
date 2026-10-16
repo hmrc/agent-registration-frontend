@@ -33,7 +33,7 @@ extends ViewSpec:
   "ConfirmationOfDeletionPage should have expected content" in:
     doc.mainContent shouldContainContent
       s"""
-         |We have deleted your application
+         |We have deleted the application
          |What happens next
          |If you want to apply for an agent services account again, you can start a new application.
          |Finish and sign out
@@ -41,10 +41,10 @@ extends ViewSpec:
         .stripMargin
 
   "ConfirmationOfDeletionPage should have the correct title" in:
-    doc.title() shouldBe "We have deleted your application - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "We have deleted the application - Apply for an agent services account - GOV.UK"
 
   "ConfirmationOfDeletionPage should have the correct h1" in:
-    doc.h1 shouldBe "We have deleted your application"
+    doc.h1 shouldBe "We have deleted the application"
 
   "ConfirmationOfDeletionPage should contain a link to start again" in:
     val startAgainLink: TestLink =

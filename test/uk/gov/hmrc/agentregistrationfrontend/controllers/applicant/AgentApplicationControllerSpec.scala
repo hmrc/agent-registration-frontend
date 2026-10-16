@@ -75,7 +75,7 @@ extends ControllerSpec:
     val response: WSResponse = get(applicationDeletedPath)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "We have deleted your application - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "We have deleted the application - Apply for an agent services account - GOV.UK"
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
 

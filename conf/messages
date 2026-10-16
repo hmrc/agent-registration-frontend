@@ -1859,7 +1859,7 @@ soleTraderHasNoSaUtr.p4 = Alternatively you can <a href="{0}" class="govuk-link"
 
 # Applicant deletes application to start again after risking decision
 confirmDeleteApplication.title = Delete your application
-confirmDeleteApplication.p1 = This action will happen immediately. You will no longer be able to access details about your current application, including our decision.
+confirmDeleteApplication.p1 = This action will happen immediately. You will no longer be able to access any details about your current application, including our decision.
 confirmDeleteApplication.p2 = You can choose to start a new application when you are ready.
 confirmDeleteApplication.p3 = HMRC carries out checks against all applications and any relevant individuals.
 confirmDeleteApplication.label = Do you want to delete your application?
@@ -1868,7 +1868,7 @@ confirmDeleteApplication.No = No
 confirmDeleteApplication.error.required = Select yes if you want to delete your application
 confirmDeleteApplication.error.invalid = Select yes if you want to delete your application
 
-confirmationOfDeletion.title = We have deleted your application
+confirmationOfDeletion.title = We have deleted the application
 confirmationOfDeletion.whatNext.h2 = What happens next
 confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services account again, you can <a class="govuk-link" href="{0}">start a new application</a>.
 
