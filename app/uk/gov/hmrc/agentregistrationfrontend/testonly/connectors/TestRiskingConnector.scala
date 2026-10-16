@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesRequest
+import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
@@ -211,6 +213,24 @@ extends Connector:
             )
       .andLogOnFailure("Failed to get unprocessed available files")
 
+  def findRiskingResultsFiles(findRiskingResultsFilesRequest: FindRiskingResultsFilesRequest)(using RequestHeader): Future[FindRiskingResultsFilesResponse] =
+    val url: URL = url"$baseUrl/find-risking-results-files/by-references"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(findRiskingResultsFilesRequest))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[FindRiskingResultsFilesResponse]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find risking results files")
+
   def viewRiskingResultsFile(filename: RiskingResultsFilename)(using RequestHeader): Future[Option[String]] =
     val url: URL = url"$baseUrl/risking-results-file/${filename.value}"
     httpClient
@@ -250,5 +270,22 @@ extends Connector:
               response = response
             )
       .andLogOnFailure(s"Failed to upload risking results file: ${filename.value}")
+
+  def deleteRiskingResultsFile(filename: RiskingResultsFilename)(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/risking-results-file/${filename.value}"
+    httpClient
+      .delete(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "DELETE",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to delete risking results file: ${filename.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking/test-only"

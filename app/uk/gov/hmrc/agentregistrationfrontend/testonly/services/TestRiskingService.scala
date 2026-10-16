@@ -16,17 +16,26 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsError
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesRequest
+import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsRecord
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -34,7 +43,8 @@ import scala.concurrent.Future
 
 @Singleton
 class TestRiskingService @Inject() (
-  testRiskingConnector: TestRiskingConnector
+  testRiskingConnector: TestRiskingConnector,
+  clock: Clock
 )(using ExecutionContext):
 
   def deleteAll()(using RequestHeader): Future[Unit] =
@@ -42,8 +52,6 @@ class TestRiskingService @Inject() (
       _ <- testRiskingConnector.deleteAllApplications()
       _ <- testRiskingConnector.deleteAllRiskingResultsFiles()
     yield ()
-
-  def deleteAllRiskingResultsFiles()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllRiskingResultsFiles()
 
   def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
 
@@ -55,6 +63,46 @@ class TestRiskingService @Inject() (
     testRiskingConnector.listSubmittedRiskingResultsFilenames()
 
   def getUnprocessedAvailableFiles()(using RequestHeader): Future[List[RiskingResultsFilename]] = testRiskingConnector.getUnprocessedAvailableFiles()
+
+  def findRiskingResultsFilesByReference(
+    applicationReferences: Seq[ApplicationReference],
+    personReferences: Seq[PersonReference]
+  )(using RequestHeader): Future[FindRiskingResultsFilesResponse] = testRiskingConnector.findRiskingResultsFiles(FindRiskingResultsFilesRequest(
+    applicationReferences = applicationReferences.toList,
+    personReferences = personReferences.toList
+  ))
+
+  def getRiskingResultsFileRecords(filename: RiskingResultsFilename)(using RequestHeader): Future[Option[Seq[RiskingResultsRecord]]] = testRiskingConnector
+    .viewRiskingResultsFile(filename)
+    .map(_.map(content => TestRiskingService.parseRecordReferences(filename, content)))
+
+  /** The submitted files that have been processed, so deleting them loses no results. */
+  def listProcessedRiskingResultsFilenames()(using RequestHeader): Future[List[RiskingResultsFilename]] =
+    for
+      riskingResultsFilenames <- listSubmittedRiskingResultsFilenames()
+      unprocessedRiskingResultsFilenames <- getUnprocessedAvailableFiles()
+    yield riskingResultsFilenames.filterNot(unprocessedRiskingResultsFilenames.contains)
+
+  def deleteRiskingResultsFiles(filenames: Seq[RiskingResultsFilename])(using RequestHeader): Future[Unit] = Future.traverse(filenames)(filename =>
+    testRiskingConnector.deleteRiskingResultsFile(filename)
+  ).map(_ => ())
+
+  /** Uploads the records of `filenames` as one new file, then deletes those files so their records are not processed twice. */
+  def combineRiskingResultsFiles(filenames: Seq[RiskingResultsFilename])(using RequestHeader): Future[Unit] =
+    for
+      fileContents <-
+        Future.traverse(filenames): filename =>
+          testRiskingConnector.viewRiskingResultsFile(filename).map: maybeContent =>
+            filename -> maybeContent.getOrThrowExpectedDataMissing(s"risking results file '${filename.value}' to exist")
+      combinedFilename = TestRiskingResultsFilename.combined(Instant.now(clock))
+      uploadOutcome <- testRiskingConnector.uploadRiskingResultsFile(combinedFilename, TestRiskingService.combineResultsJson(fileContents))
+      _ =
+        uploadOutcome match
+          case UploadRiskingResultsFileOutcome.Uploaded => ()
+          case UploadRiskingResultsFileOutcome.AlreadyExists =>
+            throw new IllegalStateException(s"Combined risking results file already exists: ${combinedFilename.value}")
+      _ <- deleteRiskingResultsFiles(filenames)
+    yield ()
 
   def viewRiskingResultsFile(
     filename: RiskingResultsFilename
@@ -107,3 +155,26 @@ class TestRiskingService @Inject() (
     "checkId" -> failure.checkId,
     "checkDescription" -> failure.checkDescription
   )
+
+object TestRiskingService:
+
+  private[testonly] def combineResultsJson(fileContents: Seq[(RiskingResultsFilename, String)]): JsArray = JsArray(fileContents.flatMap(parseRecords))
+
+  private[testonly] def parseRecordReferences(
+    filename: RiskingResultsFilename,
+    content: String
+  ): Seq[RiskingResultsRecord] = parseRecords((filename, content)).map: record =>
+    (record \ "recordType").as[String] match
+      case "Entity" => RiskingResultsRecord.ForApplication(ApplicationReference((record \ "applicationReference").as[String]))
+      case "Individual" => RiskingResultsRecord.ForPerson(PersonReference((record \ "personReference").as[String]))
+      case recordType => throw new IllegalArgumentException(s"Risking results file '${filename.value}' has a record of unknown type '$recordType'")
+
+  private def parseRecords(file: (RiskingResultsFilename, String)): Seq[JsValue] =
+    val (filename, content) = file
+    Json.parse(content).validate[JsArray].fold(
+      errors =>
+        throw new IllegalArgumentException(
+          s"Risking results file '${filename.value}' did not contain a JSON array: ${Json.stringify(JsError.toJson(errors))}"
+        ),
+      _.value.toIndexedSeq
+    )

@@ -1,0 +1,42 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsRecord
+
+@this()
+
+@(records: Seq[RiskingResultsRecord])
+
+@maxListedRecords = @{20}
+
+@recordText(record: RiskingResultsRecord) = @{
+    record match
+        case RiskingResultsRecord.ForApplication(applicationReference) => s"Application ${applicationReference.value}"
+        case RiskingResultsRecord.ForPerson(personReference) => s"Person ${personReference.value}"
+}
+
+@if(records.isEmpty) {
+    <p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">No records</p>
+} else {
+    <ul class="govuk-list govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">
+        @records.take(maxListedRecords).map { record =>
+            <li>@recordText(record)</li>
+        }
+        @if(records.size > maxListedRecords) {
+            <li>and @(records.size - maxListedRecords) more</li>
+        }
+    </ul>
+}

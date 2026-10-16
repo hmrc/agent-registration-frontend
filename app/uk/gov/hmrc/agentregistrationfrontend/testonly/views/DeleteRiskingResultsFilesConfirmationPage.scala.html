@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectRiskingResultsFilesForm
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 
 @this(
@@ -23,30 +25,41 @@
         govukButton: GovukButton
 )
 
-@()(implicit
+@(filenames: Seq[RiskingResultsFilename])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
+@fileCount: String = @{if (filenames.sizeIs > 1) s"${filenames.size} files" else "1 file"}
+
 @layout(
-    pageTitle = "Delete all risking results files",
+    pageTitle = "Delete processed risking results files",
     suppressBackLink = true
 ) {
-    <h1 class="govuk-heading-xl">Delete all risking results files</h1>
+    <h1 class="govuk-heading-xl">Delete processed risking results files</h1>
 
     @govukWarningText(WarningText(
         iconFallbackText = Some("Warning"),
-        content = Text("This will permanently delete every risking results file held by the test-only stub in the risking microservice. Applications and individuals are not affected. This cannot be undone.")
+        content = Text(s"This will permanently delete these $fileCount from the test-only stub in the risking microservice. This cannot be undone.")
     ))
 
-    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.deleteAllRiskingResultsFiles) {
+    <ul class="govuk-list govuk-list--bullet" id="files-to-delete">
+        @filenames.map { filename =>
+            <li>@filename.value</li>
+        }
+    </ul>
+
+    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.deleteSelectedRiskingResultsFiles) {
+        @filenames.map { filename =>
+            <input type="hidden" name="@{SelectRiskingResultsFilesForm.key}[]" value="@filename.value">
+        }
         @govukButton(Button(
-            content = Text("Delete all risking results files"),
+            content = Text(s"Delete $fileCount"),
             classes = "govuk-button--warning"
         ))
     }
 
     <p class="govuk-body">
-        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showTestOnlyHub">Cancel</a>
+        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles">Cancel</a>
     </p>
 }

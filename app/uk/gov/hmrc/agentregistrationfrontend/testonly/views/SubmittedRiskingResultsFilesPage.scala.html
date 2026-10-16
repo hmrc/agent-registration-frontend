@@ -15,25 +15,90 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectRiskingResultsFilesForm
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
+@import views.html.helper.CSPNonce
 
 @this(
         layout: TestOnlyLayout,
+        formWithCSRF: FormWithCSRF,
+        govukCheckboxes: GovukCheckboxes,
+        govukButton: GovukButton,
+        govukDetails: GovukDetails,
         govukTag: GovukTag
 )
 
 @(
         filenames: List[RiskingResultsFilename],
-        unprocessedFilenames: List[RiskingResultsFilename])(implicit
+        unprocessedFilenames: List[RiskingResultsFilename],
+        form: Form[Seq[RiskingResultsFilename]])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @unprocessedFilenamesSet = @{unprocessedFilenames.toSet}
 
+@label(filename: RiskingResultsFilename) = {
+    @filename.value
+    @if(unprocessedFilenamesSet.contains(filename)) {
+        @govukTag(Tag(content = Text("Unprocessed"), classes = "govuk-tag--yellow govuk-!-margin-left-2"))
+    } else {
+        @govukTag(Tag(content = Text("Processed"), classes = "govuk-tag--green govuk-!-margin-left-2"))
+    }
+    <a class="govuk-link govuk-!-margin-left-2" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)">View file</a>
+}
+
+@records(filename: RiskingResultsFilename) = {
+    @govukDetails(Details(
+        summary = Text("Records"),
+        content = HtmlContent("""<p class="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">Loading…</p>"""),
+        classes = "govuk-!-font-size-16 govuk-!-margin-bottom-0",
+        attributes = Map("data-records-url" -> AppRoutes.testOnly.TestOnlyController.showRiskingResultsFileRecords(filename).url)
+    ))
+}
+
+@dangerZoneSummary = {Danger zone@govukTag(Tag(content = Text("Destructive"), classes = "govuk-tag--red govuk-!-margin-left-2"))}
+
+@dangerZoneButtons = {
+    <div class="govuk-button-group govuk-!-margin-bottom-0">
+        @govukButton(Button(
+            content = Text("Delete selected processed files"),
+            classes = "govuk-button--warning",
+            attributes = Map("formaction" -> AppRoutes.testOnly.TestOnlyController.confirmDeleteSelectedRiskingResultsFiles.url)
+        ))
+        @govukButton(Button(
+            content = Text("Delete all processed files"),
+            classes = "govuk-button--warning",
+            attributes = Map("formaction" -> AppRoutes.testOnly.TestOnlyController.confirmDeleteAllProcessedRiskingResultsFiles.url)
+        ))
+    </div>
+}
+
+@loadRecordsOnOpen = {
+    <script @CSPNonce.attr>
+        document.querySelectorAll("details[data-records-url]").forEach(details => {
+            details.addEventListener("toggle", () => {
+                if (!details.open || details.dataset.loaded) return;
+                details.dataset.loaded = "true";
+                const text = details.querySelector(".govuk-details__text");
+                fetch(details.dataset.recordsUrl)
+                    .then(response => response.ok ? response.text() : Promise.reject(response.status))
+                    .then(html => { text.innerHTML = html; })
+                    .catch(() => {
+                        text.textContent = "Could not load the records.";
+                        delete details.dataset.loaded;
+                    });
+            });
+        });
+    </script>
+}
+
 @layout(
     pageTitle = "View risking results files",
-    suppressBackLink = true
+    maybeForm = Some(form),
+    suppressBackLink = true,
+    templateScripts = Some(loadRecordsOnOpen)
 ) {
 
     <h1 class="govuk-heading-l">View risking results files</h1>
@@ -41,17 +106,35 @@
     @if(filenames.isEmpty) {
         <p class="govuk-body">No risking results files have been submitted yet.</p>
     } else {
-        <ul class="govuk-list">
-            @filenames.map { filename =>
-                <li>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"><code>@filename.value</code></a>
-                    @if(unprocessedFilenamesSet.contains(filename)) {
-                        @govukTag(Tag(content = Text("Unprocessed"), classes = "govuk-tag--yellow"))
-                    } else {
-                        @govukTag(Tag(content = Text("Processed"), classes = "govuk-tag--green"))
-                    }
-                </li>
-            }
-        </ul>
+        @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.combineRiskingResultsFiles) {
+            @govukCheckboxes(Checkboxes(
+                fieldset = Some(Fieldset(
+                    legend = Some(Legend(content = Text("Risking results files"), classes = "govuk-visually-hidden"))
+                )),
+                classes = "govuk-checkboxes--small",
+                items = filenames.map { filename =>
+                    CheckboxItem(
+                        value = filename.value,
+                        content = HtmlContent(label(filename)),
+                        hint = Some(Hint(content = HtmlContent(records(filename))))
+                    )
+                }
+            ).withFormField(form(SelectRiskingResultsFilesForm.key)))
+
+            <div class="govuk-button-group">
+                @govukButton(Button(content = Text("Combine selected unprocessed files")))
+                @govukButton(Button(
+                    content = Text("Combine all unprocessed files"),
+                    classes = "govuk-button--secondary",
+                    attributes = Map("formaction" -> AppRoutes.testOnly.TestOnlyController.combineAllUnprocessedRiskingResultsFiles.url)
+                ))
+            </div>
+
+            @govukDetails(Details(
+                id = Some("danger-zone"),
+                summary = HtmlContent(dangerZoneSummary),
+                content = HtmlContent(dangerZoneButtons)
+            ))
+        }
     }
 }

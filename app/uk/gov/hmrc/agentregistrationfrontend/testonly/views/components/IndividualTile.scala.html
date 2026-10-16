@@ -23,6 +23,7 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -44,7 +45,7 @@
 @(
         individual: IndividualProvidedDetails,
         agentApplication: AgentApplication,
-        submittedRiskingResultsFilenames: List[RiskingResultsFilename],
+        findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse,
         unprocessedRiskingResultsFilenames: List[RiskingResultsFilename])(implicit
         requestHeader: RequestHeader
 )
@@ -54,13 +55,11 @@
 
 @individualCurrentFilename = @{TestRiskingResultsFilename.individual(individual, agentApplication)}
 
-@individualSubmittedFiles = @{
-    submittedRiskingResultsFilenames.filter(_.value.startsWith(s"test-only-individual-${individual.personReference.value}"))
-}
+@individualResultsFilename: Option[RiskingResultsFilename] = @{TestRiskingResultsFilename.individualResultsFilename(individual, findRiskingResultsFilesResponse)}
 
-@individualCurrentFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualCurrentFilename)}
+@individualResultsSubmitted: Boolean = @{TestRiskingResultsFilename.individualResultsSubmitted(individual, agentApplication, findRiskingResultsFilesResponse, unprocessedRiskingResultsFilenames)}
 
-@unprocessedRiskingResultsFilenamesSet = @{unprocessedRiskingResultsFilenames.toSet}
+@unprocessedRiskingResultsFilenamesSet: Set[RiskingResultsFilename] = @{unprocessedRiskingResultsFilenames.toSet}
 
 @fileStatusTag(filename: RiskingResultsFilename) = @{
     if (unprocessedRiskingResultsFilenamesSet.contains(filename))
@@ -78,7 +77,7 @@
 
 @showIndividualActionLinks = @{
     agentApplication.applicationState match {
-        case ApplicationState.SentToMinerva => !individualCurrentFileSubmitted && individualOutcomeAllowsLinks
+        case ApplicationState.SentToMinerva => !individualResultsSubmitted && individualOutcomeAllowsLinks
         case _ => false
     }
 }
@@ -192,16 +191,12 @@
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresNonFixable(individual.personReference, individualCurrentFilename)">fail-non-fixable</a>
         </p>
     }
-    @if(individualSubmittedFiles.nonEmpty) {
-        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Risking results files</h3>
-        <ul class="govuk-list govuk-!-margin-bottom-2">
-            @individualSubmittedFiles.map { filename =>
-                <li>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"><code>@filename.value</code></a>
-                    @fileStatusTag(filename)
-                </li>
-            }
-        </ul>
+    @individualResultsFilename.map { riskingResultsFilename =>
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Risking results file</h3>
+        <p class="govuk-body govuk-!-margin-bottom-2">
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(riskingResultsFilename)"><code>@riskingResultsFilename.value</code></a>
+            @fileStatusTag(riskingResultsFilename)
+        </p>
     }
     </div>
 }

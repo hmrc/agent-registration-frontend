@@ -21,6 +21,9 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
+import uk.gov.hmrc.agentregistration.shared.testonly.RiskingResultsFileName
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Instant
 import java.time.ZoneOffset
@@ -37,12 +40,15 @@ object TestRiskingResultsFilename:
 
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmssSSS'Z'").withZone(ZoneOffset.UTC)
 
+  /** Filename for a synthetic test-only results file that combines the records of selected results files into one larger file. */
+  def combined(now: Instant): RiskingResultsFilename = RiskingResultsFilename(s"test-only-combined-${formatter.format(now)}")
+
   /** The filename the entity's current round of risking results is/would be submitted under, derived entirely from the application's own persisted state: the
     * canonical (no-suffix) name unless the entity is currently FailedFixable and a real resubmission (`RiskingOutcomeApplication.FailedFixable.reSubmittedAt`)
     * has happened, in which case that resubmission's own timestamp is used.
     */
   def entity(agentApplication: AgentApplication): RiskingResultsFilename =
-    val reSubmittedAt = currentReSubmittedAtFor(agentApplication.riskingOutcomeEntity.exists(isFailedFixable), agentApplication)
+    val reSubmittedAt = entityRoundStartedAt(agentApplication)
     RiskingResultsFilename(s"test-only-entity-${agentApplication.applicationReference.value}${suffix(reSubmittedAt)}")
 
   /** As [[entity]], but for one of the application's individuals. */
@@ -50,8 +56,85 @@ object TestRiskingResultsFilename:
     individualProvidedDetails: IndividualProvidedDetails,
     agentApplication: AgentApplication
   ): RiskingResultsFilename =
-    val reSubmittedAt = currentReSubmittedAtFor(individualProvidedDetails.riskingOutcomeIndividual.exists(isFailedFixable), agentApplication)
+    val reSubmittedAt = individualRoundStartedAt(individualProvidedDetails, agentApplication)
     RiskingResultsFilename(s"test-only-individual-${individualProvidedDetails.personReference.value}${suffix(reSubmittedAt)}")
+
+  /** The risking results file holding the entity's record, whatever the file is called. */
+  def entityResultsFilename(
+    agentApplication: AgentApplication,
+    findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse
+  ): Option[RiskingResultsFilename] = findRiskingResultsFilesResponse
+    .fileNameByApplicationReference
+    .get(agentApplication.applicationReference)
+    .map(toRiskingResultsFilename)
+
+  /** As [[entityResultsFilename]], but for one of the application's individuals. */
+  def individualResultsFilename(
+    individualProvidedDetails: IndividualProvidedDetails,
+    findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse
+  ): Option[RiskingResultsFilename] = findRiskingResultsFilesResponse
+    .fileNameByPersonReference
+    .get(individualProvidedDetails.personReference)
+    .map(toRiskingResultsFilename)
+
+  /** Whether the entity's results for its current round are in the file holding its record. */
+  def entityResultsSubmitted(
+    agentApplication: AgentApplication,
+    findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse,
+    unprocessedRiskingResultsFilenames: List[RiskingResultsFilename]
+  ): Boolean = entityResultsFilename(agentApplication, findRiskingResultsFilesResponse).exists((riskingResultsFilename: RiskingResultsFilename) =>
+    inCurrentRound(
+      riskingResultsFilename = riskingResultsFilename,
+      roundStartedAt = entityRoundStartedAt(agentApplication),
+      currentRoundFilename = entity(agentApplication),
+      unprocessedRiskingResultsFilenames = unprocessedRiskingResultsFilenames
+    )
+  )
+
+  /** As [[entityResultsSubmitted]], but for one of the application's individuals. */
+  def individualResultsSubmitted(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplication: AgentApplication,
+    findRiskingResultsFilesResponse: FindRiskingResultsFilesResponse,
+    unprocessedRiskingResultsFilenames: List[RiskingResultsFilename]
+  ): Boolean = individualResultsFilename(individualProvidedDetails, findRiskingResultsFilesResponse).exists((riskingResultsFilename: RiskingResultsFilename) =>
+    inCurrentRound(
+      riskingResultsFilename = riskingResultsFilename,
+      roundStartedAt = individualRoundStartedAt(individualProvidedDetails, agentApplication),
+      currentRoundFilename = individual(individualProvidedDetails, agentApplication),
+      unprocessedRiskingResultsFilenames = unprocessedRiskingResultsFilenames
+    )
+  )
+
+  /** Every file belongs to the first round. The previous round's file has been processed and is named differently, so after a resubmission a file belongs to
+    * the current round if it has the current round's name or is not processed yet.
+    */
+  private def inCurrentRound(
+    riskingResultsFilename: RiskingResultsFilename,
+    roundStartedAt: Option[Instant],
+    currentRoundFilename: RiskingResultsFilename,
+    unprocessedRiskingResultsFilenames: List[RiskingResultsFilename]
+  ): Boolean =
+    roundStartedAt.isEmpty
+      || riskingResultsFilename === currentRoundFilename
+      || unprocessedRiskingResultsFilenames.contains(riskingResultsFilename)
+
+  private def toRiskingResultsFilename(riskingResultsFileName: RiskingResultsFileName): RiskingResultsFilename = RiskingResultsFilename(
+    riskingResultsFileName.value
+  )
+
+  private def entityRoundStartedAt(agentApplication: AgentApplication): Option[Instant] = currentReSubmittedAtFor(
+    agentApplication.riskingOutcomeEntity.exists(isFailedFixable),
+    agentApplication
+  )
+
+  private def individualRoundStartedAt(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplication: AgentApplication
+  ): Option[Instant] = currentReSubmittedAtFor(
+    individualProvidedDetails.riskingOutcomeIndividual.exists(isFailedFixable),
+    agentApplication
+  )
 
   private def isFailedFixable(outcome: RiskingOutcomeEntity): Boolean =
     outcome match
