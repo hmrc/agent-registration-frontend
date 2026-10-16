@@ -205,7 +205,7 @@ extends FrontendControllerBase(mcc):
         Ok(riskingActionConfirmationPage(
           heading = "Deletion scheduler ran",
           description =
-            "This deletes Expired applications whose postExpiryGracePeriodEndsAt has passed, together with their individuals." +
+            "This deletes Expired applications whose postExpiryGracePeriodEndsAt has passed, together with their individuals and their AMLS evidence in object-store." +
               " Runs on agent-registration. In production this runs daily via the scheduler;" +
               " this test-only endpoint triggers it on demand."
         ))

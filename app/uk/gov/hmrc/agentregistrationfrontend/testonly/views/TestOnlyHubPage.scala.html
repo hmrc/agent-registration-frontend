@@ -116,7 +116,7 @@
     @compactLink(
         label = "Run deletion scheduler",
         url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler,
-        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals")
+        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals and their AMLS evidence in object-store")
     )
 
     @if(appConfig.TestOnly.allowResetDatabase) {
