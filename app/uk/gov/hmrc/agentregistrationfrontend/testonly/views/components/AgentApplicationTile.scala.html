@@ -37,6 +37,7 @@
         entityFixesGroup: EntityFixesGroup,
         entityFailuresGroup: EntityFailuresGroup,
         compactLink: CompactLink,
+        actionButton: ActionButton,
         identifier: Identifier,
         businessDetailsFields: BusinessDetailsFields,
         govukTag: GovukTag,
@@ -265,6 +266,33 @@
                 <dd class="govuk-summary-list__value">@formatInstant(expiresAt)</dd>
             </div>
         }
+        @agentApplication.postExpiryGracePeriodEndsAt.map { gracePeriodEndsAt =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Post-expiry grace period ends at</dt>
+                <dd class="govuk-summary-list__value">@formatInstant(gracePeriodEndsAt)</dd>
+            </div>
+        }
+        <div class="govuk-summary-list__row" id="timers">
+            <dt class="govuk-summary-list__key">Timers</dt>
+            <dd class="govuk-summary-list__value">
+                @actionButton(
+                    label = "Expire application now",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.expireApplicationNow(agentApplication.applicationReference),
+                    enabled = agentApplication.applicationExpiresAt.isDefined,
+                    disabledHint = Some("only Started and GrsDataReceived applications have applicationExpiresAt"),
+                    id = Some("expire-application-now")
+                )
+                <p class="govuk-hint">moves applicationExpiresAt one minute into the past, so "Run expiry scheduler" in the top bar picks this application up</p>
+                @actionButton(
+                    label = "End post-expiry grace period now",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.endPostExpiryGracePeriodNow(agentApplication.applicationReference),
+                    enabled = agentApplication.postExpiryGracePeriodEndsAt.isDefined,
+                    disabledHint = Some("only Expired applications have postExpiryGracePeriodEndsAt"),
+                    id = Some("end-post-expiry-grace-period-now")
+                )
+                <p class="govuk-hint govuk-!-margin-bottom-0">moves postExpiryGracePeriodEndsAt one minute into the past, so "Run deletion scheduler" in the top bar deletes this application</p>
+            </dd>
+        </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Provide details link</dt>
             <dd class="govuk-summary-list__value">

@@ -106,8 +106,9 @@
     <p class="govuk-body">
         These trigger background scheduled jobs on <code class="govuk-!-font-size-16">agent-registration</code>.
         In prod they run on a timer; here you can fire them on demand.
-        To exercise the whole flow locally, drop <code class="govuk-!-font-size-16">days-to-submit-application</code>
-        and <code class="govuk-!-font-size-16">post-expiry-grace-period</code> in config to short values (e.g. minutes).
+        To exercise the whole flow on one application, use the Timers buttons on its details page to move
+        <code class="govuk-!-font-size-16">applicationExpiresAt</code> and <code class="govuk-!-font-size-16">postExpiryGracePeriodEndsAt</code>
+        into the past, then run the schedulers from the top bar.
     </p>
     @compactLink(
         label = "Run expiry scheduler",
