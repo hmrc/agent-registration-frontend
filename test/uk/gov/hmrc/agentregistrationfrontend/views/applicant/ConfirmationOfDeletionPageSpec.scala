@@ -50,11 +50,26 @@ extends ViewSpec:
     val startAgainLink: TestLink =
       doc
         .mainContent
-        .select("a.govuk-link")
-        .get(0)
+        .selectOrFail("a.govuk-link[href='/agent-registration/apply']")
+        .selectOnlyOneElementOrFail()
         .toLink
 
     startAgainLink shouldBe TestLink(
       text = "start a new application",
       href = "/agent-registration/apply"
+    )
+
+  "ConfirmationOfDeletionPage should contain a link to finish and sign out" in:
+    val startAgainLink: TestLink =
+      doc
+        .mainContent
+        .selectOrFail(
+          "a.govuk-link[href=/agent-registration/sign-out-with-continue?continueUrl=http%3A%2F%2Flocalhost%3A19001%2Fagent-registration%2Fsigned-out]"
+        )
+        .selectOnlyOneElementOrFail()
+        .toLink
+
+    startAgainLink shouldBe TestLink(
+      text = "Finish and sign out",
+      href = "/agent-registration/sign-out-with-continue?continueUrl=http%3A%2F%2Flocalhost%3A19001%2Fagent-registration%2Fsigned-out"
     )

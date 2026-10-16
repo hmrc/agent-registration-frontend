@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.readHasDeletedApplication
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -103,20 +102,11 @@ extends FrontendController(mcc, actions):
   def applicationDeleted: Action[AnyContent] =
     actions.authorised
       .ensure(
-        condition = implicit request => request.readHasDeletedApplication.contains(true),
-        resultWhenConditionNotMet =
-          implicit request =>
-            logger.info("User tried to access the application deleted page without having deleted an application in this session")
-            Redirect(AppRoutes.apply.AgentApplicationController.landing)
-      )
-      .ensure(
         condition =
           implicit request =>
             agentApplicationService
               .find()
-              .map:
-                case Some(_) => false
-                case None => true,
+              .map(_.isEmpty),
         resultWhenConditionNotMet =
           implicit request =>
             logger.info("User with an application tried to access the application deleted page")

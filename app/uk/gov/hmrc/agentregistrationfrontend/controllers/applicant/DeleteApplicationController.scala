@@ -25,23 +25,22 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmDeleteApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmDeleteAndStartAgainPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeleteApplicationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class ConfirmDeleteAndStartAgainController @Inject() (
+class DeleteApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  view: ConfirmDeleteAndStartAgainPage,
+  view: DeleteApplicationPage,
   applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithApplicationAndBpr] = actions.getApplicationAfterSentForRisking
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions.getApplication
     .ensure(
       condition = request => request.agentApplication.applicationState === ApplicationState.RiskingCompleted,
       resultWhenConditionNotMet = _ => Redirect(AppRoutes.apply.AgentApplicationController.landing.url)
@@ -65,6 +64,6 @@ extends FrontendController(mcc, actions):
           applicationService
             .deleteAndStartAgain()
             .map: _ =>
-              Redirect(AppRoutes.apply.AgentApplicationController.applicationDeleted.url).addToSession(confirmDeleteApplication)
+              Redirect(AppRoutes.apply.AgentApplicationController.applicationDeleted.url)
         else
           Future.successful(Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus.url))

@@ -128,5 +128,5 @@ extends ViewSpec:
 
       deleteLink shouldBe TestLink(
         text = "Delete this application and start again",
-        href = "/agent-registration/apply/start-again"
+        href = "/agent-registration/apply/delete-application"
       )

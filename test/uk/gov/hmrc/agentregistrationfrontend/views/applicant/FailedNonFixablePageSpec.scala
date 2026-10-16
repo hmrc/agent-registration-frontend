@@ -183,7 +183,7 @@ extends ViewSpec:
 
       deleteApplicationLink shouldBe TestLink(
         text = "delete this application and apply again",
-        href = "/agent-registration/apply/start-again"
+        href = "/agent-registration/apply/delete-application"
       )
 
     "should contain a link to the appeals guidance" in:

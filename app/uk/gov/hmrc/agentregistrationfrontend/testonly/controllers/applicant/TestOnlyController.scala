@@ -165,10 +165,3 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok("agent applicationId added to session")
         .addToSession(agentApplicationId)
-
-  def addHasDeletedApplicationToSession(
-    hasDeleted: Boolean
-  ): Action[AnyContent] = actions.action:
-    implicit request =>
-      Ok("has deleted application added to session")
-        .addToSession(hasDeleted)

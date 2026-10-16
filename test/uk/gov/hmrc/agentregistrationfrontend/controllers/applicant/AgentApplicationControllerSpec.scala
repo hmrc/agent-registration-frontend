@@ -69,34 +69,20 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"GET $applicationDeletedPath should return OK when hasDeleted is in session and no application exists" in:
+  s"GET $applicationDeletedPath should return OK when no application exists" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplicationNoContent()
-    val response: WSResponse = get(
-      uri = applicationDeletedPath,
-      cookies = addHasDeletedApplicationToSession(hasDeleted = true).extractCookies
-    )
+    val response: WSResponse = get(applicationDeletedPath)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "We have deleted your application - Apply for an agent services account - GOV.UK"
     AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
 
-  s"GET $applicationDeletedPath should redirect to landing page when hasDeleted is not in session" in:
-    AuthStubs.stubAuthorise()
-    val response: WSResponse = get(applicationDeletedPath)
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.landing.url
-    AuthStubs.verifyAuthorise()
-
-  s"GET $applicationDeletedPath should redirect to landing page when session says hasDeleted but an application still exists" in:
+  s"GET $applicationDeletedPath should redirect to landing page when an application still exists" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.submitted)
-    val response: WSResponse = get(
-      uri = applicationDeletedPath,
-      cookies = addHasDeletedApplicationToSession(hasDeleted = true).extractCookies
-    )
+    val response: WSResponse = get(applicationDeletedPath)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
