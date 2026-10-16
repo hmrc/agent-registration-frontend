@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
         val agentApplication: IsNotSoleTrader = request.get
         individualProvideDetailsService
           .findAllOtherRelevantIndividualsByApplicationId(agentApplication.agentApplicationId)
-          .map(individualProvidedDetailsList => individualProvidedDetailsList.find(_._id === individualProvidedDetailsId))
+          .map(_.find(_._id === individualProvidedDetailsId))
           .map[RequestWithData[DataWithIndividual] | Result]:
             case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
             case None =>
