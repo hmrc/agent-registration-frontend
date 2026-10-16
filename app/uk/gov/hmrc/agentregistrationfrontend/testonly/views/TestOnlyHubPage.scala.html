@@ -113,6 +113,11 @@
         url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler,
         hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period")
     )
+    @compactLink(
+        label = "Run deletion scheduler",
+        url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler,
+        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals and their AMLS evidence in object-store")
+    )
 
     @if(appConfig.TestOnly.allowResetDatabase) {
         <h2 class="govuk-heading-m govuk-!-margin-top-6">

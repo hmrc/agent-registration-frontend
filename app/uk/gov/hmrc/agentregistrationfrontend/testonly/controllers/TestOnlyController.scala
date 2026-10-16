@@ -191,6 +191,17 @@ extends FrontendControllerBase(mcc):
               " this test-only endpoint triggers it on demand."
         ))
 
+  def runDeletionScheduler: Action[AnyContent] = action.async:
+    implicit request =>
+      testApplicationService.runDeletionScheduler().map: _ =>
+        Ok(riskingActionConfirmationPage(
+          heading = "Deletion scheduler ran",
+          description =
+            "This deletes Expired applications whose postExpiryGracePeriodEndsAt has passed, together with their individuals and their AMLS evidence in object-store." +
+              " Runs on agent-registration. In production this runs daily via the scheduler;" +
+              " this test-only endpoint triggers it on demand."
+        ))
+
   def viewNextRiskingFileContents: Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
