@@ -4,12 +4,14 @@ GET         /                                                          uk.gov.hm
 
 # Sign out routes
 GET         /sign-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
+GET         /signed-out                                                uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signedOut
 GET         /sign-out-with-continue                                    uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOutWithContinue(continueUrl: RedirectUrl)
 GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
 GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
 GET         /application-status                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationStatus
 GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewSubmittedApplication
+GET         /application-deleted                                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationDeleted
 
 # Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.startRegistration
@@ -23,6 +25,8 @@ GET         /apply/not-agent-credential                             uk.gov.hmrc.
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
 GET         /apply/agent-already-subscribed                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AgentAlreadySubscribedController.show
+GET         /apply/delete-application                                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeleteApplicationController.show
+POST        /apply/delete-application                                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeleteApplicationController.submit
 
 ## About your business routes
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show

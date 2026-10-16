@@ -131,7 +131,7 @@ extends ViewSpec:
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
-           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
            |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).
            |Print this page
            |"""
@@ -173,6 +173,19 @@ extends ViewSpec:
         .select("p")
         .text() shouldBe "Records indicate that Beverly Hills has a relevant unspent criminal conviction."
 
+    "should contain a link to delete the application and apply again" in:
+      val deleteApplicationLink: TestLink =
+        docWithIndividualNonFixableFailures
+          .mainContent
+          .select("li#delete-application > a")
+          .get(0)
+          .toLink
+
+      deleteApplicationLink shouldBe TestLink(
+        text = "delete this application and apply again",
+        href = "/agent-registration/apply/delete-application"
+      )
+
     "should contain a link to the appeals guidance" in:
       val hmrcStandardLink: TestLink =
         docWithIndividualNonFixableFailures
@@ -200,7 +213,7 @@ extends ViewSpec:
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
-           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
            |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).
            |Print this page
            |"""
@@ -238,7 +251,7 @@ extends ViewSpec:
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
-           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+           |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
            |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).
            |Print this page
            |"""

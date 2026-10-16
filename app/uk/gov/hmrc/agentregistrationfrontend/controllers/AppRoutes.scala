@@ -65,6 +65,7 @@ object AppRoutes:
     val HmrcStandardForAgentsController = applyRoutes.HmrcStandardForAgentsController
     val DeclarationController = applyRoutes.DeclarationController
     val NotAgentLoginController = applyRoutes.NotAgentLoginController
+    val DeleteApplicationController = applyRoutes.DeleteApplicationController
 
     object aboutyourbusiness:
 

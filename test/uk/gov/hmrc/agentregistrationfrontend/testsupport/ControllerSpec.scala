@@ -73,3 +73,7 @@ extends ISpec,
   def addIndividualNameToSession(individualName: String): WSResponse = get(
     s"/agent-registration/test-only/add-individual-name/${individualName}"
   )
+
+  def addHasDeletedApplicationToSession(hasDeleted: Boolean): WSResponse = get(
+    s"/agent-registration/test-only/add-has-deleted-application/${hasDeleted.toString}"
+  )

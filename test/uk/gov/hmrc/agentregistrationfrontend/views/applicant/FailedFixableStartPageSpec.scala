@@ -66,6 +66,7 @@ extends ViewSpec:
            |Keep a copy of this decision for your records.
            |If you disagree with our decision to refuse your application, you can request a review or appeal the decision (opens in a new tab).
            |You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+           |Delete this application and start again
            |"""
           .stripMargin
 
@@ -90,6 +91,7 @@ extends ViewSpec:
            |Keep a copy of this decision for your records.
            |If you disagree with our decision to refuse your application, you can request a review or appeal the decision (opens in a new tab).
            |You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+           |Delete this application and start again
            |"""
           .stripMargin
 
@@ -114,4 +116,17 @@ extends ViewSpec:
       appealsLink shouldBe TestLink(
         text = "request a review or appeal the decision (opens in a new tab)",
         href = "https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"
+      )
+
+    "should contain a button link to delete and start again" in:
+      val deleteLink: TestLink =
+        doc
+          .mainContent
+          .selectOrFail("a.govuk-button.govuk-button--secondary")
+          .get(0)
+          .toLink
+
+      deleteLink shouldBe TestLink(
+        text = "Delete this application and start again",
+        href = "/agent-registration/apply/delete-application"
       )
