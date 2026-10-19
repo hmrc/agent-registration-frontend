@@ -24,15 +24,23 @@
 
 <nav class="test-only-quick-nav govuk-!-margin-bottom-5" aria-label="Quick navigation">
     <ul class="govuk-list govuk-!-margin-bottom-0">
-        <li><a class="govuk-link" id="quick-nav-recent-applications" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications(1, 15)">Recent applications</a></li>
-        <li><a class="govuk-link" id="quick-nav-fast-forward" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward</a></li>
-        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-start-registration" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a></li>
-        <li><a class="govuk-link" id="quick-nav-task-list" href="@AppRoutes.apply.TaskListController.show">Task list page</a></li>
-        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-run-risking" href="@AppRoutes.testOnly.TestOnlyController.runRiskingAndRedirect(RedirectUrl(requestHeader.uri))">Run risking</a></li>
-        <li><a class="govuk-link" id="quick-nav-view-next-risking-file-contents" href="@AppRoutes.testOnly.TestOnlyController.viewNextRiskingFileContents">View next risking file contents</a></li>
-        <li><a class="govuk-link" id="quick-nav-run-results-file-processing" href="@AppRoutes.testOnly.TestOnlyController.runResultsFileProcessingAndRedirect(RedirectUrl(requestHeader.uri))">Run results file processing</a></li>
-        <li><a class="govuk-link" id="quick-nav-risking-results-files" href="@AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles">View risking results files</a></li>
-        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-run-expiry-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(requestHeader.uri))">Run expiry scheduler</a></li>
-        <li><a class="govuk-link" id="quick-nav-run-deletion-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(requestHeader.uri))">Run deletion scheduler</a></li>
+        <li class="test-only-quick-nav-group">
+            <a class="govuk-link" id="quick-nav-recent-applications" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications(1, 15)">Recent applications</a>
+            <a class="govuk-link" id="quick-nav-fast-forward" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward</a>
+        </li>
+        <li class="test-only-quick-nav-group">
+            <a class="govuk-link" id="quick-nav-start-registration" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a>
+            <a class="govuk-link" id="quick-nav-task-list" href="@AppRoutes.apply.TaskListController.show">Task list page</a>
+        </li>
+        <li class="test-only-quick-nav-group">
+            <a class="govuk-link" id="quick-nav-run-risking" href="@AppRoutes.testOnly.TestOnlyController.runRiskingAndRedirect(RedirectUrl(requestHeader.uri))">Run risking</a>
+            <a class="govuk-link" id="quick-nav-view-next-risking-file-contents" href="@AppRoutes.testOnly.TestOnlyController.viewNextRiskingFileContents">View next risking file contents</a>
+            <a class="govuk-link" id="quick-nav-run-results-file-processing" href="@AppRoutes.testOnly.TestOnlyController.runResultsFileProcessingAndRedirect(RedirectUrl(requestHeader.uri))">Run results file processing</a>
+            <a class="govuk-link" id="quick-nav-risking-results-files" href="@AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles">View risking results files</a>
+        </li>
+        <li class="test-only-quick-nav-group">
+            <a class="govuk-link" id="quick-nav-run-expiry-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(requestHeader.uri))">Run expiry scheduler</a>
+            <a class="govuk-link" id="quick-nav-run-deletion-scheduler" href="@AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(requestHeader.uri))">Run deletion scheduler</a>
+        </li>
     </ul>
 </nav>
