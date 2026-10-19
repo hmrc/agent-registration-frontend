@@ -38,6 +38,7 @@
         entityFixesGroup: EntityFixesGroup,
         entityFailuresGroup: EntityFailuresGroup,
         compactLink: CompactLink,
+        actionButton: ActionButton,
         identifier: Identifier,
         businessDetailsFields: BusinessDetailsFields,
         govukTag: GovukTag,
@@ -264,6 +265,29 @@
                 <dd class="govuk-summary-list__value">@formatInstant(expiresAt)</dd>
             </div>
         }
+        @agentApplication.postExpiryGracePeriodEndsAt.map { gracePeriodEndsAt =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Post-expiry grace period ends at</dt>
+                <dd class="govuk-summary-list__value">@formatInstant(gracePeriodEndsAt)</dd>
+            </div>
+        }
+        <div class="govuk-summary-list__row" id="timers">
+            <dt class="govuk-summary-list__key">Timers</dt>
+            <dd class="govuk-summary-list__value">
+                @actionButton(
+                    label = "Expire application now",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.expireApplicationNow(agentApplication.applicationReference),
+                    enabled = agentApplication.applicationExpiresAt.isDefined,
+                    id = Some("expire-application-now")
+                )
+                @actionButton(
+                    label = "End post-expiry grace period now",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.endPostExpiryGracePeriodNow(agentApplication.applicationReference),
+                    enabled = agentApplication.postExpiryGracePeriodEndsAt.isDefined,
+                    id = Some("end-post-expiry-grace-period-now")
+                )
+            </dd>
+        </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Provide details link</dt>
             <dd class="govuk-summary-list__value">

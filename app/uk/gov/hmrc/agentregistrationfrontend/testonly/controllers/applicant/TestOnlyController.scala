@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
+import com.softwaremill.quicklens.*
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -40,6 +41,8 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetail
 import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
@@ -53,7 +56,8 @@ class TestOnlyController @Inject() (
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
-  testRiskingService: TestRiskingService
+  testRiskingService: TestRiskingService,
+  clock: Clock
 )
 extends FrontendController(mcc, actions):
 
@@ -119,6 +123,27 @@ extends FrontendController(mcc, actions):
           findRiskingResultsFilesResponse = findRiskingResultsFilesResponse,
           unprocessedRiskingResultsFilenames = unprocessedRiskingResultsFilenames
         ))
+
+  def expireApplicationNow(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions
+    .getApplication(applicationReference)
+    .async:
+      implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+        val oneMinuteAgo: Instant = Instant.now(clock).minusSeconds(60)
+        testAgentRegistrationConnector
+          .upsertAgentApplication(request.get[AgentApplication].modify(_.applicationExpiresAt).using(_.map(_ => oneMinuteAgo)))
+          .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
+
+  def endPostExpiryGracePeriodNow(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions
+    .getApplication(applicationReference)
+    .async:
+      implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+        val oneMinuteAgo: Instant = Instant.now(clock).minusSeconds(60)
+        testAgentRegistrationConnector
+          .upsertAgentApplication(request.get[AgentApplication].modify(_.postExpiryGracePeriodEndsAt).using(_.map(_ => oneMinuteAgo)))
+          .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
+
+  private def applicationDetailsUrlWithTimersAnchor(applicationReference: ApplicationReference): String =
+    s"${AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference).url}#timers"
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication

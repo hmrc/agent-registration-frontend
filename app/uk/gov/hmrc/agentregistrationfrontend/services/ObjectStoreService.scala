@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
 import sttp.model.Uri
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
@@ -38,15 +39,13 @@ class ObjectStoreService @Inject() (
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  private def evidenceDirectory(fileReference: FileUploadReference): Path.Directory = Path.Directory(fileReference.value)
-
   def getEvidenceDownloadUrl(fileReference: FileUploadReference)(using request: RequestHeader): Future[Option[PresignedDownloadUrl]] =
     for
-      objects <- playObjectStoreClient.listObjects(evidenceDirectory(fileReference))
+      objects <- playObjectStoreClient.listObjects(AmlsEvidence.objectStoreDirectory(fileReference))
       url <-
         objects.objectSummaries.headOption match
           case Some(objectListing) =>
-            val path = evidenceDirectory(fileReference).file(objectListing.location.fileName)
+            val path = AmlsEvidence.objectStoreDirectory(fileReference).file(objectListing.location.fileName)
             playObjectStoreClient.presignedDownloadUrl(path).map(Some(_))
           case None => Future.successful(None)
     yield url
@@ -67,7 +66,7 @@ extends RequestAwareLogging:
     checksum: String,
     fileName: String
   )(using request: RequestHeader): Future[Path.File] =
-    val fileLocation: Path.File = evidenceDirectory(fileReference).file(fileName)
+    val fileLocation: Path.File = AmlsEvidence.objectStoreDirectory(fileReference).file(fileName)
     val contentSha256 = Sha256Checksum.fromHex(checksum)
     playObjectStoreClient.uploadFromUrl(
       from = downloadUrl.toJavaUri.toURL,

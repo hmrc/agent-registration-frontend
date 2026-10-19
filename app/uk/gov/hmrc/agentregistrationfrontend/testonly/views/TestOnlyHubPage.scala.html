@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.components.CompactLink
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(
         appConfig: AppConfig,
@@ -105,13 +106,19 @@
     <p class="govuk-body">
         These trigger background scheduled jobs on <code class="govuk-!-font-size-16">agent-registration</code>.
         In prod they run on a timer; here you can fire them on demand.
-        To exercise the whole flow locally, drop <code class="govuk-!-font-size-16">days-to-submit-application</code>
-        and <code class="govuk-!-font-size-16">post-expiry-grace-period</code> in config to short values (e.g. minutes).
+        To exercise the whole flow on one application, use the Timers buttons on its details page to move
+        <code class="govuk-!-font-size-16">applicationExpiresAt</code> and <code class="govuk-!-font-size-16">postExpiryGracePeriodEndsAt</code>
+        into the past, then run the schedulers from the top bar.
     </p>
     @compactLink(
         label = "Run expiry scheduler",
-        url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler,
+        url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(request.uri)),
         hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period")
+    )
+    @compactLink(
+        label = "Run deletion scheduler",
+        url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(request.uri)),
+        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals and their AMLS evidence in object-store")
     )
 
     @if(appConfig.TestOnly.allowResetDatabase) {
