@@ -352,7 +352,7 @@ linkStartPage.p1=Rydych wedi creu rhestr o bobl sy’n berthnasol i’r cais hwn
 linkStartPage.p2=Mae angen i bawb rydych wedi rhoi gwybod i ni amdanynt fewngofnodi i gadarnhau pwy ydyn nhw.
 linkStartPage.p3=Byddwn yn rhoi cysylltiad i chi ei rannu â’r bobl hyn.
 linkStartPage.important.h2=Pwysig
-linkStartPage.important.p1=Mae angen i bawb ar y rhestr ddefnyddio’r cysylltiad i fewngofnodi erbyn <strong>{0}</strong>.
+linkStartPage.important.p1=Mae angen i bawb ar y rhestr ddefnyddio’r cysylltiad i fewngofnodi erbyn <span class="govuk-!-font-weight-bold">{0}</span>.
 linkStartPage.important.p2=Dylai ddefnyddio manylion mewngofnodi ar gyfer ei drethi personol, nid ei drethi busnes. Os nad oes ganddo fanylion mewngofnodi personol, gall greu rhai.
 linkStartPage.important.p3=Byddwn hefyd yn gofyn iddo roi rhywfaint o wybodaeth bersonol, gan gynnwys:
 linkStartPage.important.bullet1=enw, dyddiad geni, rhif ffôn a chyfeiriad e-bost
@@ -430,12 +430,12 @@ confirmation.viewLink=Gweld neu argraffu’ch cais
 confirmation.signOutLink=Gorffen ac allgofnodi
 applicationProgress.caption=Gwiriwch gynnydd cais
 applicationProgress.title=Cyfeirnod y cais: {0}
-applicationProgress.p1=Mae’r rhaglen hon ar gyfer cyfrif gwasanaethau asiant ar gyfer <strong>{0}</strong>.
+applicationProgress.p1=Mae’r rhaglen hon ar gyfer cyfrif gwasanaethau asiant ar gyfer <span class="govuk-!-font-weight-bold">{0}</span>.
 applicationProgress.p2=Mae rhywfaint o’r wybodaeth ar y dudalen hon yn defnyddio data amser real a gallai newid.
 applicationProgress.decision.h2=Pryd i ddisgwyl penderfyniad
 applicationProgress.decision.p1=Ar hyn o bryd, mae’n cymryd hyd at 8 wythnos i brosesu ceisiadau am gyfrif gwasanaethau asiant.
 applicationProgress.decision.p2=Os bydd angen rhagor o wybodaeth arnom i’n helpu i wneud penderfyniad, byddwn yn cysylltu â chi.
-applicationProgress.decision.p3=Rydym yn disgwyl dod i benderfyniad erbyn <strong>{0}</strong> ac ni fyddwn yn gallu rhoi diweddariad i chi cyn y dyddiad hwn.
+applicationProgress.decision.p3=Rydym yn disgwyl dod i benderfyniad erbyn <span class="govuk-!-font-weight-bold">{0}</span> ac ni fyddwn yn gallu rhoi diweddariad i chi cyn y dyddiad hwn.
 applicationProgress.decision.p4=Byddwn yn anfon e-bost atoch cyn gynted ag y byddwn wedi dod i benderfyniad.
 applicationProgress.submitted.h2=Dyddiad cyflwyno
 applicationProgress.viewLink=Gweld neu argraffu’ch cais (yn agor tab newydd)
@@ -529,7 +529,7 @@ viewApplication.hmrcStandard.h2=Safonau CThEF ar gyfer asiantau
 viewApplication.hmrcStandard.label=Cytunwyd i fodloni safonau CThEF ar gyfer asiantau
 viewApplication.whatNext.h2=Yr hyn i’w wneud nesaf
 viewApplication.whatNext.p1=Mae angen i’r rheini sy’n aelodau o {0} fewngofnodi a rhoi rhywfaint o fanylion personol.
-viewApplication.whatNext.p2=Anfonwch y cysylltiad hwn at bob aelod o’r <strong>{0}</strong>
+viewApplication.whatNext.p2=Anfonwch y cysylltiad hwn at bob aelod o’r <span class="govuk-!-font-weight-bold">{0}</span>
 viewApplication.whatNext.p3=Gallwch wirio sut mae’ch cais yn dod yn ei flaen drwy glicio’r cysylltiad ar dudalen GOV.UK ‘Gwneud cais am gyfrif gwasanaethau asiant’.
 viewApplication.print=Argraffu’r dudalen hon
 saveForLater.title=Bydd eich manylion yn cael eu cadw hyd at {0}
@@ -537,7 +537,7 @@ saveForLater.h2=Yr hyn y mae angen i chi ei wneud nesaf
 saveForLater.p1=Mae’n rhaid i chi ddod yn ôl a chwblhau’r cais hwn erbyn {0}.
 saveForLater.p2=I ddod yn ôl at y cais hwn:
 saveForLater.li1=Ewch i’r dudalen er mwyn <a class="govuk-link" href="{0}" rel="noreferrer noopener" target="_blank">gwneud cais am gyfrif gwasanaethau asiant (yn agor tab newydd)</a>.
-saveForLater.li2=Yn yr adran ynghylch <strong>pa mor hir y bydd y broses hon yn ei gymryd</strong> dewiswch y cysylltiad i wirio cynnydd cais presennol.
+saveForLater.li2=Yn yr adran ynghylch <span class="govuk-!-font-weight-bold">pa mor hir y bydd y broses hon yn ei gymryd</span> dewiswch y cysylltiad i wirio cynnydd cais presennol.
 saveForLater.li3=Mewngofnodwch gan ddefnyddio’r manylion asiant y gwnaethoch eu defnyddio pan wnaethoch y cais hwn.
 saveForLater.continueLink=Parhau â’r cais
 saveForLater.finishLink=Gorffen ac allgofnodi
@@ -553,7 +553,7 @@ provide-details.llp.title=Cadarnhad ar gyfer aelod PAC
 provideDetailsStart.title=Mewngofnodwch a chadarnhau’ch manylion
 provideDetailsStart.p1=Rydych wedi cael eich enwebu fel unigolyn perthnasol sy’n gallu cefnogi cais i CThEF am gyfrif gwasanaethau asiant.
 provideDetailsStart.p2=Mae angen rhywfaint o wybodaeth gennych cyn y gallwn brosesu’r cais.
-provideDetailsStart.p3=Bydd angen i chi roi’r wybodaeth hon erbyn <strong>{0}</strong>.
+provideDetailsStart.p3=Bydd angen i chi roi’r wybodaeth hon erbyn <span class="govuk-!-font-weight-bold">{0}</span>.
 provideDetailsStart.info.h2=Pam mae angen yr wybodaeth hon arnom
 provideDetailsStart.info.p1=Gofynnwn i chi fewngofnodi er mwyn i ni allu gwneud y canlynol:
 provideDetailsStart.info.li1=cadarnhau pwy ydych
@@ -834,8 +834,8 @@ failedFixable.decisionDate.h2=Dyddiad y penderfyniad: {0}
 failedFixable.decision.h2=Ein penderfyniad
 failedFixable.decision.p1=Ar hyn o bryd, ni all eich cais i gofrestru ar gyfer cyfrif gwasanaethau asiant gael ei gymeradwyo.
 failedFixable.decision.p2=Gwrthodir y cais o dan Adran 230 (amodau cofrestru) o <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Ddeddf Cyllid 2026 (yn agor tab newydd)</a>.
-failedFixable.decision.p3=Fodd bynnag, gall {0} fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <strong>{1}</strong>.
-failedFixable.decision.p3.SoleTrader=Fodd bynnag, gallwch fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <strong>{1}</strong>.
+failedFixable.decision.p3=Fodd bynnag, gall {0} fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <span class="govuk-!-font-weight-bold">{1}</span>.
+failedFixable.decision.p3.SoleTrader=Fodd bynnag, gallwch fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <span class="govuk-!-font-weight-bold">{1}</span>.
 failedFixable.fix.h2=Sut i fodloni’r amodau cofrestru
 failedFixable.fix.p1=Mae’r camau sydd angen eu cymryd wedi’u rhestru ar y dudalen nesaf.
 failedFixable.fix.startButton=Gweld y camau sydd angen eu cymryd
@@ -1147,7 +1147,7 @@ fixableSoleTraderDetails.EntityFix.8.7.label=A yw pob rhwymedigaeth orddyledus w
 failedNonFixable.caption=Canlyniad y cais
 failedNonFixable.title=Nid yw {0} yn bodloni’r amodau cofrestru
 failedNonFixable.p1=Ni ellir cymeradwyo’ch cais am gyfrif gwasanaethau asiant (gwrthodwyd o dan Adran 230 o Ddeddf Cyllid 2026).
-failedNonFixable.p2=Mae hyn oherwydd y canlynol:
+failedNonFixable.p2=Mae hyn oherwydd y canlynol
 failedNonFixable.individualFailures.h2=Unigolion perthnasol nad ydynt yn bodloni’r amodau cofrestru
 failedNonFixable.individualListIntro=Mae’r cofnodion ar gyfer {0} yn dangos:
 failedNonFixable.individualSingleReason=Mae’r cofnodion yn dangos bod {0} {1}.
@@ -1345,7 +1345,7 @@ individualFailedFixable.ourDecision.h2=Ein penderfyniad
 individualFailedFixable.ourDecision.p1=Ar hyn o bryd, ni all cais {0} i gofrestru ar gyfer cyfrif gwasanaethau asiant gael ei gymeradwyo.
 individualFailedFixable.ourDecision.p2=Gwrthodir y cais o dan Adran 230 (amodau cofrestru) o <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Ddeddf Cyllid 2026 (yn agor tab newydd)</a>.
 individualFailedFixable.ourDecision.p3=Mae hyn oherwydd nad ydych chi, sef unigolyn perthnasol i’r cais, wedi bodloni un neu fwy o’r amodau cofrestru.
-individualFailedFixable.ourDecision.p4=Fodd bynnag, gallwch fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <strong>{0}</strong>
+individualFailedFixable.ourDecision.p4=Fodd bynnag, gallwch fodloni’r amodau cofrestru o hyd os byddwch yn cymryd camau erbyn <span class="govuk-!-font-weight-bold">{0}</span>
 individualFailedFixable.howToFix.h2=Sut i fodloni’r amodau cofrestru
 individualFailedFixable.howToFix.p1=Mae’r camau sydd angen eu cymryd wedi’u rhestru ar y dudalen nesaf.
 individualFailedFixable.startButton=Gweld y camau sydd angen eu cymryd
@@ -1519,7 +1519,7 @@ fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.heading=Nid oedde
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p1=Fel arfer, mae hyn oherwydd bod un o’r atebion a roddwyd gennych yn anghywir, neu oherwydd nad oeddech wedi rhoi digon o fanylion.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p2=Ar y dudalen nesaf, gallwch adolygu rhai o’ch atebion.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p3=Gwiriwch nhw, a newidiwch unrhyw beth sy’n anghywir neu ar goll.
-fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4=Mae angen i chi wneud hyn erbyn <strong>{0}</strong>.
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4=Mae angen i chi wneud hyn erbyn <span class="govuk-!-font-weight-bold">{0}</span>.
 individualDetailsDeclaration.caption=Cadarnhewch fod eich ymatebion yn rhai terfynol
 individualDetailsDeclaration.title=Rydych ar fin cyflwyno’ch ymatebion
 individualDetailsDeclaration.p1=Mae cyflwyno eich ymatebion yn golygu eich bod o’r farn eich bod wedi gwneud popeth sydd ei angen i fodloni’r amodau cofrestru.
@@ -1539,7 +1539,7 @@ resubmissionConfirmation.whatNext.p1=Byddwn yn anfon e-bost atoch i gadarnhau bo
 resubmissionConfirmation.viewLink=Gweld neu argraffu’ch cais
 resubmissionConfirmation.decision.h2=Ein penderfyniad
 resubmissionConfirmation.decision.p1=Byddwn yn cynnal rhai archwiliadau ar sail yr wybodaeth rydych wedi’i rhoi i ni. Os bydd angen rhagor o wybodaeth arnom, byddwn yn cysylltu â chi.
-resubmissionConfirmation.decision.p2=Ein nod yw gwneud penderfyniad erbyn <strong>{0}</strong>.
+resubmissionConfirmation.decision.p2=Ein nod yw gwneud penderfyniad erbyn <span class="govuk-!-font-weight-bold">{0}</span>.
 resubmissionConfirmation.decision.p3=Byddwn yn anfon e-bost at {0} i roi gwybod i chi am y canlyniad.
 resubmissionConfirmation.signOutLink=Gorffen ac allgofnodi
 soleTraderHasNoSaUtr.title=Ni allwch wneud cais am gyfrif gwasanaethau asiant eto
