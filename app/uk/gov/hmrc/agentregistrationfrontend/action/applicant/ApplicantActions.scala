@@ -119,7 +119,7 @@ extends RequestAwareLogging:
     .refine:
       implicit request =>
         val aa: AgentApplication = request.agentApplication
-        if aa.continueJourney()
+        if aa.continueJourney() && !aa.applicationState.isTerminal
         then
           val updatedApplication = aa.updateCachedSessionId()
 

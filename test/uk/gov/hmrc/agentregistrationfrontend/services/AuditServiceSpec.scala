@@ -20,6 +20,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.defaultAwaitTimeout
 import play.api.test.Helpers.status
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -66,6 +67,26 @@ extends ISpec:
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       AuditStubs.verifyStartOrContinueApplicationAuditEvent(journeyType = "Continue")
+
+    "neither update the application nor send a continue event when the same user logs back in with a new session but the application is Expired" in:
+      AuthStubs.stubAuthorise()
+      AuditStubs.stubAudit()
+
+      val expiredApplicationFromPreviousSession: AgentApplication = tdAll.agentApplicationLlp.afterExpired.copy(cachedSessionId = SessionId("first-session-id"))
+
+      AgentRegistrationStubs.stubGetAgentApplication(expiredApplicationFromPreviousSession)
+
+      val secondLoggedInRequest: RequestWithData[EmptyTuple] = RequestWithDataCt.empty(
+        FakeRequest()
+          .withAuthTokenInSession("second-auth-token")
+          .withSession("sessionId" -> "second-session-id")
+      )
+
+      status(runGetApplication(secondLoggedInRequest)).shouldBe(200)
+
+      AgentRegistrationStubs.verifyGetAgentApplication()
+      AgentRegistrationStubs.verifyUpdateAgentApplication(count = 0)
+      AuditStubs.verifyStartOrContinueApplicationAuditEvent(journeyType = "Continue", count = 0)
 
   private def runGetApplication(
     request: RequestWithData[EmptyTuple]
