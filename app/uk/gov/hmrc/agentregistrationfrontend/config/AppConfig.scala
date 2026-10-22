@@ -138,12 +138,14 @@ class AppConfig @Inject() (
   object Features:
 
     val grsStub: Boolean = configuration.get[Boolean]("features.grs-stub")
-    val welshLanguageSupport: Boolean = configuration.get[Seq[String]]("play.i18n.langs").contains("cy")
 
   object FieldLevelEncryption:
 
     val enabled: Boolean = configuration.get[Boolean]("fieldLevelEncryption.enabled")
     val key: String = configuration.get[String]("fieldLevelEncryption.key")
+
+  object WelshLanguageSupport:
+    val enabled: Boolean = configuration.underlying.getList("play.i18n.langs").contains("cy")
 
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
@@ -153,6 +155,7 @@ class AppConfig @Inject() (
   TestOnly
   Features
   FieldLevelEncryption
+  WelshLanguageSupport
 
 object ConfigHelper:
 

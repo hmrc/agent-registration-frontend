@@ -105,7 +105,7 @@
 }
 
 @toggledServiceNavigation = @{
-  if(appConfig.Features.welshLanguageSupport) {
+  if(appConfig.WelshLanguageSupport.enabled) {
     serviceNavigation.withLanguageToggle()
   } else {
     serviceNavigation
@@ -126,6 +126,6 @@
           mainContentLayout = mainContentLayout
       ),
       backLink = if(suppressBackLink) None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
-      isWelshTranslationAvailable = appConfig.Features.welshLanguageSupport
+      isWelshTranslationAvailable = appConfig.WelshLanguageSupport.enabled
   )
 )(contentWithErrorsAndHelp)
