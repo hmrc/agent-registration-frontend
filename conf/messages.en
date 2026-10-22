@@ -25,6 +25,8 @@ common.cancel = Cancel
 
 button.copy=Copy link to clipboard
 button.copied=Link copied
+button.deleteAndStartAgain = Delete and start new application
+button.startNewApplication = Start a new application
 
 address.lookup.title=What correspondence address should we use for your agent services account? - Apply for an agent services account - GOV.UK
 address.lookup.header=What correspondence address should we use for your agent services account?
@@ -1874,3 +1876,13 @@ confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services 
 
 signedOut.title = You have signed out
 signedOut.link = Sign in again
+
+# Application expired page
+applicationExpired.title = Your application has expired
+applicationExpired.p1 = You started your application {0} days ago or more and did not submit it.
+applicationExpired.p2 = You can delete this application and start a new one.
+applicationExpired.p3 = If you do not delete this application, we will delete it {0} days after it expired. This will remove all the information you entered.
+
+confirmationOfExpiredDeletion.title = Your application has been deleted
+confirmationOfExpiredDeletion.p1 = All the information you entered has been removed from our database.
+confirmationOfExpiredDeletion.p2 = If you still want to apply for an agent services account, you can start a new application.

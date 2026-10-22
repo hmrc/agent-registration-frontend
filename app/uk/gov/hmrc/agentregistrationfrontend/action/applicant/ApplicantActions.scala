@@ -143,6 +143,7 @@ extends RequestAwareLogging:
           val call: Call =
             request.get[AgentApplication].applicationState match
               case ApplicationState.Started => AppRoutes.apply.AgentApplicationController.startRegistration // we don't yet have business details from GRS
+              case ApplicationState.Expired => AppRoutes.apply.expired.UnsubmittedApplicationController.show
               case _ => AppRoutes.apply.AgentApplicationController.applicationStatus // all other states are handled by this endpoint
           logger.warn(
             s"The application is not in progress" +

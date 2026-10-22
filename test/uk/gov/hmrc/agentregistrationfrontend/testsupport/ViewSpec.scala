@@ -52,3 +52,18 @@ extends ISpec:
     summaryLink.text() shouldBe errorMessage
     summaryLink.selectAttrOrFail("href") shouldBe s"$expectedSummaryLinkHref"
     inlineError.text() shouldBe s"Error: $errorMessage"
+
+  def behavesLikePageWithFinishedAndSignOutLink(doc: Document): Assertion =
+    val finishAndSignOutLink: TestLink =
+      doc
+        .mainContent
+        .selectOrFail(
+          "a.govuk-link[href=/agent-registration/sign-out-with-continue?continueUrl=http%3A%2F%2Flocalhost%3A19001%2Fagent-registration%2Fsigned-out]"
+        )
+        .selectOnlyOneElementOrFail()
+        .toLink
+
+    finishAndSignOutLink shouldBe TestLink(
+      text = "Finish and sign out",
+      href = "/agent-registration/sign-out-with-continue?continueUrl=http%3A%2F%2Flocalhost%3A19001%2Fagent-registration%2Fsigned-out"
+    )
