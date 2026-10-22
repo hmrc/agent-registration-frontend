@@ -145,7 +145,7 @@ class AppConfig @Inject() (
     val key: String = configuration.get[String]("fieldLevelEncryption.key")
 
   object WelshLanguageSupport:
-    val enabled: Boolean = configuration.underlying.getList("play.i18n.langs").contains("cy")
+    val enabled: Boolean = configuration.get[Seq[String]]("play.i18n.langs").contains("cy")
 
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
