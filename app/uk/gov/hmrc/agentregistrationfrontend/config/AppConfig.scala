@@ -92,7 +92,6 @@ class AppConfig @Inject() (
   def soleTraderProvideDetailsLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/match-application/$linkId"
 
   val sessionTimeout: FiniteDuration = configuration.get[FiniteDuration]("session.timeout")
-  val welshLanguageSupportEnabled: Boolean = configuration.get[Boolean]("features.welsh-language-support")
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId")
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
   val ignoreEmailVerification: Boolean = configuration
@@ -145,6 +144,9 @@ class AppConfig @Inject() (
     val enabled: Boolean = configuration.get[Boolean]("fieldLevelEncryption.enabled")
     val key: String = configuration.get[String]("fieldLevelEncryption.key")
 
+  object WelshLanguageSupport:
+    val enabled: Boolean = configuration.get[Seq[String]]("play.i18n.langs").contains("cy")
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
@@ -153,6 +155,7 @@ class AppConfig @Inject() (
   TestOnly
   Features
   FieldLevelEncryption
+  WelshLanguageSupport
 
 object ConfigHelper:
 
