@@ -92,7 +92,6 @@ class AppConfig @Inject() (
   def soleTraderProvideDetailsLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/match-application/$linkId"
 
   val sessionTimeout: FiniteDuration = configuration.get[FiniteDuration]("session.timeout")
-  val welshLanguageSupportEnabled: Boolean = configuration.underlying.getList("play.i18n.langs").contains("cy")
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId")
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
   val ignoreEmailVerification: Boolean = configuration
@@ -139,6 +138,7 @@ class AppConfig @Inject() (
   object Features:
 
     val grsStub: Boolean = configuration.get[Boolean]("features.grs-stub")
+    val welshLanguageSupport: Boolean = configuration.get[Seq[String]]("play.i18n.langs").contains("cy")
 
   object FieldLevelEncryption:
 
