@@ -79,15 +79,15 @@ object AddressLookupFrontendStubs:
       ),
       "cy" -> Json.obj(
         "appLevelLabels" -> Json.obj(
-          "navTitle" -> "Apply for an agent services account"
+          "navTitle" -> "Gwneud cais am gyfrif gwasanaethau asiant"
         ),
         "lookupPageLabels" -> Json.obj(
-          "title" -> "What correspondence address should we use for your agent services account? - Apply for an agent services account - GOV.UK",
-          "heading" -> "What correspondence address should we use for your agent services account?"
+          "title" -> "Pa gyfeiriad gohebu ddylem ei ddefnyddio ar gyfer eich cyfrif gwasanaethau asiant? - Gwneud cais am gyfrif gwasanaethau asiant - GOV.UK",
+          "heading" -> "Pa gyfeiriad gohebu ddylem ei ddefnyddio ar gyfer eich cyfrif gwasanaethau asiant?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Enter your correspondence address"
+          "title" -> "Nodwch eich cyfeiriad gohebu - Gwneud cais am gyfrif gwasanaethau asiant - GOV.UK",
+          "heading" -> "Nodwch eich cyfeiriad gohebu"
         )
       )
     )

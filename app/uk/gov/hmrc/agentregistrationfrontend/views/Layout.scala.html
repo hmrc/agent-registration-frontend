@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichServiceNavigation
 @import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 @import views.html.helper.CSPNonce
@@ -97,23 +97,35 @@
     }
 }
 
+@serviceNavigation = @{
+  ServiceNavigation(
+    serviceName = Some(serviceName.getOrElse(messages("service.name"))),
+    serviceUrl = Some(serviceUrl.getOrElse(appConfig.govukStartPageUrl))
+  )
+}
+
+@toggledServiceNavigation = @{
+  if(appConfig.welshLanguageSupportEnabled) {
+    serviceNavigation.withLanguageToggle()
+  } else {
+    serviceNavigation
+  }
+}
+
 @hmrcStandardPage(
   HmrcStandardPageParams(
       pageTitle = Some(gdsTitle),
       serviceURLs = ServiceURLs(
           signOutUrl = if (isSignedIn) Some(AppRoutes.SignOutController.signOut.url) else None
       ),
-      serviceNavigation = Some(ServiceNavigation(
-          serviceName = Some(serviceName.getOrElse(messages("service.name"))),
-          serviceUrl = Some(serviceUrl.getOrElse(appConfig.govukStartPageUrl))
-      )),
-    banners = banners.getOrElse(Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}")))),
+      serviceNavigation = Some(toggledServiceNavigation),
+      banners = banners.getOrElse(Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}")))),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
           additionalScriptsBlock = Some(additionalScripts),
           mainContentLayout = mainContentLayout
       ),
-      backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+      backLink = if(suppressBackLink) None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
       isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
   )
 )(contentWithErrorsAndHelp)
