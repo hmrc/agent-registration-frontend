@@ -57,9 +57,10 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val numberOfDaysToSubmitApplication: Int = appConfig.daysToSubmitApplication.toDays.toInt
 
-      /** Because the grace period days is stored as config in agent-registration, we can use the resultant Instant
-        * [[request.agentApplication.postExpiryGracePeriodEndsAt]] it generated into the application to derive this number of days. This is to avoid duplicating
-        * config in agent-registration-frontend
+      /**
+       * Because the number of grace period days is stored as config in agent-registration, we can reverse engineer the
+       * Instant [[request.agentApplication.postExpiryGracePeriodEndsAt]] saved into the Expired application by the
+       * backend to derive this number of days. This is to avoid maintaining duplicating config values.
         */
       val numberOfDaysBetweenGracePeriodAndCreatedAt: Int =
         request
@@ -70,7 +71,7 @@ extends FrontendController(mcc, actions):
           .toInt
       Ok(view(
         numberOfDaysToSubmitApplication = numberOfDaysToSubmitApplication,
-        numberOfDaysGracePeriod = numberOfDaysBetweenGracePeriodAndCreatedAt - numberOfDaysToSubmitApplication // this is stored in agent-registration config, we don't want to duplicate config
+        numberOfDaysGracePeriod = numberOfDaysBetweenGracePeriodAndCreatedAt - numberOfDaysToSubmitApplication
       ))
   def submit: Action[AnyContent] = baseAction
     .async:
