@@ -57,18 +57,21 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val numberOfDaysToSubmitApplication: Int = appConfig.daysToSubmitApplication.toDays.toInt
 
-      /**
-       * Because the number of grace period days is stored as config in agent-registration, we can reverse engineer the
-       * Instant [[request.agentApplication.postExpiryGracePeriodEndsAt]] saved into the Expired application by the
-       * backend to derive this number of days. This is to avoid maintaining duplicating config values.
+      /** Because the number of grace period days is stored as config in agent-registration, we can reverse engineer the Instant
+        * [[request.agentApplication.postExpiryGracePeriodEndsAt]] saved into the Expired application by the backend to derive this number of days. This is to
+        * avoid maintaining duplicating config values.
         */
       val numberOfDaysBetweenGracePeriodAndCreatedAt: Int =
         request
           .agentApplication
           .postExpiryGracePeriodEndsAt
-          .map(i => ChronoUnit.DAYS.between(i, request.agentApplication.createdAt))
+          .map(i => ChronoUnit.DAYS.between(i, request.agentApplication.createdAt).abs)
           .getOrElse(0L)
           .toInt
+
+      logger.info(
+        s"Rendering expired unsubmitted application page with numberOfDaysToSubmitApplication=$numberOfDaysToSubmitApplication and numberOfDaysBetweenGracePeriodAndCreatedAt=$numberOfDaysBetweenGracePeriodAndCreatedAt"
+      )
       Ok(view(
         numberOfDaysToSubmitApplication = numberOfDaysToSubmitApplication,
         numberOfDaysGracePeriod = numberOfDaysBetweenGracePeriodAndCreatedAt - numberOfDaysToSubmitApplication
