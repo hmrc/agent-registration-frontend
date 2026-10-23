@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.expired.UnsubmittedApplicationPage
-
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -55,11 +55,23 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      Ok(view(
-        numberOfDaysToSubmitApplication = appConfig.daysToSubmitApplication.toDays.toInt,
-        numberOfDaysGracePeriod = 45 // this is stored in agent-registration config, could we calc from application's postGracePeriodExpiry date instead?
-      ))
+      val numberOfDaysToSubmitApplication: Int = appConfig.daysToSubmitApplication.toDays.toInt
 
+      /** Because the grace period days is stored as config in agent-registration, we can use the resultant Instant
+        * [[request.agentApplication.postExpiryGracePeriodEndsAt]] it generated into the application to derive this number of days. This is to avoid duplicating
+        * config in agent-registration-frontend
+        */
+      val numberOfDaysBetweenGracePeriodAndCreatedAt: Int =
+        request
+          .agentApplication
+          .postExpiryGracePeriodEndsAt
+          .map(i => ChronoUnit.DAYS.between(i, request.agentApplication.createdAt))
+          .getOrElse(0L)
+          .toInt
+      Ok(view(
+        numberOfDaysToSubmitApplication = numberOfDaysToSubmitApplication,
+        numberOfDaysGracePeriod = numberOfDaysBetweenGracePeriodAndCreatedAt - numberOfDaysToSubmitApplication // this is stored in agent-registration config, we don't want to duplicate config
+      ))
   def submit: Action[AnyContent] = baseAction
     .async:
       implicit request =>
