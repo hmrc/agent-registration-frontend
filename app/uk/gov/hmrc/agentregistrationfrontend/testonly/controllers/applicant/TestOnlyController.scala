@@ -31,6 +31,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -57,7 +58,8 @@ class TestOnlyController @Inject() (
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
   testRiskingService: TestRiskingService,
-  clock: Clock
+  clock: Clock,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
@@ -129,8 +131,15 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
         val oneMinuteAgo: Instant = Instant.now(clock).minusSeconds(60)
+        val newCreatedAt: Instant = Instant.now(clock).minusSeconds(60 * 60 * 24 * appConfig.daysToSubmitApplication.toDays.toInt)
         testAgentRegistrationConnector
-          .upsertAgentApplication(request.get[AgentApplication].modify(_.applicationExpiresAt).using(_.map(_ => oneMinuteAgo)))
+          .upsertAgentApplication(
+            request.get[AgentApplication]
+              .modify(_.createdAt)
+              .using(_ => newCreatedAt)
+              .modify(_.applicationExpiresAt)
+              .using(_.map(_ => oneMinuteAgo))
+          )
           .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
 
   def endPostExpiryGracePeriodNow(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions

@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusi
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.routes as amlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api.routes as amlsApiRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.routes as entitycheckfailedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.expired.routes as applicantExpiredRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails.routes as agentdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.routes as listdetailsRoutes
@@ -175,6 +176,11 @@ object AppRoutes:
       val GlobalAsaEnrolmentCheckController = internalRoutes.GlobalAsaEnrolmentCheckController
       val DeceasedController = internalRoutes.DeceasedController
       val UnifiedCustomerRegistryController = internalRoutes.UnifiedCustomerRegistryController
+
+    object expired:
+
+      val UnsubmittedApplicationController = applicantExpiredRoutes.UnsubmittedApplicationController
+      val UnsubmittedApplicationDeletedController = applicantExpiredRoutes.UnsubmittedApplicationDeletedController
 
   object fixablefailures:
 
