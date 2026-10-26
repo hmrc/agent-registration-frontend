@@ -22,6 +22,8 @@ common.returnToTaskList=Dychwelyd i’r rhestr o dasgau
 common.cancel=Canslo
 button.copy=Copïo cysylltiad i’r clipfwrdd
 button.copied=Copïo’r cysylltiad
+button.deleteAndStartAgain=Dileu’r cais hwn a dechrau cais newydd
+button.startNewApplication=Dechrau cais newydd
 address.lookup.title=Pa gyfeiriad gohebu ddylem ei ddefnyddio ar gyfer eich cyfrif gwasanaethau asiant? - Gwneud cais am gyfrif gwasanaethau asiant - GOV.UK
 address.lookup.header=Pa gyfeiriad gohebu ddylem ei ddefnyddio ar gyfer eich cyfrif gwasanaethau asiant?
 address.lookup.editPageLabels.title=Nodwch eich cyfeiriad gohebu - Gwneud cais am gyfrif gwasanaethau asiant - GOV.UK
@@ -1565,3 +1567,13 @@ confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services 
 
 signedOut.title = Rydych wedi allgofnodi
 signedOut.link = Mewngofnodwch eto
+
+# Application expired page
+applicationExpired.title = Ni allwch barhau i lenwi’r cais hwn
+applicationExpired.p1 = Gwnaethoch ddechrau’r cais hwn {0} diwrnod yn ôl neu fwy, ac ni wnaethoch ei gyflwyno.
+applicationExpired.p2 = Gallwch ddileu’r cais hwn a dechrau un newydd.
+applicationExpired.p3 = Os na fyddwch yn dileu’r cais hwn, byddwn yn ei ddileu ar ôl {0} diwrnod. Bydd gwneud hyn yn dileu’r holl wybodaeth a nodwyd gennych.
+
+confirmationOfExpiredDeletion.title = Mae’ch cais wedi cael ei ddileu
+confirmationOfExpiredDeletion.p1 = Mae’r holl wybodaeth a nodwyd gennych wedi’i ddileu oddi ar ein cronfa ddata.
+confirmationOfExpiredDeletion.p2 = Os ydych am wneud cais am gyfrif gwasanaethau asiant o hyd, gallwch ddechrau cais newydd.
