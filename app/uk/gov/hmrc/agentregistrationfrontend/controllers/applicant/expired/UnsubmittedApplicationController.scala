@@ -26,6 +26,8 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.expired.UnsubmittedApplicationPage
+
+import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,7 +42,7 @@ class UnsubmittedApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
+  private val baseAction: ActionBuilderWithData[Instant *: DataWithApplication] = actions
     .getApplication
     .ensure(
       condition =
@@ -52,6 +54,13 @@ extends FrontendController(mcc, actions):
         logger.warn(s"Cannot view expired page because application state is ${request.agentApplication.applicationState.toString} which is not the Expired state")
         Redirect(AppRoutes.apply.AgentApplicationController.landing)
     )
+    .refine(implicit request =>
+      request.agentApplication.expiredAt match
+        case Some(expiredAt) => request.add[Instant](expiredAt)
+        case _ =>
+          logger.warn("Cannot view expired page because application does not have an expiredAt timestamp")
+          Redirect(AppRoutes.apply.AgentApplicationController.landing)
+    )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
@@ -61,20 +70,20 @@ extends FrontendController(mcc, actions):
         * [[request.agentApplication.postExpiryGracePeriodEndsAt]] saved into the Expired application by the backend to derive this number of days. This is to
         * avoid maintaining duplicating config values.
         */
-      val numberOfDaysBetweenGracePeriodAndCreatedAt: Int =
+      val numberOfDaysGracePeriod: Int =
         request
           .agentApplication
           .postExpiryGracePeriodEndsAt
-          .map(i => ChronoUnit.DAYS.between(i, request.agentApplication.createdAt).abs)
+          .map(i => ChronoUnit.DAYS.between(i, request.get[Instant]).abs)
           .getOrElse(0L)
           .toInt
 
       logger.info(
-        s"Rendering expired unsubmitted application page with numberOfDaysToSubmitApplication=$numberOfDaysToSubmitApplication and numberOfDaysBetweenGracePeriodAndCreatedAt=$numberOfDaysBetweenGracePeriodAndCreatedAt"
+        s"Rendering expired unsubmitted application page with numberOfDaysToSubmitApplication=$numberOfDaysToSubmitApplication and numberOfDaysGracePeriod=$numberOfDaysGracePeriod"
       )
       Ok(view(
         numberOfDaysToSubmitApplication = numberOfDaysToSubmitApplication,
-        numberOfDaysGracePeriod = numberOfDaysBetweenGracePeriodAndCreatedAt - numberOfDaysToSubmitApplication
+        numberOfDaysGracePeriod = numberOfDaysGracePeriod
       ))
   def submit: Action[AnyContent] = baseAction
     .async:
