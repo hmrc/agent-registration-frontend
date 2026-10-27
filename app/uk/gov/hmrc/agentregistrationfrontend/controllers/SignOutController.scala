@@ -56,13 +56,13 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       Ok(signedOutPage())
 
-  def timeOut: Action[AnyContent] = defaultActionBuilder:
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.timedOut.url}"
+  def timeOut(signBackInUrl: Option[RedirectUrl] = None): Action[AnyContent] = defaultActionBuilder:
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.timedOut(signBackInUrl).url}"
     Redirect(AppRoutes.SignOutController.signOutWithContinue(RedirectUrl(continueUrl.toString)))
 
-  def timedOut: Action[AnyContent] = defaultActionBuilder:
+  def timedOut(signBackInUrl: Option[RedirectUrl] = None): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
-      Ok(timedOutPage())
+      Ok(timedOutPage(signBackInUrl.getOrElse(RedirectUrl(appConfig.thisFrontendBaseUrl + AppRoutes.apply.AgentApplicationController.landing.url))))
 
   def individualSignOut(linkId: LinkId): Action[AnyContent] = defaultActionBuilder:
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.StartController.start(linkId).url}"

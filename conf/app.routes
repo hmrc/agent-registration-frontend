@@ -6,8 +6,8 @@ GET         /                                                          uk.gov.hm
 GET         /sign-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
 GET         /signed-out                                                uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signedOut
 GET         /sign-out-with-continue                                    uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOutWithContinue(continueUrl: RedirectUrl)
-GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
-GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
+GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut(signBackInUrl: Option[RedirectUrl])
+GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut(signBackInUrl: Option[RedirectUrl])
 
 GET         /application-status                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationStatus
 GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewSubmittedApplication

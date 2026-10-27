@@ -20,13 +20,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class TimedOutPageSpec
 extends ViewSpec:
 
   "TimedOutPage" should:
     val viewTemplate: TimedOutPage = app.injector.instanceOf[TimedOutPage]
-    val doc: Document = Jsoup.parse(viewTemplate().body)
+    val doc: Document = Jsoup.parse(viewTemplate(RedirectUrl("/agent-registration")).body)
 
     "have expected content" in:
       doc.mainContent shouldContainContent

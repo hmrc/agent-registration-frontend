@@ -14,11 +14,16 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.validateRedirectUrl
 
-@this(layout: Layout)
+@this(
+        layout: Layout,
+        appConfig: AppConfig
+)
 
-@()(implicit
+@(signBackInUrl: RedirectUrl)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -30,7 +35,7 @@
     <h1 class="govuk-heading-xl">@title</h1>
     <p class="govuk-body">@messages("timed-out.p1")</p>
     <p class="govuk-body">
-        <a href="@{uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.routes.AgentApplicationController.landing.url}" class="govuk-link">@messages("timed-out.link")</a>
+        <a href="@{validateRedirectUrl(signBackInUrl, appConfig.allowedRedirectHosts)}" class="govuk-link">@messages("timed-out.link")</a>
     </p>
 
 }

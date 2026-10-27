@@ -59,7 +59,7 @@ class AddressLookupConfig @Inject() (
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
-          "timeoutUrl" -> s"${appConfig.thisFrontendBaseUrl}${AppRoutes.SignOutController.timeOut.url}"
+          "timeoutUrl" -> s"${appConfig.thisFrontendBaseUrl}${AppRoutes.SignOutController.timeOut(signBackInUrl = None).url}"
         )
       ),
       "labels" -> Json.obj(
