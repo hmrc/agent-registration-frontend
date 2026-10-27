@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,10 +31,11 @@ class MatchIndividualProvidedDetailsControllerSpec
 extends ControllerSpec:
 
   private val linkId = tdAll.linkId
-  private val agentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterContactDetailsComplete
+  object agentApplication:
+
+    val afterContactDetailsComplete: AgentApplication = tdAll.agentApplicationLlp.afterContactDetailsComplete
+    val afterExpired: AgentApplication = tdAll.agentApplicationLlp.afterExpired
+
   private val path = s"/agent-registration/provide-details/match-application/${linkId.value}"
 
   private object individualProvideDetails:
@@ -69,7 +71,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed
     )
     val response: WSResponse = get(path)
@@ -79,7 +81,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page for a One Login cred (CL600)" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed,
       confidenceLevel = ConfidenceLevel.L600
     )
@@ -98,7 +100,7 @@ extends ControllerSpec:
 
   s"GET $path when CL50 user has failed IV uplift should redirect to manual name matching page" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed,
       confidenceLevel = ConfidenceLevel.L50
     )
@@ -110,7 +112,7 @@ extends ControllerSpec:
 
   s"GET $path when CL250 user has no Citizen Details match should redirect to manual name matching page" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed,
       confidenceLevel = ConfidenceLevel.L250
     )
@@ -130,7 +132,7 @@ extends ControllerSpec:
 
   s"GET $path when details already provided by applicant should redirect to dedicated exit page" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.providedByApplicant
     )
     val response: WSResponse = get(path)
@@ -139,9 +141,19 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.detailsAlreadyProvided.url
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
+  s"GET $path with expired application should redirect to the start for showing the expired page" in:
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.afterExpired)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.StartController.start(linkId).url
+    IndividualAuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+
   s"POST $path with a valid choice should save data and redirect to CYA controller" in:
     ProvideDetailsStubHelper.stubAuthAndClaimMatchedIndividualProvidedDetails(
-      agentApplication = agentApplication,
+      agentApplication = agentApplication.afterContactDetailsComplete,
       individualProvidedDetails = individualProvideDetails.unclaimed,
       updatedIndividualProvidedDetails = individualProvideDetails.updatedDetails
     )
@@ -155,7 +167,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed
     )
     val response: WSResponse =
@@ -170,7 +182,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid characters should return 400" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
-      agentApplication,
+      agentApplication.afterContactDetailsComplete,
       individualProvideDetails.unclaimed
     )
     val response: WSResponse =
