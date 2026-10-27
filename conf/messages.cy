@@ -278,9 +278,9 @@ individualName.error.required=Nodwch enw llawn y partner
 individualName.error.invalid=Mae’n rhaid i enw’r partner gynnwys llythrennau a i z, cysylltnodau, collnodau a bylchau yn unig
 addToListSummary.Partnership.title.plural=Rydych wedi ychwanegu {0} o bartneriaid
 addToListSummary.Partnership.title.singular=Rydych wedi ychwanegu {0} o bartneriaid
-addToListSummary.Partnership.changeNumber=Newid nifer y partneriaid
-addToListSummary.Partnership.insetText.singular=Mae’n rhaid i chi roi gwybod i ni am 1 partner arall
-addToListSummary.Partnership.insetText.plural=Mae’n rhaid i chi roi gwybod i ni am {0} o bartneriaid eraill
+addToListSummary.Partnership.changeNumber=Newidiwch y nifer o bartneriaid
+addToListSummary.Partnership.insetText.singular=Mae’n rhaid i chi roi gwybod i ni am 1 partner arall sy’n unigolyn perthnasol.
+addToListSummary.Partnership.insetText.plural=Mae’n rhaid i chi roi gwybod i ni am {0} o bartneriaid eraill sy’n unigolion perthnasol.
 removeKeyIndividual.title=Cadarnhewch eich bod am dynnu {0} o’r rhestr
 removeKeyIndividual.Yes=Iawn
 removeKeyIndividual.No=Na
@@ -849,8 +849,9 @@ failedFixable.failures.li2=bydd y cais yn cael ei ddileu ar {0} er mwyn cydymffu
 failedFixable.appeal.h2=Mae gan {0} yr hawl i apelio neu gael adolygiad
 failedFixable.appeal.h2.SoleTrader=Eich hawl i apelio neu gael adolygiad
 failedFixable.appeal.p1=Cadwch gopi o’r penderfyniad hwn ar gyfer eich cofnodion.
-failedFixable.appeal.p2=Os ydych yn anghytuno gyda’n penderfyniad i wrthod eich cais, gallwch <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">wneud cais am adolygiad neu apelio’r penderfyniad (yn agor tab newydd)</a>.
+failedFixable.appeal.p2=Os ydych yn anghytuno gyd’n penderfyniad i wrthod eich cais, gallwch <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">wneud cais am adolygiad neu apelio’r penderfyniad (yn agor tab newydd)</a>.
 failedFixable.appeal.p3=Gallwch ofyn i ni adolygu ein penderfyniad neu ddechrau’r broses apelio hyd yn oed os byddwch yn penderfynu cymryd y camau y mae angen i chi eu cymryd.
+failedFixable.deleteAndStartAgainButton = Dileu’r cais hwn a dechrau cais newydd
 fixableTaskList.title=Cymryd camau: Nid yw {0} wedi bodloni’r amodau cofrestru
 fixableTaskList.title.SoleTrader=Cymryd camau: Nid ydych yn bodloni’r amodau cofrestru
 fixableTaskList.warning=Gallwch gymryd camau o hyd i fodloni’r amodau. Mae’n rhaid i {0} gwblhau pob eitem ar y rhestr hon, neu caiff y cais ei ddileu.
@@ -1148,7 +1149,7 @@ fixableSoleTraderDetails.EntityFix.8.7.action.p4=Dysgwch <a href="https://www.go
 fixableSoleTraderDetails.EntityFix.8.7.label=A yw pob rhwymedigaeth orddyledus wedi’i thalu neu wedi’i chynnwys mewn cynllun talu?
 failedNonFixable.caption=Canlyniad y cais
 failedNonFixable.title=Nid yw {0} yn bodloni’r amodau cofrestru
-failedNonFixable.p1=Ni ellir cymeradwyo’ch cais am gyfrif gwasanaethau asiant (gwrthodwyd o dan Adran 230 o Ddeddf Cyllid 2026).
+failedNonFixable.p1=Ni ellir cymeradwyo’ch cais am gyfrif gwasanaethau asiant. Gwrthodir hyn o dan <a href="{0}" class="govuk-link" rel="noopener noreferrer" target="_blank">Adran 230 o Ddeddf Cyllid 2026 (yn agor tab newydd)</a>.
 failedNonFixable.p2=Mae hyn oherwydd y canlynol
 failedNonFixable.individualFailures.h2=Unigolion perthnasol nad ydynt yn bodloni’r amodau cofrestru
 failedNonFixable.individualListIntro=Mae’r cofnodion ar gyfer {0} yn dangos:
@@ -1551,19 +1552,19 @@ soleTraderHasNoSaUtr.p3=Os ydych wedi cofrestru ar gyfer Hunanasesiad, gallwch <
 soleTraderHasNoSaUtr.p4=Fel arall, gallwch <a href="{0}" class="govuk-link">gysylltu â CThEF</a>.
 
 # Applicant deletes application to start again after risking decision
-confirmDeleteApplication.title = Delete your application
-confirmDeleteApplication.p1 = This action will happen immediately. You will no longer be able to access any details about your current application, including our decision.
-confirmDeleteApplication.p2 = You can choose to start a new application when you are ready.
-confirmDeleteApplication.p3 = HMRC carries out checks against all applications and any relevant individuals.
-confirmDeleteApplication.label = Do you want to delete your application?
+confirmDeleteApplication.title = Dileu’ch cais
+confirmDeleteApplication.p1 = Bydd y camau hyn yn digwydd ar unwaith. Ni fyddwch bellach yn gallu cael at unrhyw fanylion am eich cais presennol, gan gynnwys ein penderfyniad.
+confirmDeleteApplication.p2 = Gallwch ddewis dechrau cais newydd pan fyddwch yn barod.
+confirmDeleteApplication.p3 = Mae CThEF yn cynnal gwiriadau mewn perthynas â phob cais ac unrhyw unigolion perthnasol.
+confirmDeleteApplication.label = A ydych am ddileu’ch cais?
 confirmDeleteApplication.Yes = Iawn
 confirmDeleteApplication.No = Na
-confirmDeleteApplication.error.required = Select yes if you want to delete your application
-confirmDeleteApplication.error.invalid = Select yes if you want to delete your application
+confirmDeleteApplication.error.required = Dewiswch ‘Iawn’ os ydych am ddileu’ch cais
+confirmDeleteApplication.error.invalid = Dewiswch ‘Iawn’ os ydych am ddileu’ch cais
 
-confirmationOfDeletion.title = We have deleted the application
+confirmationOfDeletion.title = Rydym wedi dileu’r cais
 confirmationOfDeletion.whatNext.h2 = Yr hyn sy’n digwydd nesaf
-confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services account again, you can <a class="govuk-link" href="{0}">start a new application</a>.
+confirmationOfDeletion.whatNext.p1 = Os ydych am wneud cais am gyfrif gwasanaethau asiant eto, gallwch <a class="govuk-link" href="{0}">ddechrau cais newydd</a>.
 
 signedOut.title = Rydych wedi allgofnodi
 signedOut.link = Mewngofnodwch eto
