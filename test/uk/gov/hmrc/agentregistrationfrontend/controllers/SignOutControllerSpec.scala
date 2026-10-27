@@ -29,7 +29,7 @@ extends ControllerSpec:
   private val signOutWithContinuePath = "/agent-registration/sign-out-with-continue"
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
-  private val timedOutUrl = AppRoutes.SignOutController.timedOut.url
+  private val timedOutUrl = AppRoutes.SignOutController.timedOut(signBackInUrl = None).url
   private val landingUrl = AppRoutes.apply.AgentApplicationController.landing.url
 
   private def signOutWithContinue(continue: String): String = s"$signOutWithContinuePath?continueUrl=${URLEncoder.encode(continue, "UTF-8")}"
