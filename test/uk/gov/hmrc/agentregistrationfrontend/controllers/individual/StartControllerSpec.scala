@@ -16,11 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -38,21 +36,9 @@ extends ControllerSpec:
         .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
-    val complete: AgentApplication = inComplete
-      .modify(_.applicationState)
-      .setTo(ApplicationState.SentForRisking)
-      .modify(_.submittedAt)
-      .setTo(Some(tdAll.nowAsInstant))
-    val riskingComplete: AgentApplication = complete
-      .modify(_.applicationState)
-      .setTo(ApplicationState.RiskingCompleted)
-    val expired: AgentApplication = inComplete
-      .modify(_.applicationState)
-      .setTo(ApplicationState.Expired)
-      .modify(_.expiredAt)
-      .setTo(Some(tdAll.nowAsInstant))
-      .modify(_.postExpiryGracePeriodEndsAt)
-      .setTo(Some(tdAll.nowAsInstant.plusSeconds(3600 * 24 * 45)))
+    val complete: AgentApplication = tdAll.agentApplicationLlp.afterSentForRisking
+    val riskingComplete: AgentApplication = tdAll.agentApplicationLlp.afterRiskingCompletedApproved
+    val expired: AgentApplication = tdAll.agentApplicationLlp.afterExpired
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.StartController.start(linkId) shouldBe Call(

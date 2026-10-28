@@ -50,19 +50,16 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         applicationService.find(linkId).map:
+          case Some(expiredApplication) if expiredApplication.applicationState === ApplicationState.Expired =>
+            logger.info(s"Application for linkId $linkId has expired")
+            Ok(expiredPage(linkId))
           case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
             agentApplication.applicationState match
               case ApplicationState.RiskingCompleted =>
                 Ok(outcomeStartPage(
                   linkId: LinkId
                 ))
-              case ApplicationState.Expired =>
-                logger.info(s"Application for linkId $linkId has expired")
-                Ok(expiredPage(linkId))
               case _ => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId)) // this case will only ever be for first time submissions, RiskingCompleted is the status for resubmissions
-          case Some(expiredApplication) if expiredApplication.applicationState === ApplicationState.Expired =>
-            logger.info(s"Application for linkId $linkId has expired")
-            Ok(expiredPage(linkId))
           case Some(agentApplication) =>
             val applicationExpiryInstant: Instant = agentApplication
               .applicationExpiresAt
