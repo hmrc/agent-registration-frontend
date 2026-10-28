@@ -21,6 +21,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.checkfailed.SoleTraderHasNoSaUtrPage
@@ -42,6 +44,7 @@ extends FrontendController(mcc, actions):
         condition =
           implicit request =>
             request.agentApplication match
+              case expiredApplication if expiredApplication.applicationState === ApplicationState.Expired => false
               case a: AgentApplicationSoleTrader => a.businessDetails.isEmpty // having business details means SaUtr is present
               case _: IsNotSoleTrader => false,
         resultWhenConditionNotMet =

@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
@@ -58,6 +59,9 @@ extends FrontendController(mcc, actions):
         agentApplicationService
           .find(linkId)
           .map:
+            case Some(expiredApplication) if expiredApplication.applicationState === ApplicationState.Expired =>
+              logger.warn(s"User has an expired application with linkId $linkId, redirecting to start where expired is handled")
+              Redirect(AppRoutes.providedetails.StartController.start(linkId))
             case Some(agentApplication) => request.add(agentApplication)
             case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
     .refine:

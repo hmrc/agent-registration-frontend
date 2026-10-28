@@ -55,6 +55,17 @@ extends ControllerSpec:
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
 
+  s"GET $path should redirect to the task list when the application has expired" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationSoleTrader.afterExpired)
+
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+
   s"GET $path should redirect to the task list when application is not for a sole trader" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterStarted)
