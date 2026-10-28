@@ -63,6 +63,12 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  def startNewApplication: Action[AnyContent] = actions
+    .action:
+      implicit request =>
+        // Implementation for starting a new application and signing out any stale sessions goes here
+        Redirect(AppRoutes.apply.AgentApplicationController.startRegistration.url).withNewSession
+
   def showAgentApplication: Action[AnyContent] = actions
     .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
