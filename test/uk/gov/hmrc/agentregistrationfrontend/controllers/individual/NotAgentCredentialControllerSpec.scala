@@ -30,7 +30,7 @@ extends ControllerSpec:
 
   private val continueUrl = s"$thisFrontendBaseUrl/agent-registration/provide-details/start/${tdAll.linkId.value}"
   private val encodedContinueUrl = URLEncoder.encode(continueUrl, "UTF-8")
-  private val path = s"/agent-registration/apply/not-agent-credential?continueUrl=$encodedContinueUrl"
+  private val path = s"/agent-registration/provide-details/wrong-credential-used?continueUrl=$encodedContinueUrl"
 
   "NotAgentCredentialController should have the correct routes" in:
     AppRoutes.providedetails.NotAgentCredentialController.show(Some(RedirectUrl(continueUrl))) shouldBe Call(

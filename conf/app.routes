@@ -21,7 +21,6 @@ GET         /apply/sole-trader-has-no-utr                           uk.gov.hmrc.
 GET         /apply/cannot-confirm-identity                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotConfirmIdentityController.show
 GET         /apply/cannot-register                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterController.show
 GET         /apply/unable-to-confirm-business-details               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.UnableToConfirmBusinessDetailsController.show
-GET         /apply/not-agent-credential                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
 GET         /apply/agent-already-subscribed                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AgentAlreadySubscribedController.show
@@ -183,6 +182,7 @@ POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 GET         /details-already-provided                               uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.detailsAlreadyProvided
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.genericExitPage
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.StartController.start(linkId: LinkId)
+GET         /provide-details/wrong-credential-used                  uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /provide-details/sign-out/:linkId                      uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.individualSignOut(linkId: LinkId)
 GET         /provide-details/signed-out/:linkId                    uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.individualSignedOut(linkId: LinkId)
 GET         /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.MatchIndividualProvidedDetailsController.show(linkId: LinkId, fromIv: Option[Boolean])
