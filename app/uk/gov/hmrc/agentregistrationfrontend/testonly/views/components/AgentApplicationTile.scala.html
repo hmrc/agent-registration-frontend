@@ -320,7 +320,11 @@
             <dd class="govuk-summary-list__value">
                 @compactLink(
                     label = "Log in as applicant",
-                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), RedirectUrl(redirectUrlWithAnchor))
+                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(
+                        userId = UserId(agentApplication.internalUserId.value.split("@").headOption.getOrElse(UserId.make(agentApplication.agentApplicationId).value)),
+                        planetId = PlanetId(agentApplication.internalUserId.value.split("@").lastOption.getOrElse(PlanetId.make(agentApplication.agentApplicationId).value)),
+                        redirectUrl = RedirectUrl(redirectUrlWithAnchor)
+                    )
                 )
             </dd>
         </div>
