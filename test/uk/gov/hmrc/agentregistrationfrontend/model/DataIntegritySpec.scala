@@ -113,3 +113,34 @@ extends UnitSpec:
     "flag Started state as invalid during resubmission" in:
       val bad = llp.afterResubmitted.copy(applicationState = ApplicationState.Started)
       violations(bad).exists(_.contains("resubmission-in-flight is only valid in SentForRisking, SentToMinerva or RiskingCompleted")) shouldBe true
+
+  "a valid Expired snapshot" should:
+    "produce no violations before any email is sent" in:
+      violations(llp.afterExpired) shouldBe empty
+
+    "produce no violations with the expired email sent" in:
+      violations(llp.afterExpiredEmailSent) shouldBe empty
+
+    "produce no violations with the deletion email sent after the grace period" in:
+      violations(llp.afterExpiredPostExpiryGracePeriodEndedDeletionEmailSent) shouldBe empty
+
+  "an inconsistent Expired app" should:
+    "flag expiredEmailSentAt before expiredAt" in:
+      val bad = llp.afterExpired.copy(expiredEmailSentAt = Some(td.nowAsInstant.minusSeconds(1)))
+      violations(bad).exists(_.contains("expiredEmailSentAt should not be before expiredAt in Expired state")) shouldBe true
+
+    "flag deletionEmailSentAt before postExpiryGracePeriodEndsAt" in:
+      val bad = llp.afterExpired.copy(deletionEmailSentAt = Some(td.nowAsInstant))
+      violations(bad).exists(_.contains("deletionEmailSentAt should not be before postExpiryGracePeriodEndsAt in Expired state")) shouldBe true
+
+  "an email marker outside Expired" should:
+    "flag expiredEmailSentAt on a Started app" in:
+      val bad = llp.afterStarted.copy(expiredEmailSentAt = Some(td.nowAsInstant))
+      violations(bad).exists(_.contains("expiredEmailSentAt should not be defined in Started state")) shouldBe true
+
+    "flag deletionEmailSentAt on a submitted app" in:
+      val bad = llp.afterSentForRisking.copy(deletionEmailSentAt = Some(td.nowAsInstant))
+      violations(bad).exists(_.contains("deletionEmailSentAt should not be defined in SentForRisking state")) shouldBe true
+
+    "not flag expiryReminderEmailSentAt on a submitted app, since a reminded applicant can still submit" in:
+      violations(llp.afterSentForRisking.copy(expiryReminderEmailSentAt = Some(td.nowAsInstant))) shouldBe empty
