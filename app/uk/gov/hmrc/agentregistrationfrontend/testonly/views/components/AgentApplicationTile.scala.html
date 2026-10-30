@@ -22,10 +22,9 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.testonly.FindRiskingResultsFilesResponse
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 @import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
@@ -318,14 +317,21 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Access</dt>
             <dd class="govuk-summary-list__value">
-                @compactLink(
-                    label = "Log in as applicant",
-                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(
-                        userId = UserId(agentApplication.internalUserId.value.split("@").headOption.getOrElse(UserId.make(agentApplication.agentApplicationId).value)),
-                        planetId = PlanetId(agentApplication.internalUserId.value.split("@").lastOption.getOrElse(PlanetId.make(agentApplication.agentApplicationId).value)),
-                        redirectUrl = RedirectUrl(redirectUrlWithAnchor)
-                    )
-                )
+                @User.parseIds(agentApplication.internalUserId) match {
+                    case Some((userId, planetId)) => {
+                        @compactLink(
+                            label = "Log in as applicant",
+                            url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(
+                                userId = userId,
+                                planetId = planetId,
+                                redirectUrl = RedirectUrl(redirectUrlWithAnchor)
+                            )
+                        )
+                    }
+                    case None => {
+                        <p class="govuk-hint govuk-!-margin-bottom-0">This applicant did not sign in through agents-external-stubs, so there is no stub user to log in as.</p>
+                    }
+                }
             </dd>
         </div>
         <div class="govuk-summary-list__row" id="entity-minerva-simulator">

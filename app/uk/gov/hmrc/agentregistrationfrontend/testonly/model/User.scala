@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 import play.api.libs.json.*
 import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
@@ -54,6 +55,12 @@ final case class User(
 )
 
 object User:
+
+  /** None when the id did not come from agents-external-stubs, which is the only thing that builds it as `userId@planetId`. */
+  def parseIds(internalUserId: InternalUserId): Option[(UserId, PlanetId)] =
+    internalUserId.value.split("@", 2) match
+      case Array(userId, planetId) if userId.nonEmpty && planetId.nonEmpty => Some((UserId(userId), PlanetId(planetId)))
+      case _ => None
 
   case class Address(
     line1: Option[String] = None,
