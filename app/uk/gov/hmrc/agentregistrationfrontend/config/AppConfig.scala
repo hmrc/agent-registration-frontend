@@ -68,6 +68,7 @@ class AppConfig @Inject() (
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
 
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
+  val hmrcEmailRendererBaseUrl: String = servicesConfig.baseUrl("hmrc-email-renderer")
   val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
   val agentAssuranceBaseUrl: String = servicesConfig.baseUrl("agent-assurance")
   val agentRegistrationRiskingBaseUrl: String = servicesConfig.baseUrl("agent-registration-risking")

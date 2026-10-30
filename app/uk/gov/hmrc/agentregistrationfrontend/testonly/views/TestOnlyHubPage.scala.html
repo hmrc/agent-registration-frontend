@@ -113,12 +113,12 @@
     @compactLink(
         label = "Run expiry scheduler",
         url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler(RedirectUrl(request.uri)),
-        hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period")
+        hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period, then sends the expiry reminder and expired emails")
     )
     @compactLink(
         label = "Run deletion scheduler",
         url = AppRoutes.testOnly.TestOnlyController.runDeletionScheduler(RedirectUrl(request.uri)),
-        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt and deletes them together with their individuals and their AMLS evidence in object-store")
+        hint = Some("finds Expired applications past postExpiryGracePeriodEndsAt, sends them the deletion email and deletes them together with their individuals and their AMLS evidence in object-store")
     )
 
     @if(appConfig.TestOnly.allowResetDatabase) {

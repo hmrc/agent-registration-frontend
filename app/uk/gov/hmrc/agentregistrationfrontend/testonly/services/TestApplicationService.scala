@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
@@ -25,18 +26,42 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestEmailRendererConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class TestApplicationService @Inject() (
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  testEmailRendererConnector: TestEmailRendererConnector,
   agentRegistrationConnector: AgentRegistrationConnector
-)
+)(using ExecutionContext)
 extends RequestAwareLogging:
+
+  def findApplicationEmails(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
+    testAgentRegistrationConnector.findApplicationEmails(applicationReference)
+
+  def previewApplicationEmail(
+    applicationReference: ApplicationReference,
+    templateId: String
+  )(using RequestHeader): Future[Option[String]] = findApplicationEmails(applicationReference).flatMap:
+    case Some(applicationEmails) =>
+      val maybeParameters: Option[Map[String, String]] = Seq(
+        "expiryReminder",
+        "expired",
+        "deleted"
+      )
+        .map(key => applicationEmails \ key)
+        .find(sendEmailRequest => (sendEmailRequest \ "templateId").asOpt[String].contains(templateId))
+        .flatMap(sendEmailRequest => (sendEmailRequest \ "parameters").asOpt[Map[String, String]])
+      maybeParameters match
+        case Some(parameters) => testEmailRendererConnector.renderEmailHtml(templateId, parameters).map(Some(_))
+        case None => Future.successful(None)
+    case None => Future.successful(None)
 
   def deleteAll()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.deleteAllApplications()
 

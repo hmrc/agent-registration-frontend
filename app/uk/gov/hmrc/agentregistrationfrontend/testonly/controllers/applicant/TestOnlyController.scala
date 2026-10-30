@@ -35,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
@@ -43,10 +44,12 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
+import scala.jdk.DurationConverters.*
 
 @Singleton
 class TestOnlyController @Inject() (
@@ -58,6 +61,7 @@ class TestOnlyController @Inject() (
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
   testRiskingService: TestRiskingService,
+  testApplicationService: TestApplicationService,
   clock: Clock,
   appConfig: AppConfig
 )
@@ -156,6 +160,58 @@ extends FrontendController(mcc, actions):
         testAgentRegistrationConnector
           .upsertAgentApplication(request.get[AgentApplication].modify(_.postExpiryGracePeriodEndsAt).using(_.map(_ => oneMinuteAgo)))
           .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
+
+  private val daysLeftWithinExpiryReminderWindow: Long = 5
+
+  def moveIntoExpiryReminderWindow(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions
+    .getApplication(applicationReference)
+    .async:
+      implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+        val newApplicationExpiresAt: Instant = Instant.now(clock).plus(Duration.ofDays(daysLeftWithinExpiryReminderWindow))
+        val newCreatedAt: Instant = newApplicationExpiresAt.minus(appConfig.daysToSubmitApplication.toJava)
+        testAgentRegistrationConnector
+          .upsertAgentApplication(
+            request.get[AgentApplication]
+              .modify(_.createdAt)
+              .using(_ => newCreatedAt)
+              .modify(_.applicationExpiresAt)
+              .using(_.map(_ => newApplicationExpiresAt))
+              .modify(_.expiryReminderEmailSentAt)
+              .setTo(None)
+          )
+          .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
+
+  def resetEmailMarkers(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions
+    .getApplication(applicationReference)
+    .async:
+      implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+        testAgentRegistrationConnector
+          .upsertAgentApplication(
+            request.get[AgentApplication]
+              .modify(_.expiryReminderEmailSentAt)
+              .setTo(None)
+              .modify(_.expiredEmailSentAt)
+              .setTo(None)
+              .modify(_.deletionEmailSentAt)
+              .setTo(None)
+          )
+          .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
+
+  def showApplicationEmails(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
+    implicit request =>
+      testApplicationService.findApplicationEmails(applicationReference).map:
+        case Some(applicationEmails) => Ok(Json.prettyPrint(applicationEmails))
+        case None => Ok(s"No application found for applicationReference: ${applicationReference.value}")
+
+  def previewApplicationEmail(
+    applicationReference: ApplicationReference,
+    templateId: String
+  ): Action[AnyContent] = action.async:
+    implicit request =>
+      testApplicationService.previewApplicationEmail(applicationReference, templateId).map:
+        case Some(html) => Ok(html).as(HTML)
+        case None =>
+          Ok(s"No $templateId email can be built for applicationReference ${applicationReference.value}: no verified email address, or the dates it needs are not set")
 
   private def applicationDetailsUrlWithTimersAnchor(applicationReference: ApplicationReference): String =
     s"${AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference).url}#timers"

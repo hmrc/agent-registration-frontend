@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
@@ -200,6 +201,24 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to delete all Agent Applications")
+
+  def findApplicationEmails(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
+    val url: URL = url"$baseUrl/application/by-application-reference/${applicationReference.value}/emails"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json)
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find emails for applicationReference: ${applicationReference.value}")
 
   def runExpiryScheduler()(using RequestHeader): Future[Unit] =
     val url: URL = url"$baseUrl/run-expiry-scheduler"
