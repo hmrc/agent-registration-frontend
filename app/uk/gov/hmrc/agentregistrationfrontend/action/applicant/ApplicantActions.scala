@@ -50,13 +50,16 @@ import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.validateRedirectUrl
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -92,7 +95,8 @@ class ApplicantActions @Inject() (
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
   individualProvidedDetailsService: IndividualProvideDetailsService,
-  auditService: AuditService
+  auditService: AuditService,
+  appConfig: AppConfig
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -291,7 +295,7 @@ extends RequestAwareLogging:
     /** The declared number of officers, for the pages that only exist when the company has six or more of them. `redirectWhenFiveOrLess` is where an
       * application with five or fewer officers belongs instead.
       */
-    inline def getSixOrMoreOfficers(redirectWhenFiveOrLess: Call)(using
+    inline def getSixOrMoreOfficers(redirectWhenFiveOrLess: RedirectUrl)(using
       IsIncorporated PresentIn Data,
       SixOrMoreOfficers AbsentIn Data
     ): ActionBuilderWithData[SixOrMoreOfficers *: Data] = ab.refine:
@@ -300,7 +304,7 @@ extends RequestAwareLogging:
           case Some(sixOrMoreOfficers: SixOrMoreOfficers) => request.add[SixOrMoreOfficers](sixOrMoreOfficers)
           case Some(_: FiveOrLessOfficers) =>
             logger.debug("Number of required key individuals is five or less, redirecting away from the six or more pages")
-            Redirect(redirectWhenFiveOrLess.url)
+            Redirect(validateRedirectUrl(redirectWhenFiveOrLess, appConfig.allowedRedirectHosts))
           case None =>
             logger.debug("Number of required key individuals not specified in application, redirecting to Companies House officers page")
             Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)

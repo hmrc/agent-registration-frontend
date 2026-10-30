@@ -23,11 +23,13 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQue
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
+import scala.util.matching.Regex
+
 object CompaniesHouseNameQueryForm:
 
   val firstNameKey: String = "firstName"
   val lastNameKey: String = "lastName"
-  private val nameRegex = "^[a-zA-Z\\s\\-']+$"
+  private val nameRegex: Regex = """^[\p{L}\p{M}\s'\u2019\-.]+$""".r
   private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
   val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
@@ -40,7 +42,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          _.matches(nameRegex)
+          _.matches(nameRegex.regex)
         ),
       lastNameKey -> Forms.of(using TextFormatter(ErrorKeys.requiredFieldErrorMessage(lastNameKey)))
         .transform[String](canonicalise, identity)
@@ -50,7 +52,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(lastNameKey),
-          _.matches(nameRegex)
+          _.matches(nameRegex.regex)
         )
     )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
   )

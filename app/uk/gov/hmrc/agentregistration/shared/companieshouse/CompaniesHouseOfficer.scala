@@ -20,6 +20,7 @@ import play.api.libs.json.*
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import scala.util.matching.Regex
 
 final case class CompaniesHouseOfficer(
   name: String,
@@ -50,24 +51,10 @@ object CompaniesHouseOfficer:
         case surname :: forenames :: _ => s"${titleCase(forenames)} ${titleCase(surname)}"
         case _ => trimmed
     else
-      // Already likely "Forename Surname" or corporate name
-      titleCasePreserveAcronyms(trimmed)
+      // Already likely "Forename Surname"
+      titleCase(trimmed)
 
-  private def titleCase(s: String): String = s.split("\\s+")
-    .filter(_.nonEmpty)
-    .map { word =>
-      if word.forall(_.isUpper) then
-        word.toLowerCase.capitalize
-      else
-        s"${word.head.toUpper}${word.tail.toLowerCase}"
-    }
-    .mkString(" ")
-
-  private def titleCasePreserveAcronyms(s: String): String = s.split("\\s+")
-    .filter(_.nonEmpty)
-    .map { word =>
-      // Preserve things like "LLP", "UK", "HMRC"
-      if word.forall(_.isUpper) && word.length <= 5 then word
-      else s"${word.head.toUpper}${word.tail.toLowerCase}"
-    }
-    .mkString(" ")
+  private val namePartDelimiter: Regex = "(?<=^|[\\s.'’-])(\\p{L})".r
+  // this ensures names like O'CONNOR do not come out as O'connor, but rather O'Connor, and similarly for hyphenated names like Smith-Jones
+  // the only companies house officer names we support are for individuals, so we don't need to worry about corporate acronyms like "ACME UK LTD" or "ACME LIMITED"
+  private def titleCase(s: String): String = namePartDelimiter.replaceAllIn(s.toLowerCase, m => m.group(1).toUpperCase)

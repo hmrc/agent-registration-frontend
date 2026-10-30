@@ -151,7 +151,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
-  // stubSixOfficers returns 6 active officers (normalised): John Tester, John Ian Tester, Alice Tester, Bob Tester, Carol Tester, Carol Tester (duplicate)
+  // stubSixOfficers returns 6 active officers (normalised): René O’Connor, John Ian Tester, Alice Tester, Bob Tester, Carol Tester, Carol Tester (duplicate)
   private def individualWithName(
     name: String
   ): IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(
@@ -163,7 +163,7 @@ extends ControllerSpec:
     // List is over-complete (6 > totalListSize 5), so renderPage redirects to CYA.
     // This should never happen as the GET method should have already redirected to CYA.
     val allOfficers = List(
-      individualWithName("John Tester"),
+      individualWithName("René O’Connor"),
       individualWithName("John Ian Tester"),
       individualWithName("Alice Tester"),
       individualWithName("Bob Tester"),
@@ -239,8 +239,8 @@ extends ControllerSpec:
     CompaniesHouseStubs.verifySixOfficersCalls(surname = Some("Tester"))
 
   s"POST $postPath should store the matched CH officer name, not the user-entered name" in:
-    // User enters "john" / "tester" (lowercase), but CH has "John Tester".
-    // The stored name should be the CH officer name "John Tester", not "john tester".
+    // User enters "rené" / "o’connor" (lowercase), but CH has "René O’Connor".
+    // The stored name should be the CH officer name "René O’Connor", not "rené o’connor".
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -248,14 +248,14 @@ extends ControllerSpec:
     )
     AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("René O’Connor"))
     )
-    CompaniesHouseStubs.stubSixOfficers(surname = Some("tester"))
+    CompaniesHouseStubs.stubSixOfficers(surname = Some("o’connor"))
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("john"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("rené"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("o’connor")
       ))
 
     response.status shouldBe Status.SEE_OTHER

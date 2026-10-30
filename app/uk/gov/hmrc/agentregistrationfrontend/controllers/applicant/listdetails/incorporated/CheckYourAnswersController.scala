@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.CheckYourAnswersPage
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @Singleton
 class CheckYourAnswersController @Inject() (
@@ -42,7 +43,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getIncorporatedApplication
-    .getSixOrMoreOfficers(redirectWhenFiveOrLess = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show)
+    .getSixOrMoreOfficers(redirectWhenFiveOrLess = RedirectUrl(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url))
     .getCompaniesHouseKeyIndividuals
     .ensure(
       condition = request => request.get[List[IndividualProvidedDetails]].nonEmpty || request.get[SixOrMoreOfficers].totalListSize === 0,

@@ -35,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvi
 import uk.gov.hmrc.agentregistrationfrontend.util.NameMatching
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.EnterCompaniesHouseFirstIndividualNamePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.EnterCompaniesHouseNextIndividualNamePage
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -57,7 +58,9 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilderWithData[CompaniesHouseRequestData] = actions
     .getIncorporatedApplicationAndBpr
     .getCompaniesHouseKeyIndividuals
-    .getSixOrMoreOfficers(redirectWhenFiveOrLess = AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+    .getSixOrMoreOfficers(
+      redirectWhenFiveOrLess = RedirectUrl(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>

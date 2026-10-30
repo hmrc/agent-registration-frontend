@@ -37,7 +37,7 @@ object CompaniesHouseStubs {
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern =
       surname match
-        case Some(s) => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$s")
+        case Some(s) => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=${URLEncoder.encode(s, "UTF-8")}")
         case None => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     responseStatus =
       if noMatch
@@ -183,7 +183,7 @@ object CompaniesHouseStubs {
       ),
       "items" -> Json.arr(
         Json.obj(
-          "name" -> s"Tester, John$title",
+          "name" -> s"O’CONNOR, René$title",
           "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
           "officer_role" -> officerRole.role
         ),
@@ -247,6 +247,11 @@ object CompaniesHouseStubs {
         "self" -> "/company/1234567890/appointments"
       ),
       "items" -> Json.arr(
+        Json.obj(
+          "name" -> s"$surname, René$title",
+          "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
+          "officer_role" -> officerRole.role
+        ),
         Json.obj(
           "name" -> s"$surname, John$title",
           "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
