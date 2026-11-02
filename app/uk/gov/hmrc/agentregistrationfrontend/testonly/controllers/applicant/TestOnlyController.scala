@@ -156,9 +156,19 @@ extends FrontendController(mcc, actions):
     .getApplication(applicationReference)
     .async:
       implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+        val agentApplication: AgentApplication = request.get[AgentApplication]
         val oneMinuteAgo: Instant = Instant.now(clock).minusSeconds(60)
+        val shift: Duration = agentApplication.postExpiryGracePeriodEndsAt
+          .map(postExpiryGracePeriodEndsAt => Duration.between(oneMinuteAgo, postExpiryGracePeriodEndsAt))
+          .getOrElse(Duration.ZERO)
         testAgentRegistrationConnector
-          .upsertAgentApplication(request.get[AgentApplication].modify(_.postExpiryGracePeriodEndsAt).using(_.map(_ => oneMinuteAgo)))
+          .upsertAgentApplication(
+            agentApplication
+              .modify(_.postExpiryGracePeriodEndsAt)
+              .using(_.map(_ => oneMinuteAgo))
+              .modify(_.expiredAt)
+              .using(_.map(_.minus(shift)))
+          )
           .map(_ => Redirect(applicationDetailsUrlWithTimersAnchor(applicationReference)))
 
   private val daysLeftWithinExpiryReminderWindow: Long = 5
