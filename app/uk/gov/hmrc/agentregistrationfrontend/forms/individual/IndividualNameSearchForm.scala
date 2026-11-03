@@ -31,7 +31,6 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 object IndividualNameSearchForm:
 
   val key: String = "individualNameSearch"
-  private val nameRegex = "^[a-zA-Z\\-' ]+$"
 
   private def canonicalise(s: String): String = s.trim.replaceAll("\\s+", " ")
 
@@ -51,7 +50,7 @@ object IndividualNameSearchForm:
       key -> text
         .transform[String](_.trim, identity)
         .verifying(ErrorKeys.requiredFieldErrorMessage(key), _.nonEmpty)
-        .verifying(ErrorKeys.invalidInputErrorMessage(key), _.matches(nameRegex))
+        .verifying(ErrorKeys.invalidInputErrorMessage(key), IndividualName(_).isValidName)
         .verifying(ErrorKeys.inputTooLongErrorMessage(key), _.length <= 100)
         .verifying(existsConstraint)
     )(individualName =>
