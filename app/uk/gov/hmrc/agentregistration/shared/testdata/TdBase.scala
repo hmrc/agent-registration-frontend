@@ -89,8 +89,7 @@ trait TdBase { dependencies: (TdTime & TdAgentApplicationTime) =>
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
   def companyName = "Test Company Name"
-  def limitedCompanyName = "Test Company Ltd"
-  def limitedPartnershipName = "Test Partnership"
+  def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def applicationReference: ApplicationReference = ApplicationReference("APPREF123")
   def personReference: PersonReference = PersonReference("1234567890")
   def applicantName: ApplicantName = ApplicantName(authorisedPersonName)
@@ -115,8 +114,6 @@ trait TdBase { dependencies: (TdTime & TdAgentApplicationTime) =>
     ))
   )
 
-  def companyProfileLimited: CompanyProfile = companyProfile.copy(companyName = limitedCompanyName)
-  def companyProfileLimitedPartnership: CompanyProfile = companyProfile.copy(companyName = limitedPartnershipName)
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
   def agentVerifiedEmailAddress = AgentVerifiedEmailAddress(

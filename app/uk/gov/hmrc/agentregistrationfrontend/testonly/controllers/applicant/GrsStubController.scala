@@ -313,7 +313,7 @@ extends FrontendController(mcc, actions):
       then
         Some(CompanyProfile(
           companyNumber = companyNumberForBusinessType(businessType),
-          companyName = if businessType === LimitedCompany then "Test Company Ltd" else "Test Partnership",
+          companyName = "Test Company Name",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
           unsanitisedCHROAddress = Some(ChroAddress(
             address_line_1 = Some("23 Great Portland Street"),
