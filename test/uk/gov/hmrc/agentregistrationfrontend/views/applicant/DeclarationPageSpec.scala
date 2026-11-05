@@ -30,7 +30,7 @@ extends ViewSpec:
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       agentApplication = agentApplicationRequest.agentApplication
     ).body
   )
@@ -41,7 +41,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Declaration
-          |I am authorised by Test Company Name to apply for an agent services account with HMRC.
+          |I am authorised by ABC Accounting to apply for an agent services account with HMRC.
           |The information I have given in this application is accurate to the best of my knowledge.
           |I understand that applying for an HMRC agent services account with the intention to commit tax fraud is a crime.
           |Accept and send

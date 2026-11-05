@@ -75,7 +75,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.CANNOT_START_YET
@@ -93,7 +93,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED // becomes COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
@@ -111,7 +111,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED // becomes COMPLETED
@@ -129,7 +129,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED
@@ -147,7 +147,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED
@@ -171,7 +171,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED
@@ -199,7 +199,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED
@@ -227,7 +227,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.businessDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.applicantContactDetails) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.accountDetails) shouldBe Constants.COMPLETED

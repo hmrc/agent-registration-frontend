@@ -34,7 +34,7 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       agentApplication = agentApplicationRequest.agentApplication
     ).body
   )
@@ -44,7 +44,7 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |Application for Test Company Name
+           |Application for ABC Accounting
            |Application reference: ${agentApplicationRequest.agentApplication.applicationReference.value}
            |About your business
            |UK-based agent
@@ -54,7 +54,7 @@ extends ViewSpec:
            |Are you a member of the limited liability partnership?
            |No, but I’m authorised by them to set up this account
            |Company name
-           |Test Company Name
+           |ABC Accounting
            |Unique taxpayer reference
            |1234567895
            |Your contact details
@@ -66,7 +66,7 @@ extends ViewSpec:
            |user@test.com
            |Agency contact details
            |Name shown to clients
-           |Test Company Name
+           |ABC Accounting
            |Telephone number
            |(+44) 10794554342
            |Email address
@@ -89,7 +89,7 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Application for Test Company Name"
+      doc.h1 shouldBe "Application for ABC Accounting"

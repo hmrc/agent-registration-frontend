@@ -30,7 +30,7 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/tell-us-about-relevant-individuals"
 
-  private val expectedHeading = "Tell us about the relevant individuals for Test Company Name"
+  private val expectedHeading = "Tell us about the relevant individuals for ABC Accounting"
 
   object agentApplication:
 

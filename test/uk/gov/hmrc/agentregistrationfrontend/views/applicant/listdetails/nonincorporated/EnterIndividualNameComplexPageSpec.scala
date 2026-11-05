@@ -39,7 +39,7 @@ extends ViewSpec:
 
   object ExpectedStrings:
 
-    val heading = "Tell us about 5 partners at Test Company Name"
+    val heading = "Tell us about 5 partners at ABC Accounting"
     val firstPartnerLabel = "What is the full name of the first partner?"
     val nextPartnerLabel = "What is the full name of the next partner?"
 
@@ -58,22 +58,22 @@ extends ViewSpec:
     (
       1,
       "the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
-      "any other 4 partners at Test Company Name"
+      "any other 4 partners at ABC Accounting"
     ),
     (
       2,
       "the 2 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
-      "any other 3 partners at Test Company Name"
+      "any other 3 partners at ABC Accounting"
     ),
     (
       3,
       "the 3 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
-      "any other 2 partners at Test Company Name"
+      "any other 2 partners at ABC Accounting"
     ),
     (
       4,
       "the 4 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
-      "1 other partner at Test Company Name"
+      "1 other partner at ABC Accounting"
     )
   )
 
@@ -109,7 +109,7 @@ extends ViewSpec:
         doc.mainContent shouldContainContent
           s"""
              |Partners and other relevant individuals
-             |Tell us about 5 partners at Test Company Name
+             |Tell us about 5 partners at ABC Accounting
              |We need the names of:
              |${testCase.expectedPaddingBullet1}
              |${testCase.expectedPaddingBullet2}

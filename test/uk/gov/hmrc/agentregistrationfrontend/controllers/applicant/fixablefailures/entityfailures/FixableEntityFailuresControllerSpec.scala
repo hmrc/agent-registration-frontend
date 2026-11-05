@@ -57,19 +57,19 @@ extends ControllerSpec:
   )
 
   private val entityFixFailureCodeHeadings: Map[String, String] = Map(
-    "EntityFix.4.1" -> "Self Assessment returns for Test Company Name",
-    "EntityFix.4.2" -> "Company Tax returns for Test Company Name",
-    "EntityFix.4.3" -> "VAT returns for Test Company Name",
-    "EntityFix.4.4" -> "PAYE reports for Test Company Name",
-    "EntityFix.5.1" -> "Test Company Name has an overdue Self Assessment liability",
-    "EntityFix.5.2" -> "Test Company Name has an overdue Corporation Tax liability",
-    "EntityFix.5.3" -> "Test Company Name has an overdue VAT liability",
-    "EntityFix.5.4" -> "Test Company Name has an overdue PAYE liability",
-    "EntityFix.5.5" -> "Test Company Name has an overdue civil penalty liability",
-    "EntityFix.5.6" -> "Test Company Name has an overdue Stamp Duty liability",
-    "EntityFix.5.7" -> "Test Company Name has an overdue Capital Gains Tax liability",
-    "EntityFix.8.5" -> "Test Company Name has an overdue penalty liability",
-    "EntityFix.8.7" -> "Test Company Name has an overdue penalty liability"
+    "EntityFix.4.1" -> "Self Assessment returns for ABC Accounting",
+    "EntityFix.4.2" -> "Company Tax returns for ABC Accounting",
+    "EntityFix.4.3" -> "VAT returns for ABC Accounting",
+    "EntityFix.4.4" -> "PAYE reports for ABC Accounting",
+    "EntityFix.5.1" -> "ABC Accounting has an overdue Self Assessment liability",
+    "EntityFix.5.2" -> "ABC Accounting has an overdue Corporation Tax liability",
+    "EntityFix.5.3" -> "ABC Accounting has an overdue VAT liability",
+    "EntityFix.5.4" -> "ABC Accounting has an overdue PAYE liability",
+    "EntityFix.5.5" -> "ABC Accounting has an overdue civil penalty liability",
+    "EntityFix.5.6" -> "ABC Accounting has an overdue Stamp Duty liability",
+    "EntityFix.5.7" -> "ABC Accounting has an overdue Capital Gains Tax liability",
+    "EntityFix.8.5" -> "ABC Accounting has an overdue penalty liability",
+    "EntityFix.8.7" -> "ABC Accounting has an overdue penalty liability"
   )
 
   private def pathForFailureCode(failureCode: String) = s"/agent-registration/conditions-not-yet-met/failure-details/$failureCode"

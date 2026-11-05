@@ -84,7 +84,7 @@ extends ControllerSpec:
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
       expectedInsetText = Some(
-        "We need the names of: the 3 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities any other 2 partners at Test Company Name"
+        "We need the names of: the 3 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities any other 2 partners at ABC Accounting"
       )
     ),
     TestCase(

@@ -42,7 +42,7 @@ extends ControllerSpec:
 
   private object ExpectedStrings:
 
-    private val heading = "What is the name of the supervisory body for Test Company Name?"
+    private val heading = "What is the name of the supervisory body for ABC Accounting?"
     val title = s"$heading - Apply for an agent services account - GOV.UK"
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
     val requiredError = "Enter a name and choose your supervisor from the list"

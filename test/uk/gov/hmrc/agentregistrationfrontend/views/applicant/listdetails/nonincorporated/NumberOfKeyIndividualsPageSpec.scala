@@ -42,7 +42,7 @@ extends ViewSpec:
     entityName = tdAll.companyName,
     agentApplication = agentApplication
   ).body)
-  private val heading: String = "How many partners are there at Test Company Name?"
+  private val heading: String = "How many partners are there at ABC Accounting?"
 
   "NumberOfKeyIndividualsPage" should:
 
@@ -50,7 +50,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Partners and other relevant individuals
-          |How many partners are there at Test Company Name?
+          |How many partners are there at ABC Accounting?
           |Only tell us about people with the title ‘partner’. Do not include partner organisations.
           |5 or fewer
           |What is the exact number?

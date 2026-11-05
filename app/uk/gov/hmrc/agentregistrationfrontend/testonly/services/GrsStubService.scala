@@ -80,7 +80,7 @@ class GrsStubService @Inject() (
               ))
             case Partnership.GeneralPartnership | BusinessType.Partnership.ScottishPartnership =>
               Some(Organisation(
-                organisationName = "Electronicsson Group", // hard coded to avoid random generation of name - we don't get this from GRS
+                organisationName = "ABC Accounting", // hard coded to avoid random generation of name - we don't get this from GRS
                 organisationType = "5T"
               ))
             case _ => None,

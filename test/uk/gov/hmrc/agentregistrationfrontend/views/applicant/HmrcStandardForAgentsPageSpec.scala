@@ -30,7 +30,7 @@ extends ViewSpec:
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       agentApplication = agentApplicationRequest.agentApplication
     ).body
   )
@@ -49,7 +49,7 @@ extends ViewSpec:
           |The HMRC standard for agents (opens in new tab)
           |Declaration
           |I have read the HMRC standard for agents.
-          |I agree that Test Company Name will meet the standard when working on behalf of clients.
+          |I agree that ABC Accounting will meet the standard when working on behalf of clients.
           |Agree and continue
           |Save and come back later
           |"""

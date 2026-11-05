@@ -48,7 +48,7 @@ extends ViewSpec:
           |Account contact details
           |Check your answers
           |Name shown to clients
-          |Test Company Name
+          |ABC Accounting
           |Change Name shown to clients
           |Telephone number
           |(+44) 10794554342
@@ -73,7 +73,7 @@ extends ViewSpec:
         List(
           TestSummaryRow(
             key = "Name shown to clients",
-            value = "Test Company Name",
+            value = "ABC Accounting",
             action = AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url,
             changeLinkAccessibleContent = "Change Name shown to clients"
           ),

@@ -33,7 +33,7 @@ extends ViewSpec:
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       agentApplication = agentApplication,
       dateOfDecision = "21 April 2026",
       dateSubmitted = "10 March 2026"
@@ -47,7 +47,7 @@ extends ViewSpec:
         s"""
            |Check the progress of an application
            |Application reference: ${agentApplication.applicationReference.value}
-           |This is application is for an agent services account for Test Company Name.
+           |This is application is for an agent services account for ABC Accounting.
            |Some of the information on this page uses real-time data and might change.
            |When to expect a decision
            |It’s currently taking up to 8 weeks to process applications for an agent services account.

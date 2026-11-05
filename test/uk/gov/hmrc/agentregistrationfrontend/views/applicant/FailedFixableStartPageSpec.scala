@@ -30,7 +30,7 @@ extends ViewSpec:
     viewTemplate(
       actualDecisionDate = "4 June 2026",
       correctiveActionExpiryDate = "3 August 2026",
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       isSoleTrader = false
     ).body
   )
@@ -39,7 +39,7 @@ extends ViewSpec:
     viewTemplate(
       actualDecisionDate = "4 June 2026",
       correctiveActionExpiryDate = "3 August 2026",
-      entityName = "Test Company Name",
+      entityName = "ABC Accounting",
       isSoleTrader = true
     ).body
   )
@@ -49,20 +49,20 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions yet
+           |ABC Accounting does not meet the registration conditions yet
            |Date of decision: 4 June 2026
            |Our decision
            |Your application to register for an agent services account cannot currently be approved.
            |The application is refused under Section 230 (registration conditions) of the Finance Act 2026 (opens in a new tab).
-           |However, Test Company Name can still meet the registration conditions if you take action by 3 August 2026.
+           |However, ABC Accounting can still meet the registration conditions if you take action by 3 August 2026.
            |How to meet the registration conditions
            |The actions to take are listed on the next page.
            |View actions to take
            |Failure to meet the registration conditions
            |If you choose not to take action to meet the registration conditions:
-           |Test Company Name will not be given an agent services account on this occasion
+           |ABC Accounting will not be given an agent services account on this occasion
            |the application will be deleted on 3 August 2026 to comply with our data retention policy
-           |Test Company Name has the right to review or appeal
+           |ABC Accounting has the right to review or appeal
            |Keep a copy of this decision for your records.
            |If you disagree with our decision to refuse your application, you can request a review or appeal the decision (opens in a new tab).
            |You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
@@ -96,12 +96,12 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title when not a sole trader" in:
-      doc.title() shouldBe "Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "ABC Accounting does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
     "have the correct title when a sole trader owner" in:
       soleTraderDoc.title() shouldBe "You do not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
 
     "have the correct h1 when not a sole trader" in:
-      doc.h1 shouldBe "Test Company Name does not meet the registration conditions yet"
+      doc.h1 shouldBe "ABC Accounting does not meet the registration conditions yet"
     "have the correct h1 when a sole trader owner" in:
       soleTraderDoc.h1 shouldBe "You do not meet the registration conditions yet"
 

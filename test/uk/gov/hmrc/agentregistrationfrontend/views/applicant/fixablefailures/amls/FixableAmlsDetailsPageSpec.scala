@@ -36,7 +36,7 @@ extends ViewSpec:
     "EntityFailure.3.1" -> """
                              |Anti-money laundering supervision details
                              |We could not match your details with a current record
-                             |You told us that Test Company Name is supervised by Association of TaxationTechnicians (ATT) for anti-money laundering.
+                             |You told us that ABC Accounting is supervised by Association of TaxationTechnicians (ATT) for anti-money laundering.
                              |The registration number you gave was ATT AML-1234-123456.
                              |However, this number is not in Association of TaxationTechnicians (ATT)’s register.
                              |Please check your details and try again.
@@ -45,7 +45,7 @@ extends ViewSpec:
     "EntityFailure.3.2" -> """
                              |Anti-money laundering supervision details
                              |We have not been able to confirm your anti-money laundering supervision
-                             |You gave us these supervisory details for Test Company Name:
+                             |You gave us these supervisory details for ABC Accounting:
                              |Association of TaxationTechnicians (ATT)
                              |registration number: ATT AML-1234-123456
                              |We could not find a record of this supervision.
@@ -57,7 +57,7 @@ extends ViewSpec:
                              |Anti-money laundering supervision details
                              |We could not accept your evidence
                              |The evidence you uploaded did not meet our requirements.
-                             |It did not prove that Association of TaxationTechnicians (ATT) is the current anti-money laundering supervisor for Test Company Name.
+                             |It did not prove that Association of TaxationTechnicians (ATT) is the current anti-money laundering supervisor for ABC Accounting.
                              |This might be because the document did not contain:
                              |the name of your business
                              |a date to prove you paid the supervision fee within the last 12 months
@@ -70,11 +70,11 @@ extends ViewSpec:
     "EntityFailure.3.5" -> """
                              |Anti-money laundering supervision details
                              |Your membership does not include anti-money laundering supervision
-                             |You gave us these supervisory details for Test Company Name:
+                             |You gave us these supervisory details for ABC Accounting:
                              |Association of TaxationTechnicians (ATT)
                              |registration number: ATT AML-1234-123456
                              |These records are for student membership. A student membership does not provide the level of anti-money laundering supervision you need as an agent with HMRC.
-                             |You need to confirm that Test Company Name has membership of a professional body that includes anti-money laundering supervision.
+                             |You need to confirm that ABC Accounting has membership of a professional body that includes anti-money laundering supervision.
                              |Continue
                              |"""
       .stripMargin
@@ -102,7 +102,7 @@ extends ViewSpec:
     ) =>
       val doc: Document = Jsoup.parse(
         viewTemplate(
-          entityName = "Test Company Name",
+          entityName = "ABC Accounting",
           failureCode = failureCode,
           amlsDetails = agentApplication.withNonHmrcAmls.getAmlsDetails
         ).body
