@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 
 import com.softwaremill.quicklens.modify
 import play.api.libs.ws.WSResponse
+import play.api.libs.ws.WSBodyReadables.readableAsString
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
@@ -33,6 +34,8 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
 class RiskingOutcomeControllerSpec
 extends ControllerSpec:
@@ -139,3 +142,34 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "You do not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+
+  s"GET $path with no application found on the link id should redirect to the application not found page" in:
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(linkId = linkId)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url
+    IndividualAuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+
+  s"GET $path when internalUserId does not match any of the IndividualProvidedDetails records should redirect to the no records left to claim page" in:
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    AgentRegistrationStubs.stubFindApplicationByLinkId(
+      linkId = linkId,
+      agentApplication = failedFixableApplication
+    )
+    AgentRegistrationStubs.stubFindIndividualsForMatching(
+      agentApplicationId = failedFixableApplication.agentApplicationId,
+      individuals = List(
+        tdAll.providedDetails.afterStarted.copy(internalUserId = Some(InternalUserId("non-matching"))),
+        tdAll.providedDetails.afterStarted.copy(internalUserId = Some(InternalUserId("non-matching-2")))
+      )
+    )
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.noRecordsLeftToClaim(linkId).url
+    IndividualAuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+    AgentRegistrationStubs.verifyFindIndividualsForMatching(applicationId = failedFixableApplication.agentApplicationId)

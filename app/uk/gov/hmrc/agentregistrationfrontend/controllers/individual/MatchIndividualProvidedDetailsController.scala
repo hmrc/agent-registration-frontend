@@ -89,9 +89,11 @@ extends FrontendController(mcc, actions):
         .map:
           case Some(expiredApplication) if expiredApplication.applicationState === ApplicationState.Expired =>
             logger.warn(s"User has an expired application with linkId $linkId, redirecting to start where expired is handled")
-            Redirect(AppRoutes.providedetails.StartController.start(linkId))
+            Redirect(AppRoutes.providedetails.StartController.start(linkId).url)
           case Some(agentApplication) => request.add(agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+          case None =>
+            logger.warn(s"An application with linkId $linkId not found, redirecting to start where not found is handled")
+            Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url)
     )
     .refine(implicit request =>
       individualProvideDetailsService
@@ -100,8 +102,10 @@ extends FrontendController(mcc, actions):
           case list: List[IndividualProvidedDetails] if list.exists(_.internalUserId.contains(request.get[InternalUserId])) =>
             Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
           case list: List[IndividualProvidedDetails] if !list.exists(_.internalUserId.isEmpty) =>
-            logger.warn("No matching IndividualProvidedDetails record and there are no records left without an internalUserId, so we must exit the user")
-            Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+            logger.warn(
+              "No matching IndividualProvidedDetails record and there are no records left without an internalUserId, redirect to no records left to claim page"
+            )
+            Redirect(AppRoutes.providedetails.ExitController.noRecordsLeftToClaim(linkId).url)
           case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
     )
     .refine(implicit request =>

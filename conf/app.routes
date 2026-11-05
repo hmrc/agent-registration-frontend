@@ -181,6 +181,9 @@ POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 # Individuals (directors/partners/members/owners) providing details
 GET         /details-already-provided                               uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.detailsAlreadyProvided
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.genericExitPage
+GET         /provide-details/exit/application-not-found/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.applicationNotFound(linkId: LinkId)
+GET         /provide-details/exit/name-not-found/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.nameNotFound(linkId: LinkId)
+GET         /provide-details/exit/not-recognised/:linkId            uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.noRecordsLeftToClaim(linkId: LinkId)
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.StartController.start(linkId: LinkId)
 GET         /provide-details/wrong-credential-used                  uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /provide-details/sign-out/:linkId                      uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.individualSignOut(linkId: LinkId)

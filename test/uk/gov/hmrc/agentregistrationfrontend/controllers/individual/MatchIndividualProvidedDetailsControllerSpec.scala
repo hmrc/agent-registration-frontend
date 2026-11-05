@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -150,6 +151,37 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.providedetails.StartController.start(linkId).url
     IndividualAuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+
+  s"GET $path with no application found on the link id should redirect to the application not found page" in:
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(linkId = linkId)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url
+    IndividualAuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+
+  s"GET $path when all individual records have been claimed and signed in user is not one of them should redirect to the no records left to claim page" in:
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    AgentRegistrationStubs.stubFindApplicationByLinkId(
+      linkId = linkId,
+      agentApplication = agentApplication.afterContactDetailsComplete
+    )
+    AgentRegistrationStubs.stubFindIndividualsForMatching(
+      agentApplicationId = agentApplication.afterContactDetailsComplete.agentApplicationId,
+      individuals = List(
+        tdAll.providedDetails.afterStarted.copy(internalUserId = Some(InternalUserId("non-matching"))),
+        tdAll.providedDetails.afterStarted.copy(internalUserId = Some(InternalUserId("non-matching-2")))
+      )
+    )
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.noRecordsLeftToClaim(linkId).url
+    IndividualAuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+    AgentRegistrationStubs.verifyFindIndividualsForMatching(agentApplication.afterContactDetailsComplete.agentApplicationId)
 
   s"POST $path with a valid choice should save data and redirect to CYA controller" in:
     ProvideDetailsStubHelper.stubAuthAndClaimMatchedIndividualProvidedDetails(

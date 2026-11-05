@@ -17,9 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.DetailsAlreadyProvidedPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.exitpages.ApplicationNotFoundPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.exitpages.NameNotFoundPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.exitpages.NoIndividualRecordsLeftToClaimPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,9 +33,12 @@ import javax.inject.Singleton
 class ExitController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
+  agentApplicationService: AgentApplicationService,
   placeholderExitPage: SimplePage,
-  multipleMemberProvidedDetailsPage: SimplePage,
-  detailsAlreadyProvidedPage: DetailsAlreadyProvidedPage
+  detailsAlreadyProvidedPage: DetailsAlreadyProvidedPage,
+  noRecordsLeftToClaimPage: NoIndividualRecordsLeftToClaimPage,
+  applicationNotFoundPage: ApplicationNotFoundPage,
+  nameNotFoundPage: NameNotFoundPage
 )
 extends FrontendController(mcc, actions):
 
@@ -47,11 +55,25 @@ extends FrontendController(mcc, actions):
         )
       ))
 
-  def multipleProvidedDetailsPage: Action[AnyContent] = actions.action:
+  def noRecordsLeftToClaim(linkId: LinkId): Action[AnyContent] = actions.authorised:
     implicit request =>
-      Ok(multipleMemberProvidedDetailsPage(
-        h1 = "You cannot use this service...",
-        bodyText = Some(
-          "Placeholder for multiple member provided details generic page..."
-        )
-      ))
+      Ok(noRecordsLeftToClaimPage(linkId))
+
+  def applicationNotFound(linkId: LinkId): Action[AnyContent] =
+    actions.action
+      .ensure(
+        condition =
+          implicit request =>
+            agentApplicationService
+              .find(linkId)
+              .map(_.isEmpty),
+        resultWhenConditionNotMet =
+          implicit request =>
+            Redirect(AppRoutes.providedetails.StartController.start(linkId))
+      ):
+        implicit request =>
+          Ok(applicationNotFoundPage(linkId))
+
+  def nameNotFound(linkId: LinkId): Action[AnyContent] = actions.authorised:
+    implicit request =>
+      Ok(nameNotFoundPage(linkId))
