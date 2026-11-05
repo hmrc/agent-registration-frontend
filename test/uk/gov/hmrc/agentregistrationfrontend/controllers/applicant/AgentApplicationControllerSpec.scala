@@ -66,7 +66,7 @@ extends ControllerSpec:
     val response: WSResponse = get(viewApplicationPath)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationDeletedPath should return OK when no application exists" in:

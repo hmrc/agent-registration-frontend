@@ -76,7 +76,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     val radioForExistingBusinessName = doc.mainContent.select(s"input#${AgentBusinessNameForm.key}")
-    radioForExistingBusinessName.attr("value") shouldBe "Test Company Name"
+    radioForExistingBusinessName.attr("value") shouldBe "ABC Accounting"
     radioForExistingBusinessName.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -98,7 +98,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("Test Company Name")
+        AgentBusinessNameForm.key -> Seq("ABC Accounting")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -190,7 +190,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("Test Company Name"),
+        AgentBusinessNameForm.key -> Seq("ABC Accounting"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

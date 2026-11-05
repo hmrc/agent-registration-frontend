@@ -88,7 +88,7 @@ trait TdBase { dependencies: (TdTime & TdAgentApplicationTime) =>
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
-  def companyName = "Test Company Name"
+  def companyName = "ABC Accounting"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def applicationReference: ApplicationReference = ApplicationReference("APPREF123")
   def personReference: PersonReference = PersonReference("1234567890")
@@ -193,7 +193,7 @@ trait TdBase { dependencies: (TdTime & TdAgentApplicationTime) =>
   )
 
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
-    organisationName = Some("Test Company Name"),
+    organisationName = Some("ABC Accounting"),
     agentReferenceNumber = None,
     individualName = None,
     address = bprRegisteredAddress,

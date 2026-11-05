@@ -57,8 +57,8 @@ extends ViewSpec:
         s"""
            |Partners and other relevant individuals
            |$heading
-           |We also need to know if Test Company Name has any other relevant individuals.
-           |This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at Test Company Name.
+           |We also need to know if ABC Accounting has any other relevant individuals.
+           |This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at ABC Accounting.
            |Read the guidance about how we define ‘relevant individuals’ (opens in new tab)
            |$question
            |Yes

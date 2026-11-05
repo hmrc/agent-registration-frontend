@@ -71,7 +71,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Take action: Test Company Name has not met the registration conditions - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Take action: ABC Accounting has not met the registration conditions - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.amls) shouldBe Constants.INCOMPLETE
     expectedEntityFixes.zipWithIndex.map: (_, index) =>
       doc.getTaskStatus(tasks.entityFailures(index + 1)) shouldBe Constants.INCOMPLETE

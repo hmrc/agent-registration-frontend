@@ -100,7 +100,7 @@ extends ViewSpec:
     viewTemplate(
       nonFixableIndividuals = nonFixableIndividuals,
       agentApplication = agentApplication,
-      entityName = "Test Company Name"
+      entityName = "ABC Accounting"
     ).body
   )
 
@@ -118,7 +118,7 @@ extends ViewSpec:
       docWithIndividualNonFixableFailures.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |ABC Accounting does not meet the registration conditions
            |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because one or more relevant individuals linked to the application do not meet the registration conditions.
            |Relevant individuals who do not meet the registration conditions
@@ -128,7 +128,7 @@ extends ViewSpec:
            |Beverly Hills
            |Records indicate that Beverly Hills has a relevant unspent criminal conviction.
            |Failure to meet the registration conditions
-           |Test Company Name will not be given an agent services account on this occasion.
+           |ABC Accounting will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
            |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
@@ -138,10 +138,10 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      docWithIndividualNonFixableFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+      docWithIndividualNonFixableFailures.title() shouldBe "ABC Accounting does not meet the registration conditions - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      docWithIndividualNonFixableFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
+      docWithIndividualNonFixableFailures.h1 shouldBe "ABC Accounting does not meet the registration conditions"
 
     "display each individuals failure with entity failures" in:
       val paragraphElements = docWithIndividualNonFixableFailures.selectOrFail("p.govuk-body")
@@ -205,12 +205,12 @@ extends ViewSpec:
       docWithApplicantOnlyNonFixableFailures.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |ABC Accounting does not meet the registration conditions
            |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |Failure to meet the registration conditions
-           |Test Company Name will not be given an agent services account on this occasion.
+           |ABC Accounting will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
            |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
@@ -220,10 +220,10 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      docWithApplicantOnlyNonFixableFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+      docWithApplicantOnlyNonFixableFailures.title() shouldBe "ABC Accounting does not meet the registration conditions - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      docWithApplicantOnlyNonFixableFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
+      docWithApplicantOnlyNonFixableFailures.h1 shouldBe "ABC Accounting does not meet the registration conditions"
 
     "not have a failure list item for the entity about individual failures" in:
       renderedEntityFailuresWithNoIndividualFailures.last().text() should not be entityFailureMessages("AnyIndividualFailures")
@@ -236,7 +236,7 @@ extends ViewSpec:
       docWithAllNonFixableFailures.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |ABC Accounting does not meet the registration conditions
            |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
@@ -248,7 +248,7 @@ extends ViewSpec:
            |Beverly Hills
            |Records indicate that Beverly Hills has a relevant unspent criminal conviction.
            |Failure to meet the registration conditions
-           |Test Company Name will not be given an agent services account on this occasion.
+           |ABC Accounting will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
            |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can delete this application and apply again.
@@ -262,7 +262,7 @@ extends ViewSpec:
       docWithSingleEntityFailureApplicantOnly.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |ABC Accounting does not meet the registration conditions
            |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because our records show that the business is formally insolvent.
            |Failure to meet the registration conditions
@@ -280,7 +280,7 @@ extends ViewSpec:
       docWithSingleEntityFailureAndIndividuals.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |ABC Accounting does not meet the registration conditions
            |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |our records show that the business is formally insolvent

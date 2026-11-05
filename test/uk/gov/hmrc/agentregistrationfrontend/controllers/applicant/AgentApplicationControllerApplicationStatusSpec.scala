@@ -74,13 +74,13 @@ extends ControllerSpec:
       description = "render the fixable failures start page when risking completed with a fixable failure",
       application = tdAll.agentApplicationLlp.afterRiskingCompletedFixable,
       individuals = List(tdAll.providedDetails.afterRiskedFixable),
-      expectedResponse = RendersPageTitled("Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK")
+      expectedResponse = RendersPageTitled("ABC Accounting does not meet the registration conditions yet - Apply for an agent services account - GOV.UK")
     ),
     TestCase(
       description = "render the failed non-fixable page when risking completed with a non-fixable failure",
       application = tdAll.agentApplicationLlp.afterRiskingCompletedNonFixable,
       individuals = List(tdAll.providedDetails.afterRiskedNonFixable),
-      expectedResponse = RendersPageTitled("Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK")
+      expectedResponse = RendersPageTitled("ABC Accounting does not meet the registration conditions - Apply for an agent services account - GOV.UK")
     ),
     TestCase(
       description = "redirect to the ASA dashboard when risking completed and the application was approved",

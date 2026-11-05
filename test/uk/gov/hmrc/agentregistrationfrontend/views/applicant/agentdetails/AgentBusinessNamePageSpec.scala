@@ -39,7 +39,7 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(viewTemplate(
     form = AgentBusinessNameForm.form,
-    bprBusinessName = Some("Test Company Name")
+    bprBusinessName = Some("ABC Accounting")
   ).body)
   private val heading: String = "What business name will you use for clients?"
 
@@ -52,7 +52,7 @@ extends ViewSpec:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          "Test Company Name" -> "Test Company Name",
+          "ABC Accounting" -> "ABC Accounting",
           "Something else" -> "other"
         ),
         hint = Some("Choose a name your clients know. We’ll use it when clients respond to authorisation requests or manage their agent relationships.")
@@ -80,6 +80,6 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = AgentBusinessNameForm.key,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, Some("Test Company Name")).body),
+        errorDoc = Jsoup.parse(viewTemplate(formWithError, Some("ABC Accounting")).body),
         heading = heading
       )

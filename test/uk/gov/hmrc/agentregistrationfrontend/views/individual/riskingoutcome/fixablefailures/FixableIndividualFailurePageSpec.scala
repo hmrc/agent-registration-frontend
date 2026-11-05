@@ -54,7 +54,7 @@ extends ViewSpec:
         |File your missing Self Assessment returns
         |Your Self Assessment returns
         |When we reviewed your application, we found that one or more returns had not been filed.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue returns must now be filed and any resulting liabilities paid.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -72,7 +72,7 @@ extends ViewSpec:
         |File your missing VAT returns
         |Your VAT returns
         |When we reviewed your application, we found that one or more returns had not been filed.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue returns must now be filed and any resulting liabilities paid.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -90,7 +90,7 @@ extends ViewSpec:
         |File your missing PAYE reports
         |Your PAYE reports
         |When we reviewed your application, we found that one or more reports had not been filed.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue reports must now be filed and any resulting liabilities paid.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -108,7 +108,7 @@ extends ViewSpec:
         |Pay your Self Assessment liability
         |You have an overdue Self Assessment liability
         |When we reviewed the application, we found that you owed an overdue amount relating to Self Assessment.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -126,7 +126,7 @@ extends ViewSpec:
         |Pay your VAT liability
         |You have an overdue VAT liability
         |When we reviewed the application, we found that you owed an overdue amount relating to VAT.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -144,7 +144,7 @@ extends ViewSpec:
         |Pay your PAYE liability
         |You have an overdue PAYE liability
         |When we reviewed the application, we found that you owed an overdue amount relating to PAYE.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -162,7 +162,7 @@ extends ViewSpec:
         |Pay your civil penalty liability
         |You have an overdue civil penalty liability
         |When we reviewed the application, we found that you owed an overdue amount relating to one or more civil penalties.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -180,7 +180,7 @@ extends ViewSpec:
         |Pay your Stamp Duty liability
         |You have an overdue Stamp Duty liability
         |When we reviewed the application, we found that you owed an overdue amount relating to Stamp Duty.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -198,7 +198,7 @@ extends ViewSpec:
         |Pay your Capital Gains Tax liability
         |You have an overdue Capital Gains Tax liability
         |When we reviewed the application, we found that you owed an overdue amount relating to Capital Gains Tax.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -216,7 +216,7 @@ extends ViewSpec:
         |Pay your relevant anti-avoidance penalty liability
         |You have an overdue relevant anti-avoidance penalty liability
         |When we reviewed the application, we found that you owed an overdue amount relating to one or more relevant anti-avoidance penalties.
-        |We cannot set up an agent services account for Test Company Name until this is resolved.
+        |We cannot set up an agent services account for ABC Accounting until this is resolved.
         |Take action on this issue
         |All overdue liabilities must now be paid in full or included in a payment plan.
         |You need to confirm by 17 August 2026 that this has been done.
@@ -244,7 +244,7 @@ extends ViewSpec:
     ) =>
       val doc: Document = Jsoup.parse(
         viewTemplate(
-          entityName = "Test Company Name",
+          entityName = "ABC Accounting",
           failureCode = individualFixCode,
           correctiveActionExpiryDate = "17 August 2026",
           form = ConfirmFixForm.form(individualFixCode),
@@ -282,7 +282,7 @@ extends ViewSpec:
           .bind(Map.empty[String, String])
         val docWithError: Document = Jsoup.parse(
           viewTemplate(
-            entityName = "Test Company Name",
+            entityName = "ABC Accounting",
             failureCode = individualFixCode,
             correctiveActionExpiryDate = "17 August 2026",
             form = formWithError,
