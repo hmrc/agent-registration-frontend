@@ -104,7 +104,7 @@ trait TdBase:
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def dateOfBirthFromCitizenDetails: IndividualDateOfBirth.FromCitizensDetails = IndividualDateOfBirth.FromCitizensDetails(dateOfBirth)
   def dateOfBirthProvided = IndividualDateOfBirth.Provided(dateOfBirth)
-  def fullName: FullName = FullName(firstName = "ST Name", lastName = "ST Lastname")
+  def fullName: FullName = FullName(firstName = "Joe", lastName = "Bloggs")
 
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
   def individualEmailAddress: EmailAddress = EmailAddress("member@test.com")
