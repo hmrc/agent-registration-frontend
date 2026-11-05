@@ -31,6 +31,8 @@ class NumberOfKeyIndividualsPageSpec
 extends ViewSpec:
 
   val viewTemplate: NumberOfKeyIndividualsPage = app.injector.instanceOf[NumberOfKeyIndividualsPage]
+  val entityName: String = tdAll.TdAgencyName.generalPartnership
+
   val agentApplication: AgentApplication =
     tdAll
       .agentApplicationGeneralPartnershipSections
@@ -39,28 +41,28 @@ extends ViewSpec:
       .afterBusinessNameProvided
   val doc: Document = Jsoup.parse(viewTemplate(
     form = NumberOfKeyIndividualsForm.form,
-    entityName = tdAll.companyName,
+    entityName = entityName,
     agentApplication = agentApplication
   ).body)
-  private val heading: String = "How many partners are there at ABC Accounting?"
+  private val heading: String = s"How many partners are there at $entityName?"
 
   "NumberOfKeyIndividualsPage" should:
 
     "contain expected content" in:
       doc.mainContent shouldContainContent
-        """
-          |Partners and other relevant individuals
-          |How many partners are there at ABC Accounting?
-          |Only tell us about people with the title ‘partner’. Do not include partner organisations.
-          |5 or fewer
-          |What is the exact number?
-          |6 or more
-          |How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
-          |Read the guidance about relevant individuals (opens in new tab)
-          |Save and continue
-          |Save and come back later
-          |Is this page not working properly? (opens in new tab)
-          |""".stripMargin
+        s"""
+           |Partners and other relevant individuals
+           |How many partners are there at $entityName?
+           |Only tell us about people with the title ‘partner’. Do not include partner organisations.
+           |5 or fewer
+           |What is the exact number?
+           |6 or more
+           |How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
+           |Read the guidance about relevant individuals (opens in new tab)
+           |Save and continue
+           |Save and come back later
+           |Is this page not working properly? (opens in new tab)
+           |""".stripMargin
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
@@ -102,7 +104,7 @@ extends ViewSpec:
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,
-          entityName = tdAll.companyName,
+          entityName = entityName,
           agentApplication = agentApplication
         ).body),
         heading = heading

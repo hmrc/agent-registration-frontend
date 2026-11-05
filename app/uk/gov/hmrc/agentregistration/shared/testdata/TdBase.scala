@@ -111,12 +111,34 @@ trait TdBase:
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
-  def companyName = "ABC Accounting"
+  def agencyName = "ABC Accounting"
+
+  def agencyNameBase = "ABC Accounting"
+
+  object TdAgencyName:
+
+    val limitedCompany = s"$agencyNameBase LC"
+    val limitedPartnership = s"$agencyNameBase LP"
+    val llp = s"$agencyNameBase LLP"
+    val scottishLimitedPartnership = s"$agencyNameBase SLP"
+    val scottishPartnership = s"$agencyNameBase SP"
+    val generalPartnership = s"$agencyNameBase GP"
+
+    def getAgencyNameFor(agentApplication: AgentApplication): String =
+      agentApplication match
+        case _: AgentApplicationLimitedCompany => limitedCompany
+        case _: AgentApplicationLimitedPartnership => limitedPartnership
+        case _: AgentApplicationLlp => llp
+        case _: AgentApplicationScottishLimitedPartnership => scottishLimitedPartnership
+        case _: AgentApplicationScottishPartnership => scottishPartnership
+        case _: AgentApplicationGeneralPartnership => generalPartnership
+        case _ => throw new Exception("No agency name for application type")
+
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def applicationReference: ApplicationReference = ApplicationReference("APPREF123")
   def personReference: PersonReference = PersonReference("1234567890")
   def applicantName: ApplicantName = ApplicantName(authorisedPersonName)
-  def agentBusinessName: AgentBusinessName = AgentBusinessName(agentBusinessName = companyName, otherAgentBusinessName = None)
+  def agentBusinessName: AgentBusinessName = AgentBusinessName(agentBusinessName = agencyName, otherAgentBusinessName = None)
   def amlsCode: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("HMRC")
   def amlsRegistrationNumber: AmlsRegistrationNumber = AmlsRegistrationNumber("XAML00000123456")
   def vrn = Vrn("123456789")
@@ -129,7 +151,7 @@ trait TdBase:
 
   def companyProfile: CompanyProfile = CompanyProfile(
     companyNumber = crn,
-    companyName = companyName,
+    companyName = agencyName,
     dateOfIncorporation = Some(dateOfIncorporation),
     unsanitisedCHROAddress = Some(ChroAddress(
       address_line_1 = Some("23 Great Portland Street"),
@@ -138,6 +160,25 @@ trait TdBase:
       country = Some("GB")
     ))
   )
+
+  def companyProfileBase: CompanyProfile = CompanyProfile(
+    companyNumber = crn,
+    companyName = agencyName,
+    dateOfIncorporation = Some(dateOfIncorporation),
+    unsanitisedCHROAddress = Some(ChroAddress(
+      address_line_1 = Some("23 Great Portland Street"),
+      address_line_2 = Some("London"),
+      postal_code = Some("W1 8LT"),
+      country = Some("GB")
+    ))
+  )
+
+  object TdCompanyProfile:
+
+    val limitedPartnership = companyProfileBase.copy(companyName = TdAgencyName.limitedPartnership)
+    val llp = companyProfileBase.copy(companyName = TdAgencyName.llp)
+    val scottishLimitedPartnership = companyProfileBase.copy(companyName = TdAgencyName.scottishLimitedPartnership)
+    val limitedCompany = companyProfileBase.copy(companyName = TdAgencyName.scottishLimitedPartnership)
 
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
@@ -226,6 +267,25 @@ trait TdBase:
     emailAddress = Some(bprEmailAddress),
     isAnAsaAgent = false
   )
+
+  def businessPartnerRecordResponseBase: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
+    organisationName = Some(agencyNameBase),
+    agentReferenceNumber = None,
+    individualName = None,
+    address = bprRegisteredAddress,
+    primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
+    emailAddress = Some(bprEmailAddress),
+    isAnAsaAgent = false
+  )
+
+  object TdBusinessPartnerRecordResponse:
+
+    val limitedPartnership: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.limitedPartnership))
+    val llp: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.llp))
+    val scottishLimitedPartnership: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName =
+      Some(TdAgencyName.scottishLimitedPartnership)
+    )
+    val limitedCompany: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.scottishLimitedPartnership))
 
   def businessPartnerRecordResponseSoleTrader: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = None,

@@ -27,6 +27,7 @@ class NumberOfKeyIndividualsControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/how-many-key-individuals"
+  private val agencyName: String = tdAll.TdAgencyName.generalPartnership
 
   object agentApplication:
 
@@ -57,7 +58,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "How many partners are there at ABC Accounting? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe s"How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with valid amounts should save data and redirect to CYA for working out the next page" in:
@@ -82,7 +83,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: How many partners are there at ABC Accounting? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividualsOption}-error"
     ).text() shouldBe "Error: Select how many partners there are"
@@ -97,7 +98,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: How many partners are there at ABC Accounting? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
@@ -113,7 +114,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: How many partners are there at ABC Accounting? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
@@ -129,7 +130,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: How many partners are there at ABC Accounting? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"

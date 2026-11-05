@@ -33,7 +33,7 @@ extends ControllerSpec:
   private val postFiveOrLessPath = "/agent-registration/apply/list-details/confirm-companies-house-officers"
   private val postSixOrMorePath = "/agent-registration/apply/list-details/how-many-companies-house-officers"
 
-  private val headingFiveOrLess: String = s"Check this list of members for ${tdAll.companyName}"
+  private val headingFiveOrLess: String = s"Check this list of members for ${tdAll.TdAgencyName.llp}"
   private val headingSixOrMore: String = "LLP members who are also ‘relevant individuals’"
 
   object agentApplication:

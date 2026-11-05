@@ -30,6 +30,8 @@ extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
+  val agencyName: String = tdAll.TdAgencyName.llp
+
   object agentApplication:
     val complete: AgentApplicationLlp =
       tdAll
@@ -44,25 +46,25 @@ extends ViewSpec:
     val doc: Document = Jsoup.parse(viewTemplate(bpr, agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
-        """
-          |About your business
-          |Your business details
-          |The details you provided match your HMRC record.
-          |If you change any of these details you will need to start the application again.
-          |Business details
-          |Change (Business details)
-          |UK-based agent
-          |Yes
-          |Business type
-          |Limited liability partnership
-          |Are you a member of the limited liability partnership?
-          |No, but I’m authorised by them to set up this account
-          |Company name
-          |ABC Accounting
-          |Unique taxpayer reference
-          |1234567895
-          |Return to task list
-          |Save and come back later
+        s"""
+           |About your business
+           |Your business details
+           |The details you provided match your HMRC record.
+           |If you change any of these details you will need to start the application again.
+           |Business details
+           |Change (Business details)
+           |UK-based agent
+           |Yes
+           |Business type
+           |Limited liability partnership
+           |Are you a member of the limited liability partnership?
+           |No, but I’m authorised by them to set up this account
+           |Company name
+           |$agencyName
+           |Unique taxpayer reference
+           |1234567895
+           |Return to task list
+           |Save and come back later
           """.stripMargin
 
     "have the correct title" in:
@@ -85,7 +87,7 @@ extends ViewSpec:
           ),
           TestReadOnlySummaryRow(
             key = "Company name",
-            value = "ABC Accounting"
+            value = agencyName
           ),
           TestReadOnlySummaryRow(
             key = "Unique taxpayer reference",

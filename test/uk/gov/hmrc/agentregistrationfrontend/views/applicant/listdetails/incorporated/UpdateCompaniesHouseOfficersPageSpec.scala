@@ -27,11 +27,11 @@ extends ViewSpec:
 
   val viewTemplate: UpdateCompaniesHouseOfficersPage = app.injector.instanceOf[UpdateCompaniesHouseOfficersPage]
 
-  private val entityName: String = tdAll.companyName
   private val heading: String = "You need to update Companies House"
 
   case class BusinessTypeTestCase(
     label: String,
+    entityName: String,
     agentApplication: AgentApplication,
     caption: String,
     p1EntityType: String
@@ -40,25 +40,31 @@ extends ViewSpec:
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
+      entityName = tdAll.TdAgencyName.llp,
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals",
       p1EntityType = "members"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
+      entityName = tdAll.TdAgencyName.limitedCompany,
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
       caption = "Directors and other relevant individuals",
       p1EntityType = "directors"
     ),
     BusinessTypeTestCase(
       label = "Partnership",
+      entityName = tdAll.TdAgencyName.limitedPartnership,
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       p1EntityType = "partners"
     )
   )
 
-  private def render(agentApplication: AgentApplication): Document = Jsoup.parse(viewTemplate(
+  private def render(
+    agentApplication: AgentApplication,
+    entityName: String
+  ): Document = Jsoup.parse(viewTemplate(
     entityName = entityName,
     agentApplication = agentApplication
   ).body)
@@ -66,7 +72,7 @@ extends ViewSpec:
   for testCase <- testCases do
     s"UpdateCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-      val doc: Document = render(testCase.agentApplication)
+      val doc: Document = render(testCase.agentApplication, testCase.entityName)
 
       "have the correct caption" in:
         doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
@@ -78,7 +84,7 @@ extends ViewSpec:
         doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
       "show the correct p1 text with entity type" in:
-        doc.mainContent.select("p.govuk-body").first().text() should include(s"current ${testCase.p1EntityType} of $entityName")
+        doc.mainContent.select("p.govuk-body").first().text() should include(s"current ${testCase.p1EntityType} of ${testCase.entityName}")
 
       "show the p2 text" in:
         doc.mainContent.select("p.govuk-body").text() should include("Update your Companies House")

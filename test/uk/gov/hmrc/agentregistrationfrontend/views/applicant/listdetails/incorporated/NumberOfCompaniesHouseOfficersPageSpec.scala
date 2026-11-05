@@ -30,11 +30,11 @@ extends ViewSpec:
 
   val viewTemplate: NumberOfCompaniesHouseOfficersPage = app.injector.instanceOf[NumberOfCompaniesHouseOfficersPage]
 
-  private val entityName: String = tdAll.companyName
   private val companiesHouseOfficersCount: Int = 6
 
   case class BusinessTypeTestCase(
     label: String,
+    entityName: String,
     caption: String,
     officerType: String,
     heading: String,
@@ -44,6 +44,7 @@ extends ViewSpec:
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
+      entityName = tdAll.TdAgencyName.llp,
       caption = "LLP members and other relevant individuals",
       officerType = "LLP members",
       heading = "LLP members who are also ‘relevant individuals’",
@@ -51,6 +52,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
+      entityName = tdAll.TdAgencyName.limitedCompany,
       caption = "Directors and other relevant individuals",
       officerType = "directors",
       heading = "Directors who are also ‘relevant individuals’",
@@ -58,6 +60,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "Partnership",
+      entityName = tdAll.TdAgencyName.limitedPartnership,
       caption = "Partners and other relevant individuals",
       officerType = "partners",
       heading = "Partners who are also ‘relevant individuals’",
@@ -67,7 +70,8 @@ extends ViewSpec:
 
   private def render(
     form: play.api.data.Form[Int],
-    businessTypeKey: String
+    businessTypeKey: String,
+    entityName: String
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
@@ -80,6 +84,7 @@ extends ViewSpec:
 
       val doc: Document = render(
         form = NumberCompaniesHouseOfficersForm.form(companiesHouseOfficersCount, testCase.label),
+        entityName = testCase.entityName,
         businessTypeKey = testCase.label
       )
 
@@ -93,7 +98,7 @@ extends ViewSpec:
         doc.title() shouldBe s"${testCase.heading} - Apply for an agent services account - GOV.UK"
 
       "show the correct intro text" in:
-        doc.mainContent.select("p.govuk-body").first().text() shouldBe s"We need to know which of the ${testCase.officerType} at $entityName meet the legal definition of relevant individuals, as defined in Chapter 226(2) of the Finance Act 2026 (opens in new tab)."
+        doc.mainContent.select("p.govuk-body").first().text() shouldBe s"We need to know which of the ${testCase.officerType} at ${testCase.entityName} meet the legal definition of relevant individuals, as defined in Chapter 226(2) of the Finance Act 2026 (opens in new tab)."
 
       "show the correct question" in:
         doc.mainContent.select("label.govuk-label--m").text() shouldBe testCase.question
@@ -126,6 +131,10 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.label),
+          errorDoc = render(
+            formWithError,
+            testCase.label,
+            testCase.entityName
+          ),
           heading = testCase.heading
         )

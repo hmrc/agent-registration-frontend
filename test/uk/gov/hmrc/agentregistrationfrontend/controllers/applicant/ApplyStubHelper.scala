@@ -75,9 +75,10 @@ object ApplyStubHelper:
           responseBody = tdAll.businessPartnerRecordResponseSoleTrader
         )
       case a: AgentApplication.IsNotSoleTrader =>
+        val organisationName = tdAll.TdAgencyName.getAgencyNameFor(application)
         AgentRegistrationStubs.stubGetBusinessPartnerRecord(
           utr = a.getUtr,
-          responseBody = tdAll.businessPartnerRecordResponse
+          responseBody = tdAll.businessPartnerRecordResponse.copy(organisationName = Some(organisationName))
         )
 
   def verifyConnectorsToSupplyBprToPage(utr: Option[Utr] = None): Unit =

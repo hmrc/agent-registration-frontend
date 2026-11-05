@@ -38,7 +38,7 @@ extends ViewSpec:
       .whenUsingExistingCompanyName
       .afterBusinessNameProvided
 
-  private val entityName: String = tdAll.companyName
+  private val entityName: String = tdAll.TdAgencyName.generalPartnership
   private val heading: String = "Other people we need to know about"
   private val question: String = s"Are there any non-partner relevant individuals at $entityName?"
 
@@ -57,8 +57,8 @@ extends ViewSpec:
         s"""
            |Partners and other relevant individuals
            |$heading
-           |We also need to know if ABC Accounting has any other relevant individuals.
-           |This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at ABC Accounting.
+           |We also need to know if $entityName has any other relevant individuals.
+           |This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at $entityName.
            |Read the guidance about how we define ‘relevant individuals’ (opens in new tab)
            |$question
            |Yes

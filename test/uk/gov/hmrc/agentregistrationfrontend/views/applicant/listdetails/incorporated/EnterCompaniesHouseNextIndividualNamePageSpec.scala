@@ -32,13 +32,11 @@ extends ViewSpec:
 
   val viewTemplate: EnterCompaniesHouseNextIndividualNamePage = app.injector.instanceOf[EnterCompaniesHouseNextIndividualNamePage]
 
-  private val entityName: String = tdAll.companyName
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit
-  private val heading: String = "What is the name of the next person?"
-  private val p1: String = s"We’ll check this against the business records for $entityName in Companies House."
 
   case class BusinessTypeTestCase(
     label: String,
+    entityName: String,
     agentApplication: AgentApplication,
     caption: String
   )
@@ -46,21 +44,25 @@ extends ViewSpec:
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
+      entityName = tdAll.TdAgencyName.llp,
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
+      entityName = tdAll.TdAgencyName.limitedCompany,
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
       caption = "Directors and other relevant individuals"
     ),
     BusinessTypeTestCase(
       label = "LimitedPartnership",
+      entityName = tdAll.TdAgencyName.limitedPartnership,
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals"
     ),
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
+      entityName = tdAll.TdAgencyName.scottishLimitedPartnership,
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals"
     )
@@ -68,7 +70,8 @@ extends ViewSpec:
 
   private def render(
     form: play.api.data.Form[CompaniesHouseNameQuery],
-    agentApplication: AgentApplication
+    agentApplication: AgentApplication,
+    entityName: String
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
@@ -78,7 +81,14 @@ extends ViewSpec:
   for testCase <- testCases do
     s"EnterCompaniesHouseNextIndividualNamePage for ${testCase.label}" should:
 
-      val doc: Document = render(CompaniesHouseNameQueryForm.form, testCase.agentApplication)
+      val p1: String = s"We’ll check this against the business records for ${testCase.entityName} in Companies House."
+      val heading: String = "What is the name of the next person?"
+
+      val doc: Document = render(
+        CompaniesHouseNameQueryForm.form,
+        testCase.agentApplication,
+        testCase.entityName
+      )
 
       "have the correct caption" in:
         doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
@@ -123,7 +133,11 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = CompaniesHouseNameQueryForm.firstNameKey,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(
+            formWithError,
+            testCase.agentApplication,
+            testCase.entityName
+          ),
           heading = heading
         )
 
@@ -139,6 +153,10 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = CompaniesHouseNameQueryForm.lastNameKey,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(
+            formWithError,
+            testCase.agentApplication,
+            testCase.entityName
+          ),
           heading = heading
         )

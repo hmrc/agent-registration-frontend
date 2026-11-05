@@ -29,8 +29,8 @@ class MandatoryRelevantIndividualsControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/tell-us-about-relevant-individuals"
-
-  private val expectedHeading = "Tell us about the relevant individuals for ABC Accounting"
+  private val agencyName: String = tdAll.TdAgencyName.generalPartnership
+  private val expectedHeading = s"Tell us about the relevant individuals for $agencyName"
 
   object agentApplication:
 
