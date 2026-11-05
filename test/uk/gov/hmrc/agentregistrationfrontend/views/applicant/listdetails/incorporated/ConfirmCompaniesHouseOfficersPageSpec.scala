@@ -32,7 +32,6 @@ extends ViewSpec:
 
   val viewTemplate: ConfirmCompaniesHouseOfficersPage = app.injector.instanceOf[ConfirmCompaniesHouseOfficersPage]
 
-  private val entityName: String = tdAll.companyName
   private val individualNameList: Seq[IndividualName] = Seq(
     IndividualName("Tester, John"),
     IndividualName("Tester, Alice")
@@ -41,6 +40,7 @@ extends ViewSpec:
 
   case class BusinessTypeTestCase(
     label: String,
+    entityName: String,
     agentApplication: AgentApplication,
     caption: String,
     entityType: String,
@@ -52,45 +52,50 @@ extends ViewSpec:
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
+      entityName = tdAll.TdAgencyName.llp,
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals",
       entityType = "members",
-      heading = s"Check this list of members for $entityName",
-      intro = s"These are the members listed in Companies House for $entityName:",
+      heading = s"Check this list of members for ${tdAll.TdAgencyName.llp}",
+      intro = s"These are the members listed in Companies House for ${tdAll.TdAgencyName.llp}:",
       question = "Is this list of members correct?"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
+      entityName = tdAll.TdAgencyName.limitedCompany,
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
       caption = "Directors and other relevant individuals",
       entityType = "directors",
-      heading = s"Check this list of directors for $entityName",
-      intro = s"These are the directors listed in Companies House for $entityName:",
+      heading = s"Check this list of directors for ${tdAll.TdAgencyName.limitedCompany}",
+      intro = s"These are the directors listed in Companies House for ${tdAll.TdAgencyName.limitedCompany}:",
       question = "Is this list of directors correct?"
     ),
     BusinessTypeTestCase(
       label = "LimitedPartnership",
+      entityName = tdAll.TdAgencyName.limitedPartnership,
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       entityType = "partners",
-      heading = s"Check this list of partners for $entityName",
-      intro = s"These are the partners listed in Companies House for $entityName:",
+      heading = s"Check this list of partners for ${tdAll.TdAgencyName.limitedPartnership}",
+      intro = s"These are the partners listed in Companies House for ${tdAll.TdAgencyName.limitedPartnership}:",
       question = "Is this list of partners correct?"
     ),
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
+      entityName = tdAll.TdAgencyName.scottishLimitedPartnership,
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       entityType = "partners",
-      heading = s"Check this list of partners for $entityName",
-      intro = s"These are the partners listed in Companies House for $entityName:",
+      heading = s"Check this list of partners for ${tdAll.TdAgencyName.scottishLimitedPartnership}",
+      intro = s"These are the partners listed in Companies House for ${tdAll.TdAgencyName.scottishLimitedPartnership}:",
       question = "Is this list of partners correct?"
     )
   )
 
   private def render(
     form: play.api.data.Form[Boolean],
-    agentApplication: AgentApplication
+    agentApplication: AgentApplication,
+    entityName: String
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
@@ -101,7 +106,11 @@ extends ViewSpec:
   for testCase <- testCases do
     s"ConfirmCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-      val doc: Document = render(ConfirmCompaniesHouseOfficersForm.form, testCase.agentApplication)
+      val doc: Document = render(
+        ConfirmCompaniesHouseOfficersForm.form,
+        testCase.agentApplication,
+        testCase.entityName
+      )
 
       "have the correct caption" in:
         doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
@@ -151,6 +160,10 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = field,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(
+            formWithError,
+            testCase.agentApplication,
+            testCase.entityName
+          ),
           heading = testCase.heading
         )

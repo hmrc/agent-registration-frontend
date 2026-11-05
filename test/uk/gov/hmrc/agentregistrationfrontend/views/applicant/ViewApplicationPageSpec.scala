@@ -25,6 +25,8 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicatio
 class ViewApplicationPageSpec
 extends ViewSpec:
 
+  private val agencyName = tdAll.TdAgencyName.llp
+
   val viewTemplate: ViewApplicationPage = app.injector.instanceOf[ViewApplicationPage]
   implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
     agentApplication =
@@ -34,7 +36,7 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "ABC Accounting",
+      entityName = agencyName,
       agentApplication = agentApplicationRequest.agentApplication
     ).body
   )
@@ -44,7 +46,7 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |Application for ABC Accounting
+           |Application for $agencyName
            |Application reference: ${agentApplicationRequest.agentApplication.applicationReference.value}
            |About your business
            |UK-based agent
@@ -54,7 +56,7 @@ extends ViewSpec:
            |Are you a member of the limited liability partnership?
            |No, but I’m authorised by them to set up this account
            |Company name
-           |ABC Accounting
+           |$agencyName
            |Unique taxpayer reference
            |1234567895
            |Your contact details
@@ -66,7 +68,7 @@ extends ViewSpec:
            |user@test.com
            |Agency contact details
            |Name shown to clients
-           |ABC Accounting
+           |$agencyName
            |Telephone number
            |(+44) 10794554342
            |Email address
@@ -89,7 +91,7 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "Application for ABC Accounting - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe s"Application for $agencyName - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Application for ABC Accounting"
+      doc.h1 shouldBe s"Application for $agencyName"

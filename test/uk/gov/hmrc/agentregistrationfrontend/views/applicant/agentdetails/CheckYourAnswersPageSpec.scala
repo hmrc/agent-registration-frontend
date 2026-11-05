@@ -36,6 +36,7 @@ extends ViewSpec:
         .whenUsingExistingCompanyName
         .afterBprAddressSelected
 
+  private val agencyName = tdAll.TdAgencyName.llp
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Agent Details" should:
@@ -44,11 +45,11 @@ extends ViewSpec:
     val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
-        """
+        s"""
           |Account contact details
           |Check your answers
           |Name shown to clients
-          |ABC Accounting
+          |$agencyName
           |Change Name shown to clients
           |Telephone number
           |(+44) 10794554342
@@ -73,7 +74,7 @@ extends ViewSpec:
         List(
           TestSummaryRow(
             key = "Name shown to clients",
-            value = "ABC Accounting",
+            value = agencyName,
             action = AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url,
             changeLinkAccessibleContent = "Change Name shown to clients"
           ),
