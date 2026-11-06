@@ -74,3 +74,11 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Application has expired - Apply for an agent services account - GOV.UK"
     AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
+
+  s"GET $path with no application found on the link id should redirect to the application not found page" in:
+    AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(linkId = linkId)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)

@@ -110,7 +110,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url
 
   s"POST $path with a matching name should send the user to CYA controller for navigation" in:
     val testIndividualName = "Test Name"
@@ -236,8 +236,8 @@ extends ControllerSpec:
       s"#${IndividualNameSearchForm.key}-error"
     ).text() shouldBe s"Error: Your full name must be 100 characters or fewer"
 
-  s"POST $path with an individuals name which has not been matched should render a form error" in:
-    val NotPresentName = "Bob Boson"
+  s"POST $path with an individuals name which has not been matched should redirect to the name not found page" in:
+    val notPresentName: String = "Bob Boson"
     IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
@@ -250,12 +250,9 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(path)(Map(
-        IndividualNameSearchForm.key -> Seq(NotPresentName)
+        IndividualNameSearchForm.key -> Seq(notPresentName)
       ))
 
-    response.status shouldBe Status.BAD_REQUEST
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: What is your full name? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select(
-      s"#${IndividualNameSearchForm.key}-error"
-    ).text() shouldBe s"Error: Your name does not match the name given to us by Miss Alexa Fantastic"
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.nameNotFound(linkId).url

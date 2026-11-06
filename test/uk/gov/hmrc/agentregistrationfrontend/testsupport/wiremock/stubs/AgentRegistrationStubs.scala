@@ -205,6 +205,25 @@ object AgentRegistrationStubs:
     responseBody = Json.toJson(individuals).toString
   )
 
+  def stubFindIndividualsForMatching(
+    agentApplicationId: AgentApplicationId,
+    individuals: List[IndividualProvidedDetails] = List.empty
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-matching-application/${agentApplicationId.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(individuals).toString
+  )
+
+  def verifyFindIndividualsForMatching(
+    applicationId: AgentApplicationId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-matching-application/${applicationId.value}"),
+    count = count
+  )
+
   def verifyFindIndividualsForApplication(
     applicationId: AgentApplicationId,
     count: Int = 1

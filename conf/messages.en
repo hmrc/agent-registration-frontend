@@ -1890,3 +1890,19 @@ confirmationOfExpiredDeletion.p2 = If you still want to apply for an agent servi
 # Individual link id application expired
 linkIdApplicationExpired.title = Application has expired
 linkIdApplicationExpired.p1 = Contact the person who sent you the link.
+
+# Individual link id not matched
+applicationNotFound.title = We cannot find an application for the link you entered
+applicationNotFound.p1 = If you typed or pasted the link you were given, check it’s correct.
+applicationNotFound.p2 = Contact the person who sent you the link, to check:
+applicationNotFound.li1 = that they sent you the correct link
+applicationNotFound.li2 = if the application has been deleted since they sent you the link
+
+# No individual records left to claim
+noIndividualRecordsLeftToClaim.title = You cannot add your details to the application
+noIndividualRecordsLeftToClaim.p1 = Check if you have already added your details using a different HMRC account.
+noIndividualRecordsLeftToClaim.p2 = If you did not add your details using a different HMRC account, contact the person who sent you the link.
+
+# Individual name search not matched
+nameNotFound.title = We cannot find your name in the application
+nameNotFound.p1 = Contact the person who sent you the link, to check how they entered your name in the application.

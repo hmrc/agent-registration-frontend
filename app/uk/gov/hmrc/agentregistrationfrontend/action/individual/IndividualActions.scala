@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.*
-import play.api.mvc.Results.NotFound
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
@@ -45,7 +44,6 @@ import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordServi
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.auth.core
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -90,7 +88,9 @@ class IndividualActions @Inject(
   agentApplicationService: AgentApplicationService,
   individualProvideDetailsService: IndividualProvideDetailsService,
   businessPartnerRecordService: BusinessPartnerRecordService
-)(using ExecutionContext)
+)(using
+  ExecutionContext
+)
 extends RequestAwareLogging:
 
   export ActionBuildersWithData.*
@@ -116,7 +116,9 @@ extends RequestAwareLogging:
           case Some(agentApplication) if agentApplication.riskingOutcomeApplication.isDefined =>
             Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
           case Some(agentApplication) => request.add[AgentApplication](agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+          case None =>
+            logger.info(s"User has entered application at deep url and application for linkId $linkId not found, redirecting to start where not found is handled.")
+            Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId))
     )
     .refine(implicit request =>
       individualProvideDetailsService
@@ -138,7 +140,9 @@ extends RequestAwareLogging:
         .map:
           case Some(agentApplication) if agentApplication.isAfterSentForRisking => request.add[AgentApplication](agentApplication)
           case Some(_) => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId))
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+          case None =>
+            logger.info(s"User has entered application at a deep url and application for linkId $linkId not found.")
+            Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId))
     )
     .refine(implicit request =>
       individualProvideDetailsService
@@ -165,7 +169,7 @@ extends RequestAwareLogging:
               )
               .map(request.add[IndividualProvidedDetails])
               .getOrElse(
-                NotFound
+                Redirect(AppRoutes.providedetails.ExitController.noRecordsLeftToClaim(linkId))
               )
     )
     .refine(implicit request =>
@@ -173,16 +177,16 @@ extends RequestAwareLogging:
       agentApplication.riskingOutcomeApplication match
         case Some(riskingOutcomeApplication) => request.add[RiskingOutcomeApplication](riskingOutcomeApplication)
         case None =>
-          logger.info("Risking outcome for application not found.")
-          NotFound
+          logger.info(s"User has entered application at deep url and risking outcome for linkId $linkId not found, redirecting to start where the state can be handled.")
+          Redirect(AppRoutes.providedetails.StartController.start(linkId))
     )
     .refine(implicit request =>
       val individualProvidedDetails: IndividualProvidedDetails = request.get
       individualProvidedDetails.riskingOutcomeIndividual match
         case Some(riskingOutcomeIndividual) => request.add[RiskingOutcomeIndividual](riskingOutcomeIndividual)
         case None =>
-          logger.info("Risking outcome for individual not found.")
-          NotFound
+          logger.info(s"User has entered application at deep url and risking outcome for individual for linkId $linkId not found, redirecting to start where the state can be handled.")
+          Redirect(AppRoutes.providedetails.StartController.start(linkId))
     )
     .refine:
       implicit request =>

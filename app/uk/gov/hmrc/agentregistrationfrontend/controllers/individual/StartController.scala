@@ -70,4 +70,4 @@ extends FrontendController(mcc, actions):
             ))
           case None =>
             logger.info(s"Application for linkId $linkId not found")
-            NotFound
+            Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url)
