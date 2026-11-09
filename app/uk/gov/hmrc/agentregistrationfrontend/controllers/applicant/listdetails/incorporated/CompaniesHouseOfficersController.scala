@@ -20,7 +20,6 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
@@ -34,6 +33,8 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersF
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.NameValidator
+import uk.gov.hmrc.agentregistrationfrontend.util.OfficerNameNormaliser
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.NumberOfCompaniesHouseOfficersPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.UpdateCompaniesHouseOfficersPage
@@ -68,9 +69,9 @@ extends FrontendController(mcc, actions):
           .map: companiesHouseOfficers =>
             request.add[Seq[IndividualName]](
               companiesHouseOfficers
-                .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
+                .map(x => OfficerNameNormaliser.normalise(x.name))
+                .filter(NameValidator.isValid)
                 .map(IndividualName(_))
-                .filter(_.isValidName)
             )
 
   def show: Action[AnyContent] = baseAction

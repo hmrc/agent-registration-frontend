@@ -26,13 +26,13 @@ import play.api.data.validation.Valid
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
+import uk.gov.hmrc.agentregistrationfrontend.util.NameValidator
 
 object IndividualNameSearchForm:
 
   val key: String = "individualNameSearch"
-
-  private def canonicalise(s: String): String = s.trim.replaceAll("\\s+", " ")
 
   def form(
     individuals: List[IndividualProvidedDetails],
@@ -48,13 +48,13 @@ object IndividualNameSearchForm:
 
     val mappingToProvided: Mapping[IndividualProvidedDetails] = mapping(
       key -> text
-        .transform[String](_.trim, identity)
+        .transform[String](canonicalise, identity)
         .verifying(ErrorKeys.requiredFieldErrorMessage(key), _.nonEmpty)
-        .verifying(ErrorKeys.invalidInputErrorMessage(key), IndividualName(_).isValidName)
+        .verifying(ErrorKeys.invalidInputErrorMessage(key), NameValidator.isValid)
         .verifying(ErrorKeys.inputTooLongErrorMessage(key), _.length <= 100)
         .verifying(existsConstraint)
     )(individualName =>
-      IndividualName(canonicalise(individualName))
+      IndividualName(individualName)
     )((individualName: IndividualName) =>
       Some(individualName.value)
     )

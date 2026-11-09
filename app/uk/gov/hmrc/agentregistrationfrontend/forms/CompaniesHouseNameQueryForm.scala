@@ -20,17 +20,15 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
-
-import scala.util.matching.Regex
+import uk.gov.hmrc.agentregistrationfrontend.util.NameValidator
 
 object CompaniesHouseNameQueryForm:
 
   val firstNameKey: String = "firstName"
   val lastNameKey: String = "lastName"
-  private val nameRegex: Regex = """^[\p{L}\p{M}\s'\u2019\-.]+$""".r
-  private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
   val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
     mapping(
@@ -42,7 +40,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          _.matches(nameRegex.regex)
+          NameValidator.isValid
         ),
       lastNameKey -> Forms.of(using TextFormatter(ErrorKeys.requiredFieldErrorMessage(lastNameKey)))
         .transform[String](canonicalise, identity)
@@ -52,7 +50,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(lastNameKey),
-          _.matches(nameRegex.regex)
+          NameValidator.isValid
         )
     )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
   )

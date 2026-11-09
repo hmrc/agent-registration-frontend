@@ -459,3 +459,63 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+
+  "reduceToAvailableNames" should:
+    List(
+      ReduceTestCase(
+        providedNames = Seq.empty,
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "O'CONNOR, Anne-Marie"),
+        availableNames = Seq("Taylor Leadenhall-Lane", "Anne-Marie O'Connor"),
+        description = "offer every officer when the applicant has provided nobody"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "O'CONNOR, Anne-Marie"),
+        availableNames = Seq("Anne-Marie O'Connor"),
+        description = "stop offering an officer the applicant has already provided"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "keep offering a duplicated name while Companies House has one left"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane", "Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "LEADENHALL-LANE, Taylor"),
+        availableNames = Seq.empty,
+        description = "offer nobody once every duplicate has been provided"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Anne-Marie O'Connor"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "ignore a provided name that is not an officer"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq.empty,
+        availableNames = Seq.empty,
+        description = "offer nobody when Companies House returns no officers"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("taylor leadenhall-lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "treat a provided name differing only in case as a different person"
+      )
+    ).foreach: tc =>
+      tc.description in:
+        EnterCompaniesHouseOfficerController.reduceToAvailableNames(
+          individualProvidedDetailsList = tc.providedNames.map(name =>
+            tdAll.providedDetails.precreated.copy(individualName = IndividualName(name))
+          ),
+          companiesHouseOfficerList = tc.officerNames.map(name => tdAll.companiesHouseOfficer.copy(name = name))
+        ) shouldBe tc.availableNames.map(IndividualName(_))
+
+  private case class ReduceTestCase(
+    providedNames: Seq[String],
+    officerNames: Seq[String],
+    availableNames: Seq[String],
+    description: String
+  )
