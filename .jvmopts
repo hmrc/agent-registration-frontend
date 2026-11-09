@@ -1,3 +1,4 @@
 -Xmx4g
 -Xms1g
 -XX:MaxMetaspaceSize=1g
+-XX:+UseG1GC

@@ -1582,3 +1582,19 @@ confirmationOfExpiredDeletion.p2 = Os ydych am wneud cais am gyfrif gwasanaethau
 # Individual link id application expired
 linkIdApplicationExpired.title = Ni allwch barhau â’r cais hwn
 linkIdApplicationExpired.p1 = Cysylltwch â’r person a anfonodd y cysylltiad atoch.
+
+# Individual link id not matched
+applicationNotFound.title = Ni allwn ddod o hyd i gais sy’n cysylltiedig â’r cysylltiad a nodwyd gennych
+applicationNotFound.p1 = Os gwnaethoch deipio neu ludo’r cysylltiad, gwnewch yn siŵr ei fod yn ymddangos yn gywir.
+applicationNotFound.p2 = Dylech gysylltu â’r person a anfonodd y cysylltiad atoch er mwyn gwirio’r canlynol:
+applicationNotFound.li1 = bod y person hwnnw wedi anfon y cysylltiad iawn atoch
+applicationNotFound.li2 = a yw’r cais wedi cael ei ddileu ers i’r person hwnnw anfon y cysylltiad atoch
+
+# No individual records left to claim
+noIndividualRecordsLeftToClaim.title = Ni allwch ychwanegu eich manylion chi at y cais hwn
+noIndividualRecordsLeftToClaim.p1 = Dylech wirio a ydych eisoes wedi ychwanegu’ch manylion chi gan ddefnyddio cyfrif CThEF arall.
+noIndividualRecordsLeftToClaim.p2 = Os na wnaethoch ychwanegu’ch manylion chi gan ddefnyddio cyfrif CThEF arall, dylech gysylltu â’r person a anfonodd y cysylltiad atoch.
+
+# Individual name search not matched
+nameNotFound.title = Ni allwn ddod o hyd i’ch enw chi ar y cais hwn
+nameNotFound.p1 = Bydd angen i chi gysylltu â’r person a anfonodd y cysylltiad atoch er mwyn gwirio sut y cafodd eich enw ei nodi ar y cais.

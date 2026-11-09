@@ -63,7 +63,9 @@ extends FrontendController(mcc, actions):
               logger.warn(s"User has an expired application with linkId $linkId, redirecting to start where expired is handled")
               Redirect(AppRoutes.providedetails.StartController.start(linkId))
             case Some(agentApplication) => request.add(agentApplication)
-            case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+            case None =>
+              logger.warn(s"User is accessing the name matching page without a matching application for link id ${linkId.value}")
+              Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url)
     .refine:
       implicit request =>
         individualProvideDetailsService
@@ -105,11 +107,18 @@ extends FrontendController(mcc, actions):
       val applicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName.value
       IndividualNameSearchForm.form(request.get[List[IndividualProvidedDetails]], applicantName).bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(
-            form = formWithErrors,
-            linkId = linkId,
-            applicantName = applicantName
-          ))),
+          if
+            formWithErrors.errors.headOption.exists(_.message === s"${IndividualNameSearchForm.key}.error.nameNotFound")
+          then
+            logger.warn(s"User submitted a name that does not match any of the relevant individuals within application for linkId $linkId")
+            Future.successful(Redirect(AppRoutes.providedetails.ExitController.nameNotFound(linkId).url))
+          else
+            Future.successful(BadRequest(view(
+              form = formWithErrors,
+              linkId = linkId,
+              applicantName = applicantName
+            )))
+        ,
         matchedIndividual =>
           if matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
           then

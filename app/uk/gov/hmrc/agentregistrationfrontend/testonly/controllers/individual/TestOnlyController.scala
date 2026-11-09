@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
         .find(linkId)
         .map:
           case Some(agentApplication) => request.add(agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+          case None => Redirect(AppRoutes.providedetails.ExitController.applicationNotFound(linkId).url)
     )
     .refine(implicit request =>
       individualProvideDetailsService
@@ -64,7 +64,7 @@ extends FrontendController(mcc, actions):
               .find(_.internalUserId.contains(request.get[InternalUserId]))
               .map(request.add[IndividualProvidedDetails])
               .getOrElse(
-                Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+                Redirect(AppRoutes.providedetails.ExitController.noRecordsLeftToClaim(linkId).url)
               )
     )
 
