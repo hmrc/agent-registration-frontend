@@ -40,7 +40,7 @@ empty), and in one of the roles `getCompaniesHouseOfficerRole` returns for the [
   `LimitedPartnerLimitedPartnership`.
 
 Their normalised names become `individualName` on [key individual](#key-individual) records. Names that fail
-`IndividualName.isValidName` are skipped.
+`NameValidator.isValid` are skipped.
 
 ## GRS
 

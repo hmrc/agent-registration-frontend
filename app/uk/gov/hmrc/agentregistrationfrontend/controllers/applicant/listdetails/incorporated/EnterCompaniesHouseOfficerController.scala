@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer.normaliseOfficerName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -33,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.NameMatching
+import uk.gov.hmrc.agentregistrationfrontend.util.OfficerNameNormaliser
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.EnterCompaniesHouseFirstIndividualNamePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.EnterCompaniesHouseNextIndividualNamePage
 
@@ -89,8 +89,8 @@ extends FrontendController(mcc, actions):
           val agentApplication: IsIncorporated = request.get
           val existingList: List[IndividualProvidedDetails] = request.get
           val companiesHouseOfficerList: Seq[CompaniesHouseOfficer] = request.get
-          val availableNames: Seq[IndividualName] = reduceToAvailableNames(
-            existingList = existingList,
+          val availableNames: Seq[IndividualName] = EnterCompaniesHouseOfficerController.reduceToAvailableNames(
+            individualProvidedDetailsList = existingList,
             companiesHouseOfficerList = companiesHouseOfficerList
           )
           NameMatching.individualNameMatching(IndividualName(s"${companiesHouseNameQuery.firstName} ${companiesHouseNameQuery.lastName}"), availableNames) match
@@ -147,29 +147,31 @@ extends FrontendController(mcc, actions):
         )
       case _ => Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
 
+object EnterCompaniesHouseOfficerController:
+
   /** We need to support duplicate names existing on Companies House. This means that if there are 2 or more instances of the same name on Companies House and
     * the applicant has already provided a name that matches those duplicates, we want to allow them to provide as many as there are on Companies House. We
     * group the CH list by name and count the occurrences, then for each name in the CH list we check if it exists in the existing list and if so we reduce the
     * count. If the count is greater than 0, we know there are still unmatched officers with that name on the CH list, and we keep it in the available names
     * list. Worth noting we may end up using other CH officer values (such as DoB) and this is why we keep the CH officer list as a list of officers not names.
     */
-  private def reduceToAvailableNames(
-    existingList: List[IndividualProvidedDetails],
+  def reduceToAvailableNames(
+    individualProvidedDetailsList: Seq[IndividualProvidedDetails],
     companiesHouseOfficerList: Seq[CompaniesHouseOfficer]
   ): Seq[IndividualName] =
-    val existingListGroupedByName: Map[String, Int] =
-      existingList
+    val providedNameCounts: Map[String, Int] =
+      individualProvidedDetailsList
         .groupMapReduce(_.individualName.value)(_ => 1)(_ + _)
-    val (unMatchedCompaniesHouseOfficers, _) =
-      companiesHouseOfficerList.foldLeft((Seq.empty[CompaniesHouseOfficer], existingListGroupedByName)):
+    val (unMatchedCompaniesHouseOfficers, _): (Seq[CompaniesHouseOfficer], Map[String, Int]) =
+      companiesHouseOfficerList.foldLeft((Seq.empty[CompaniesHouseOfficer], providedNameCounts)):
         case ((acc, counts), officer) =>
-          val key = normaliseOfficerName(officer.name)
-          val existingForName = counts.getOrElse(key, 0)
+          val key: String = OfficerNameNormaliser.normalise(officer.name)
+          val existingForName: Int = counts.getOrElse(key, 0)
           if existingForName > 0
           then (acc, counts.updated(key, existingForName - 1).filter(_._2 > 0))
           else
             // either not matched by existing list or all existing occurrences consumed therefore keep this officer in the list
             (acc :+ officer, counts)
     unMatchedCompaniesHouseOfficers
-      .map(o => normaliseOfficerName(o.name))
+      .map(o => OfficerNameNormaliser.normalise(o.name))
       .map(IndividualName(_))

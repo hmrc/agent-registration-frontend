@@ -151,7 +151,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
-  // stubSixOfficers returns 6 active officers (normalised): John Tester, John Ian Tester, Alice Tester, Bob Tester, Carol Tester, Carol Tester (duplicate)
+  // stubSixOfficers returns 6 active officers (normalised): René O’Connor, John Ian Tester, Alice Tester, Bob Tester, Carol Tester, Carol Tester (duplicate)
   private def individualWithName(
     name: String
   ): IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(
@@ -163,7 +163,7 @@ extends ControllerSpec:
     // List is over-complete (6 > totalListSize 5), so renderPage redirects to CYA.
     // This should never happen as the GET method should have already redirected to CYA.
     val allOfficers = List(
-      individualWithName("John Tester"),
+      individualWithName("René O’Connor"),
       individualWithName("John Ian Tester"),
       individualWithName("Alice Tester"),
       individualWithName("Bob Tester"),
@@ -239,8 +239,8 @@ extends ControllerSpec:
     CompaniesHouseStubs.verifySixOfficersCalls(surname = Some("Tester"))
 
   s"POST $postPath should store the matched CH officer name, not the user-entered name" in:
-    // User enters "john" / "tester" (lowercase), but CH has "John Tester".
-    // The stored name should be the CH officer name "John Tester", not "john tester".
+    // User enters "rené" / "o’connor" (lowercase), but CH has "René O’Connor".
+    // The stored name should be the CH officer name "René O’Connor", not "rené o’connor".
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -248,14 +248,14 @@ extends ControllerSpec:
     )
     AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("René O’Connor"))
     )
-    CompaniesHouseStubs.stubSixOfficers(surname = Some("tester"))
+    CompaniesHouseStubs.stubSixOfficers(surname = Some("o’connor"))
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("john"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("rené"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("o’connor")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -459,3 +459,63 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+
+  "reduceToAvailableNames" should:
+    List(
+      ReduceTestCase(
+        providedNames = Seq.empty,
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "O'CONNOR, Anne-Marie"),
+        availableNames = Seq("Taylor Leadenhall-Lane", "Anne-Marie O'Connor"),
+        description = "offer every officer when the applicant has provided nobody"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "O'CONNOR, Anne-Marie"),
+        availableNames = Seq("Anne-Marie O'Connor"),
+        description = "stop offering an officer the applicant has already provided"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "keep offering a duplicated name while Companies House has one left"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane", "Taylor Leadenhall-Lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor", "LEADENHALL-LANE, Taylor"),
+        availableNames = Seq.empty,
+        description = "offer nobody once every duplicate has been provided"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Anne-Marie O'Connor"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "ignore a provided name that is not an officer"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("Taylor Leadenhall-Lane"),
+        officerNames = Seq.empty,
+        availableNames = Seq.empty,
+        description = "offer nobody when Companies House returns no officers"
+      ),
+      ReduceTestCase(
+        providedNames = Seq("taylor leadenhall-lane"),
+        officerNames = Seq("LEADENHALL-LANE, Taylor"),
+        availableNames = Seq("Taylor Leadenhall-Lane"),
+        description = "treat a provided name differing only in case as a different person"
+      )
+    ).foreach: tc =>
+      tc.description in:
+        EnterCompaniesHouseOfficerController.reduceToAvailableNames(
+          individualProvidedDetailsList = tc.providedNames.map(name =>
+            tdAll.providedDetails.precreated.copy(individualName = IndividualName(name))
+          ),
+          companiesHouseOfficerList = tc.officerNames.map(name => tdAll.companiesHouseOfficer.copy(name = name))
+        ) shouldBe tc.availableNames.map(IndividualName(_))
+
+  private case class ReduceTestCase(
+    providedNames: Seq[String],
+    officerNames: Seq[String],
+    availableNames: Seq[String],
+    description: String
+  )

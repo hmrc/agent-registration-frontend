@@ -20,14 +20,14 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
+import uk.gov.hmrc.agentregistrationfrontend.util.NameValidator
 
 object IndividualNameForm:
 
   val key: String = "individualName"
-
-  private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
   val form: Form[IndividualName] = Form[IndividualName](
     mapping(
@@ -37,10 +37,10 @@ object IndividualNameForm:
           ErrorKeys.inputTooLongErrorMessage(key),
           _.length <= 100
         )
-        .transform[IndividualName](IndividualName(_), _.value)
         .verifying(
           ErrorKeys.invalidInputErrorMessage(key),
-          _.isValidName
+          NameValidator.isValid
         )
+        .transform[IndividualName](IndividualName(_), _.value)
     )(identity)(Some(_))
   )

@@ -20,13 +20,12 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object ApplicantNameForm:
 
   val key: String = "authorisedName"
-
-  private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
   val form: Form[ApplicantName] = Form[ApplicantName](
     mapping(
