@@ -100,7 +100,7 @@ Not to be confused with `UserRole.Partner`, the [applicant](#applicant)'s own ro
 ## Partnership
 
 An `AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals`: `AgentApplicationGeneralPartnership` or
-`AgentApplicationScottishPartnership`. Its `numberOfIndividuals` is an `Option[NumberOfRequiredKeyIndividuals]`,
+`AgentApplicationScottishPartnership`. Its `numberOfIndividuals` is an `Option[NumberOfPartners]`,
 declared by the [applicant](#applicant) in `NumberOfKeyIndividualsController`. Not the same as
 `BusinessType.Partnership`, which also includes LLPs and limited partnerships.
 

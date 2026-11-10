@@ -1,0 +1,107 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated
+
+import com.softwaremill.quicklens.modify
+import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfPartnersPage
+
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class NumberOfPartnersController @Inject() (
+  mcc: MessagesControllerComponents,
+  actions: ApplicantActions,
+  numberOfPartnersPage: NumberOfPartnersPage,
+  agentApplicationService: AgentApplicationService
+)
+extends FrontendController(mcc, actions):
+
+  type DataWithValidApplicationAndBpr = BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
+
+  private val baseAction: ActionBuilderWithData[
+    DataWithValidApplicationAndBpr
+  ] = actions
+    .getApplicationInProgress
+    .getBusinessPartnerRecord
+    .refine:
+      implicit request =>
+        request.agentApplication match
+          case _: AgentApplication.IsIncorporated =>
+            logger.warn(
+              "Incorporated businesses should have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
+            )
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case _: AgentApplication.IsSoleTrader =>
+            logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
+
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      val agentApplication: IsUnincorporatedPartnership = request.get
+      Ok(numberOfPartnersPage(
+        form = NumberOfPartnersForm.form
+          .fill:
+            agentApplication.getNumberOfPartners
+        ,
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+        agentApplication = agentApplication
+      ))
+
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[NumberOfPartners](
+        form = NumberOfPartnersForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            formWithErrors =>
+              val agentApplication: IsUnincorporatedPartnership = request.get[IsUnincorporatedPartnership]
+              numberOfPartnersPage(
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+                agentApplication = agentApplication
+              )
+      )
+      .async:
+        implicit request =>
+          val agentApplication: IsUnincorporatedPartnership = request.get
+          val numberOfPartners: NumberOfPartners = request.get[NumberOfPartners]
+          val updatedApplication: IsUnincorporatedPartnership =
+            agentApplication match
+              case application: AgentApplicationScottishPartnership =>
+                application
+                  .modify(_.numberOfIndividuals)
+                  .setTo(Some(numberOfPartners))
+              case application: AgentApplicationGeneralPartnership =>
+                application
+                  .modify(_.numberOfIndividuals)
+                  .setTo(Some(numberOfPartners))
+
+          agentApplicationService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
+      .redirectIfSaveForLater

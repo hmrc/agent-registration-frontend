@@ -55,6 +55,11 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterHowManyKeyIndividualsNeedsPadding
 
+    val afterSixOrMoreChosen: AgentApplicationGeneralPartnership =
+      tdAll
+        .agentApplicationGeneralPartnership
+        .afterSixOrMoreChosen
+
   final case class TestCase(
     description: String,
     agentApplication: AgentApplicationGeneralPartnership,
@@ -158,5 +163,14 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header(HeaderNames.LOCATION) shouldBe Some(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
+    response.header(HeaderNames.LOCATION) shouldBe Some(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url)
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"GET $path when required number of partners responsible for tax is missing should redirect to number of partners responsible for tax page" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterSixOrMoreChosen)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header(HeaderNames.LOCATION) shouldBe Some(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxController.show.url)
     ApplyStubHelper.verifyConnectorsForAuthAction()

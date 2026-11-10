@@ -131,7 +131,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should redirect to task list for incorporated businesses" in:

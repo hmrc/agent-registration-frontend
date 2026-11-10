@@ -20,17 +20,17 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
+import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfPartnersPage
 
-class NumberOfKeyIndividualsPageSpec
+class NumberOfPartnersPageSpec
 extends ViewSpec:
 
-  val viewTemplate: NumberOfKeyIndividualsPage = app.injector.instanceOf[NumberOfKeyIndividualsPage]
+  val viewTemplate: NumberOfPartnersPage = app.injector.instanceOf[NumberOfPartnersPage]
   val agentApplication: AgentApplication =
     tdAll
       .agentApplicationGeneralPartnershipSections
@@ -38,7 +38,7 @@ extends ViewSpec:
       .whenUsingExistingCompanyName
       .afterBusinessNameProvided
   val doc: Document = Jsoup.parse(viewTemplate(
-    form = NumberOfKeyIndividualsForm.form,
+    form = NumberOfPartnersForm.form,
     entityName = tdAll.companyName,
     agentApplication = agentApplication
   ).body)
@@ -55,8 +55,6 @@ extends ViewSpec:
           |5 or fewer
           |What is the exact number?
           |6 or more
-          |How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
-          |Read the guidance about relevant individuals (opens in new tab)
           |Save and continue
           |Save and come back later
           |Is this page not working properly? (opens in new tab)
@@ -94,11 +92,11 @@ extends ViewSpec:
 
     "render a form error when the form contains an error" in:
       val errorMessage: String = "Select how many partners there are"
-      val formWithError: Form[NumberOfRequiredKeyIndividuals] = NumberOfKeyIndividualsForm
+      val formWithError: Form[NumberOfPartners] = NumberOfPartnersForm
         .form
         .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = NumberOfKeyIndividualsForm.howManyIndividualsOption,
+        field = NumberOfPartnersForm.whichNumberType,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,

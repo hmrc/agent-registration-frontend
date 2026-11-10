@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
@@ -82,8 +82,7 @@ object ApplicantActions:
   type DataWithApplication = AgentApplication *: DataWithAuth
   type DataWithApplicationAndBpr = BusinessPartnerRecordResponse *: DataWithApplication
   type DataWithSoleTraderIdentityFix = IndividualDetailsFix *: RiskingOutcomeApplication.FailedFixable *: IndividualProvidedDetails *: DataWithApplicationAndBpr
-  type DataWithUnincorporatedPartnershipKeyIndividuals =
-    List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsUnincorporatedPartnership *: DataWithAuth
+  type DataWithUnincorporatedPartnershipKeyIndividuals = List[IndividualProvidedDetails] *: NumberOfPartners *: IsUnincorporatedPartnership *: DataWithAuth
 
 @Singleton
 class ApplicantActions @Inject() (
@@ -200,14 +199,13 @@ extends RequestAwareLogging:
             request.replace[AgentApplication, IsUnincorporatedPartnership](unincorporatedPartnership)
     .refine:
       implicit request =>
-        request.get[IsUnincorporatedPartnership].getNumberOfRequiredKeyIndividuals match
-          case Some(numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals) =>
-            request.add[NumberOfRequiredKeyIndividuals](numberOfRequiredKeyIndividuals)
+        request.get[IsUnincorporatedPartnership].getNumberOfPartners match
+          case Some(numberOfPartners: NumberOfPartners) => request.add[NumberOfPartners](numberOfPartners)
           case None =>
             logger.warn(
-              "Number of required key individuals not specified in application, redirecting to number of key individuals page"
+              "Number of required partners not specified in application, redirecting to number of partners page"
             )
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url)
     .refine:
       implicit request =>
         individualProvidedDetailsService
