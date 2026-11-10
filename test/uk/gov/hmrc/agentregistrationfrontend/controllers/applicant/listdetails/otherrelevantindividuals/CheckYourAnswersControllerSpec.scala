@@ -32,6 +32,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
 
+  private val agencyName = tdAll.TdAgencyName.generalPartnership
+
   private val path = "/agent-registration/apply/list-details/other-relevant-individuals/check-your-answers"
 
   val existingOtherRelevantIndividuals: List[IndividualProvidedDetails] = List(
@@ -114,7 +116,7 @@ extends ControllerSpec:
 
     doc.select("main fieldset legend").text() shouldBe "Do you need to tell us about any other relevant individuals?"
     doc.select("main #addOtherRelevantIndividuals-hint").text() shouldBe
-      "We need to know everyone who has a senior role in managing or organising tax adviser activities, but is not a partner at ABC Accounting."
+      s"We need to know everyone who has a senior role in managing or organising tax adviser activities, but is not a partner at $agencyName."
 
     val radioLabels = doc.select("main .govuk-radios__item label").eachText()
     radioLabels.contains("Yes") shouldBe true

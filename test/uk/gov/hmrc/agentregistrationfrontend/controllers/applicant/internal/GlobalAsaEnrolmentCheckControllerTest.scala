@@ -62,7 +62,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers.businessType)
     )
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterGlobalAsaEnrolmentCheckPass)
 
@@ -81,7 +81,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
-      responseBody = tdAll.businessPartnerRecordResponse.copy(
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers.businessType).copy(
         agentReferenceNumber = Some(arn),
         isAnAsaAgent = true
       )
@@ -104,7 +104,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
-      responseBody = tdAll.businessPartnerRecordResponse.copy(
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers.businessType).copy(
         agentReferenceNumber = Some(arn),
         isAnAsaAgent = true
       )

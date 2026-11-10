@@ -109,7 +109,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterAllOtherTasksComplete.agentApplicationId)
 
   s"GET $path should not call for BPR when it is available in the session store" in:
-    businessPartnerRecordSessionStore.upsert(tdAll.businessPartnerRecordResponse).futureValue
+    businessPartnerRecordSessionStore.upsert(tdAll.getBusinessPartnerRecordResponse(agentApplication.afterAllOtherTasksComplete.businessType)).futureValue
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterAllOtherTasksComplete)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,

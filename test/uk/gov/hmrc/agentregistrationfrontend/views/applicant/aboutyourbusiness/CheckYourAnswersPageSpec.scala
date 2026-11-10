@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ViewSelectors.*
@@ -42,7 +43,7 @@ extends ViewSpec:
 
   "CheckYourAnswersPage for complete GRS details received" should:
     given agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
-    val bpr: BusinessPartnerRecordResponse = tdAll.businessPartnerRecordResponse
+    val bpr: BusinessPartnerRecordResponse = tdAll.getBusinessPartnerRecordResponse(LimitedLiabilityPartnership)
     val doc: Document = Jsoup.parse(viewTemplate(bpr, agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent

@@ -68,18 +68,10 @@ object ApplyStubHelper:
     application: AgentApplication
   ): StubMapping =
     stubsForAuthAction(application)
-    application match
-      case a: AgentApplication.IsSoleTrader =>
-        AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-          utr = a.getUtr,
-          responseBody = tdAll.businessPartnerRecordResponseSoleTrader
-        )
-      case a: AgentApplication.IsNotSoleTrader =>
-        val organisationName = tdAll.TdAgencyName.getAgencyNameFor(application)
-        AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-          utr = a.getUtr,
-          responseBody = tdAll.businessPartnerRecordResponse.copy(organisationName = Some(organisationName))
-        )
+    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
+      utr = application.getUtr,
+      responseBody = tdAll.getBusinessPartnerRecordResponse(application.businessType)
+    )
 
   def verifyConnectorsToSupplyBprToPage(utr: Option[Utr] = None): Unit =
     verifyConnectorsForAuthAction()
@@ -132,5 +124,5 @@ object ApplyStubHelper:
       )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
