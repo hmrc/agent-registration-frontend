@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrity.violations
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
@@ -53,7 +54,7 @@ extends UnitSpec:
       val bad = llp.afterStarted.copy(
         applicantContactDetails = Some(td.applicantContactDetails),
         amlsDetails = Some(td.completeAmlsDetails),
-        agentDetails = Some(td.completeAgentDetails)
+        agentDetails = Some(td.getCompleteAgentDetails(LimitedLiabilityPartnership))
       )
       violations(bad) shouldBe empty
 

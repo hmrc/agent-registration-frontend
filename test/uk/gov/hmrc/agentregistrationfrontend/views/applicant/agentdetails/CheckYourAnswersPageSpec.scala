@@ -46,24 +46,24 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         s"""
-          |Account contact details
-          |Check your answers
-          |Name shown to clients
-          |$agencyName
-          |Change Name shown to clients
-          |Telephone number
-          |(+44) 10794554342
-          |Change Telephone number
-          |Email address
-          |new@example.com
-          |Change Email address
-          |Correspondence address
-          |Registered Line 1
-          |Registered Line 2
-          |AB1 2CD
-          |GB
-          |Change Correspondence address
-          |Confirm and continue
+           |Account contact details
+           |Check your answers
+           |Name shown to clients
+           |$agencyName
+           |Change Name shown to clients
+           |Telephone number
+           |(+44) 10794554342
+           |Change Telephone number
+           |Email address
+           |new@example.com
+           |Change Email address
+           |Correspondence address
+           |Registered Line 1
+           |Registered Line 2
+           |AB1 2CD
+           |GB
+           |Change Correspondence address
+           |Confirm and continue
           """.stripMargin
 
     "have the correct title" in:

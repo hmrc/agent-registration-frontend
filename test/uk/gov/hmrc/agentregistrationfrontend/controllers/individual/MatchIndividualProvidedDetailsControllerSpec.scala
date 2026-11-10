@@ -122,7 +122,7 @@ extends ControllerSpec:
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.afterContactDetailsComplete.businessType)
     )
     val response: WSResponse = get(path + "?fromIv=true")
     response.status shouldBe Status.SEE_OTHER

@@ -29,6 +29,9 @@ class FixableTaskListControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/conditions-not-yet-met/task-list"
+
+  private val agencyName = tdAll.TdAgencyName.llp
+
   object agentApplication:
     val riskingCompletedFixable: AgentApplicationLlp =
       tdAll
@@ -71,7 +74,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Take action: ABC Accounting has not met the registration conditions - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Take action: $agencyName has not met the registration conditions - Apply for an agent services account - GOV.UK"
     doc.getTaskStatus(tasks.amls) shouldBe Constants.INCOMPLETE
     expectedEntityFixes.zipWithIndex.map: (_, index) =>
       doc.getTaskStatus(tasks.entityFailures(index + 1)) shouldBe Constants.INCOMPLETE

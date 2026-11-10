@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -37,7 +41,7 @@ trait TdGrsJourneyData {
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.TdCompanyProfile.llp),
+        companyProfile = Some(dependencies.getCompanyProfile(LimitedLiabilityPartnership)),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,
@@ -75,7 +79,7 @@ trait TdGrsJourneyData {
         nino = None,
         trn = None,
         sautr = None,
-        companyProfile = Some(dependencies.TdCompanyProfile.limitedCompany),
+        companyProfile = Some(dependencies.getCompanyProfile(LimitedCompany)),
         ctutr = Some(dependencies.ctUtr),
         postcode = None,
         identifiersMatch = true,
@@ -93,7 +97,7 @@ trait TdGrsJourneyData {
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.TdCompanyProfile.limitedPartnership),
+        companyProfile = Some(dependencies.getCompanyProfile(LimitedPartnership)),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,
@@ -111,7 +115,7 @@ trait TdGrsJourneyData {
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.TdCompanyProfile.scottishLimitedPartnership),
+        companyProfile = Some(dependencies.getCompanyProfile(ScottishLimitedPartnership)),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,

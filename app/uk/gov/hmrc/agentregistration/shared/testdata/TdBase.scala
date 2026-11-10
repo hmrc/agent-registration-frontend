@@ -17,6 +17,13 @@
 package uk.gov.hmrc.agentregistration.shared.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
+import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.GeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
@@ -111,7 +118,6 @@ trait TdBase:
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
-  def agencyName = "ABC Accounting"
 
   def agencyNameBase = "ABC Accounting"
 
@@ -123,22 +129,27 @@ trait TdBase:
     val scottishLimitedPartnership = s"$agencyNameBase SLP"
     val scottishPartnership = s"$agencyNameBase SP"
     val generalPartnership = s"$agencyNameBase GP"
+    val soleTrader = s"$agencyNameBase ST"
 
-    def getAgencyNameFor(agentApplication: AgentApplication): String =
-      agentApplication match
-        case _: AgentApplicationLimitedCompany => limitedCompany
-        case _: AgentApplicationLimitedPartnership => limitedPartnership
-        case _: AgentApplicationLlp => llp
-        case _: AgentApplicationScottishLimitedPartnership => scottishLimitedPartnership
-        case _: AgentApplicationScottishPartnership => scottishPartnership
-        case _: AgentApplicationGeneralPartnership => generalPartnership
-        case _ => throw new Exception("No agency name for application type")
+    def getAgencyName(businessType: BusinessType): String =
+      businessType match
+        case LimitedCompany => limitedCompany
+        case LimitedPartnership => limitedPartnership
+        case LimitedLiabilityPartnership => llp
+        case ScottishLimitedPartnership => scottishLimitedPartnership
+        case ScottishPartnership => scottishPartnership
+        case GeneralPartnership => generalPartnership
+        case SoleTrader => soleTrader
 
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def applicationReference: ApplicationReference = ApplicationReference("APPREF123")
   def personReference: PersonReference = PersonReference("1234567890")
   def applicantName: ApplicantName = ApplicantName(authorisedPersonName)
-  def agentBusinessName: AgentBusinessName = AgentBusinessName(agentBusinessName = agencyName, otherAgentBusinessName = None)
+  def getAgentBusinessName(businessType: BusinessType): AgentBusinessName = AgentBusinessName(
+    agentBusinessName = TdAgencyName.getAgencyName(businessType),
+    otherAgentBusinessName = None
+  )
+
   def amlsCode: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("HMRC")
   def amlsRegistrationNumber: AmlsRegistrationNumber = AmlsRegistrationNumber("XAML00000123456")
   def vrn = Vrn("123456789")
@@ -149,9 +160,9 @@ trait TdBase:
   def riskingCompletedDate: LocalDate = LocalDate.now().minusDays(1)
   def correctiveActionExpiryDate: LocalDate = LocalDate.now().plusDays(45)
 
-  def companyProfile: CompanyProfile = CompanyProfile(
+  def getCompanyProfile(businessType: BusinessType): CompanyProfile = CompanyProfile(
     companyNumber = crn,
-    companyName = agencyName,
+    companyName = TdAgencyName.getAgencyName(businessType),
     dateOfIncorporation = Some(dateOfIncorporation),
     unsanitisedCHROAddress = Some(ChroAddress(
       address_line_1 = Some("23 Great Portland Street"),
@@ -160,25 +171,6 @@ trait TdBase:
       country = Some("GB")
     ))
   )
-
-  def companyProfileBase: CompanyProfile = CompanyProfile(
-    companyNumber = crn,
-    companyName = agencyName,
-    dateOfIncorporation = Some(dateOfIncorporation),
-    unsanitisedCHROAddress = Some(ChroAddress(
-      address_line_1 = Some("23 Great Portland Street"),
-      address_line_2 = Some("London"),
-      postal_code = Some("W1 8LT"),
-      country = Some("GB")
-    ))
-  )
-
-  object TdCompanyProfile:
-
-    val limitedPartnership = companyProfileBase.copy(companyName = TdAgencyName.limitedPartnership)
-    val llp = companyProfileBase.copy(companyName = TdAgencyName.llp)
-    val scottishLimitedPartnership = companyProfileBase.copy(companyName = TdAgencyName.scottishLimitedPartnership)
-    val limitedCompany = companyProfileBase.copy(companyName = TdAgencyName.scottishLimitedPartnership)
 
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
@@ -198,11 +190,11 @@ trait TdBase:
       isVerified = true
     ))
   )
-  def completeAgentDetails: AgentDetails = AgentDetails(
+  def getCompleteAgentDetails(businessType: BusinessType): AgentDetails = AgentDetails(
     agentCorrespondenceAddress = Some(chroAddress),
     telephoneNumber = Some(agentTelephoneNumber),
     agentEmailAddress = Some(agentVerifiedEmailAddress),
-    businessName = agentBusinessName
+    businessName = getAgentBusinessName(businessType)
   )
 
   def completeAmlsDetails: AmlsDetails = AmlsDetails(
@@ -258,44 +250,28 @@ trait TdBase:
     identification = None
   )
 
-  def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
-    organisationName = Some("ABC Accounting"),
-    agentReferenceNumber = None,
-    individualName = None,
-    address = bprRegisteredAddress,
-    primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
-    emailAddress = Some(bprEmailAddress),
-    isAnAsaAgent = false
-  )
-
-  def businessPartnerRecordResponseBase: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
-    organisationName = Some(agencyNameBase),
-    agentReferenceNumber = None,
-    individualName = None,
-    address = bprRegisteredAddress,
-    primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
-    emailAddress = Some(bprEmailAddress),
-    isAnAsaAgent = false
-  )
-
-  object TdBusinessPartnerRecordResponse:
-
-    val limitedPartnership: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.limitedPartnership))
-    val llp: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.llp))
-    val scottishLimitedPartnership: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName =
-      Some(TdAgencyName.scottishLimitedPartnership)
-    )
-    val limitedCompany: BusinessPartnerRecordResponse = businessPartnerRecordResponseBase.copy(organisationName = Some(TdAgencyName.scottishLimitedPartnership))
-
-  def businessPartnerRecordResponseSoleTrader: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
-    organisationName = None,
-    agentReferenceNumber = None,
-    individualName = Some(individualName.value),
-    address = bprRegisteredAddress,
-    primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
-    emailAddress = Some(bprEmailAddress),
-    isAnAsaAgent = false
-  )
+  def getBusinessPartnerRecordResponse(businessType: BusinessType): BusinessPartnerRecordResponse =
+    businessType match
+      case SoleTrader =>
+        BusinessPartnerRecordResponse(
+          organisationName = None,
+          agentReferenceNumber = None,
+          individualName = Some(individualName.value),
+          address = bprRegisteredAddress,
+          primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
+          emailAddress = Some(bprEmailAddress),
+          isAnAsaAgent = false
+        )
+      case _ =>
+        BusinessPartnerRecordResponse(
+          organisationName = Some(TdAgencyName.getAgencyName(businessType)),
+          agentReferenceNumber = None,
+          individualName = None,
+          address = bprRegisteredAddress,
+          primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
+          emailAddress = Some(bprEmailAddress),
+          isAnAsaAgent = false
+        )
 
   def fiveOrFewerKeyIndividuals: FiveOrLess = FiveOrLess(
     numberOfKeyIndividuals = 3

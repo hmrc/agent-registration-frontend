@@ -35,7 +35,7 @@ trait TdSectionAgentDetails {
 
       object whenUsingExistingCompanyName:
 
-        private val agencyName = dependencies.TdAgencyName.getAgencyNameFor(baseForSectionAgentDetails)
+        private val agencyName = dependencies.TdAgencyName.llp
 
         val afterBusinessNameProvided: AgentApplication = baseForSectionAgentDetails
           .modify(_.agentDetails)

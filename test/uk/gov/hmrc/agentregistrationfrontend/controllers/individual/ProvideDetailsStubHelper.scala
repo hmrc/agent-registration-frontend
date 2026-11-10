@@ -49,7 +49,7 @@ object ProvideDetailsStubHelper:
     then
       AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
         utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
-        responseBody = tdAll.businessPartnerRecordResponse
+        responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
       )
     else ()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails), agentApplication.agentApplicationId)
@@ -82,7 +82,7 @@ object ProvideDetailsStubHelper:
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
 
   def stubAuthAndMatchIndividualProvidedDetails(
@@ -103,7 +103,7 @@ object ProvideDetailsStubHelper:
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
 
   def stubAuthAndClaimMatchedIndividualProvidedDetails(
@@ -145,5 +145,5 @@ object ProvideDetailsStubHelper:
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
