@@ -78,9 +78,14 @@ class GrsStubService @Inject() (
                 organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
                 organisationType = "5T"
               ))
-            case Partnership.GeneralPartnership | BusinessType.Partnership.ScottishPartnership =>
+            case Partnership.GeneralPartnership =>
               Some(Organisation(
-                organisationName = "ABC Accounting", // hard coded to avoid random generation of name - we don't get this from GRS
+                organisationName = "ABC Accounting GP",
+                organisationType = "5T"
+              ))
+            case BusinessType.Partnership.ScottishPartnership =>
+              Some(Organisation(
+                organisationName = "ABC Accounting SP",
                 organisationType = "5T"
               ))
             case _ => None,
