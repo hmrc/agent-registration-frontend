@@ -20,6 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.ExpiryTransformations.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
@@ -36,9 +37,9 @@ extends ControllerSpec:
         .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
-    val complete: AgentApplication = tdAll.agentApplicationLlp.afterSentForRisking
+    val complete: AgentApplication = tdAll.agentApplicationLlp.afterDeclarationSubmitted
     val riskingComplete: AgentApplication = tdAll.agentApplicationLlp.afterRiskingCompletedApproved
-    val expired: AgentApplication = tdAll.agentApplicationLlp.afterExpired
+    val expired: AgentApplication = tdAll.agentApplicationLlp.afterStarted.makeOverdue.makeExpired
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.StartController.start(linkId) shouldBe Call(

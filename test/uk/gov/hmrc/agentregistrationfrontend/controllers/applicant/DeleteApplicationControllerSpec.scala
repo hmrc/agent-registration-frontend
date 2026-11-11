@@ -37,7 +37,7 @@ extends ControllerSpec:
     val duringRisking: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterSentForRisking
+        .afterDeclarationSubmitted
 
     val afterRisking: AgentApplicationLlp =
       tdAll

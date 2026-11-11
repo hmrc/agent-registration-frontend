@@ -30,7 +30,7 @@ class StartPageSpec
 extends ViewSpec:
 
   val viewTemplate: StartPage = app.injector.instanceOf[StartPage]
-  val expiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val expiryDate: LocalDate = tdAll.applicationExpiresAt.atZone(ZoneId.systemDefault()).toLocalDate
   val expiryDateDisplay: String = DisplayDate.displayDateForLang(Some(expiryDate))
   private val linkId = LinkId("test-link-id")
 

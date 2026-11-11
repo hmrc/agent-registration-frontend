@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdTime
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.*
 
 trait TdAllSections
@@ -26,7 +27,7 @@ extends TdSectionContactDetails,
   TdSectionAgentDetails,
   TdUpload,
   TdSectionAmls:
-  this: TdBase =>
+  this: (TdBase & TdTime) =>
 
   def getConfirmedAddressResponse: GetConfirmedAddressResponse = GetConfirmedAddressResponse(
     lines = Seq("New Line 1", "New Line 2"),

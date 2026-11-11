@@ -29,8 +29,9 @@ import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadEventDetails
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdTime
 
-trait TdUpload { dependencies: TdBase =>
+trait TdUpload { dependencies: (TdBase & TdTime) =>
 
   def uploadId: UploadId = UploadId("upload-id-12345")
 
@@ -49,7 +50,7 @@ trait TdUpload { dependencies: TdBase =>
     reference = fileUploadReference,
     downloadUrl = downloadUrl,
     uploadDetails = UploadEventDetails(
-      uploadTimestamp = dependencies.nowAsInstant,
+      uploadTimestamp = dependencies.now,
       checksum = checksum,
       fileMimeType = mimeType,
       fileName = fileName,
@@ -66,7 +67,7 @@ trait TdUpload { dependencies: TdBase =>
        |  "uploadDetails": {
        |      "fileName": "$fileName",
        |      "fileMimeType": "$mimeType",
-       |      "uploadTimestamp": "${dependencies.nowAsInstant}",
+       |      "uploadTimestamp": "${dependencies.now}",
        |      "checksum": "$checksum",
        |      "size": $sizeInBytes
        |  }
@@ -85,7 +86,7 @@ trait TdUpload { dependencies: TdBase =>
   def uploadInProgress: Upload = Upload(
     _id = uploadId,
     internalUserId = dependencies.internalUserId,
-    createdAt = dependencies.nowAsInstant,
+    createdAt = dependencies.now,
     fileUploadReference = fileUploadReference,
     uploadStatus = UploadStatus.InProgress
   )
@@ -118,7 +119,7 @@ trait TdUpload { dependencies: TdBase =>
     "location" -> objectStoreLocation,
     "contentLength" -> sizeInBytes,
     "contentMD5" -> "a3c2f1e38701bd2c7b54ebd7b1cd0dbc",
-    "lastModified" -> dependencies.nowAsInstant
+    "lastModified" -> dependencies.now
   )
 
 }

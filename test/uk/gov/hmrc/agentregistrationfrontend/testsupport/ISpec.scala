@@ -56,8 +56,16 @@ extends AnyWordSpecLike,
   val thisFrontendBaseUrl: String = ISpec.thisFrontendBaseUrl
 
   lazy val tdAll: TdAll = TdAll.tdAll
-  lazy val frozenInstant: Instant = tdAll.nowAsInstant
-  given clock: Clock = tdAll.clock
+
+  /** The moment this spec runs at.
+    *
+    * Defaults to the test data's "now", which is some days after the application was created, so a fixture part-way through the journey has its earlier events
+    * in the past. A spec that drives the production code into stamping a timestamp of its own has to override this with the moment of that event, or the
+    * stamped value and the fixture's will not agree.
+    */
+  protected def frozenInstant: Instant = tdAll.now
+
+  given clock: Clock = Clock.fixed(frozenInstant, tdAll.zoneId)
   given ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it everywhere in ISpecs

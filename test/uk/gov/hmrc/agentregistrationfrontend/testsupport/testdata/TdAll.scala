@@ -16,17 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationLimitedCompany
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationLimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationScottishLimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationScottishPartnership
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual.TdIndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
-import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTraderRepresentative
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistration.shared.testdata.risking.TdRiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.testdata.risking.TdRiskingOutcomeIndividual
 
@@ -48,21 +38,11 @@ object TdAll:
   * This allows reusing default test data while overriding specific values as needed.
   */
 trait TdAll
-extends TdBase,
+extends TestOnlyData,
   TdRequest,
-  TdGrsBusinessDetails,
   TdGrsJourneyData,
   TdAgentApplicationRequest,
-  TdAgentApplicationLlp,
-  TdAgentApplicationGeneralPartnership,
-  TdAgentApplicationLimitedCompany,
-  TdAgentApplicationLimitedPartnership,
-  TdAgentApplicationScottishLimitedPartnership,
-  TdAgentApplicationScottishPartnership,
-  TdAgentApplicationSoleTrader,
-  TdAgentApplicationSoleTraderRepresentative,
   TdAllSections,
-  TdIndividualProvidedDetails,
   TdRiskingOutcomeEntity,
   TdRiskingOutcomeIndividual:
 

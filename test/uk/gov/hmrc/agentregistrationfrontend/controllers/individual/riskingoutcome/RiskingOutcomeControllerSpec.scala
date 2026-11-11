@@ -55,10 +55,6 @@ extends ControllerSpec:
     )))
     .modify(_.riskingOutcomeEntity)
     .setTo(Some(RiskingOutcomeEntity.Approved))
-    .modify(_.applicationExpiresAt)
-    .setTo(None)
-    .modify(_.submittedAt)
-    .setTo(Some(tdAll.newInstant))
 
   val failedNonFixableApplication: AgentApplication = failedFixableApplication
     .modify(_.riskingOutcomeApplication)

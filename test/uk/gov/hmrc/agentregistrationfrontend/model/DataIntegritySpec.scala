@@ -37,7 +37,7 @@ extends UnitSpec:
       violations(bad).exists(_.contains("applicationExpiresAt should be defined in Started state")) shouldBe true
 
     "flag submittedAt set" in:
-      val bad = llp.afterStarted.copy(submittedAt = Some(td.nowAsInstant))
+      val bad = llp.afterStarted.copy(submittedAt = Some(td.now))
       violations(bad).exists(_.contains("submittedAt should not be defined in Started state")) shouldBe true
 
     "flag riskingOutcomeApplication set" in:
@@ -45,7 +45,7 @@ extends UnitSpec:
       violations(bad).exists(_.contains("riskingOutcomeApplication should not be defined in Started state")) shouldBe true
 
     "include applicationReference in the message" in:
-      val bad = llp.afterStarted.copy(submittedAt = Some(td.nowAsInstant))
+      val bad = llp.afterStarted.copy(submittedAt = Some(td.now))
       val violation = violations(bad).headOption.getOrElse(fail("expected at least one violation"))
       violation should include(s"applicationReference=${bad.applicationReference.value}")
 
@@ -67,7 +67,7 @@ extends UnitSpec:
       violations(bad).exists(_.contains("businessDetails should be defined in GrsDataReceived state")) shouldBe true
 
     "flag submittedAt set" in:
-      val bad = llp.afterGrsDataReceived.copy(submittedAt = Some(td.nowAsInstant))
+      val bad = llp.afterGrsDataReceived.copy(submittedAt = Some(td.now))
       violations(bad).exists(_.contains("submittedAt should not be defined in GrsDataReceived state")) shouldBe true
 
     "flag riskingOutcomeEntity set" in:

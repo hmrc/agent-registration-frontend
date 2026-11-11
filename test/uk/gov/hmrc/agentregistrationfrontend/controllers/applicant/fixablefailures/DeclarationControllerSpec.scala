@@ -28,9 +28,13 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
+import java.time.Instant
 
 class DeclarationControllerSpec
 extends ControllerSpec:
+
+  // re-submitting after fixes stamps a time from the clock, so this spec runs at the moment the test data was re-submitted
+  override protected def frozenInstant: Instant = tdAll.reSubmittedAt
 
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(

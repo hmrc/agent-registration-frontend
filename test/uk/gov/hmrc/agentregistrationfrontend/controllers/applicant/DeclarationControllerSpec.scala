@@ -26,9 +26,13 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
+import java.time.Instant
 
 class DeclarationControllerSpec
 extends ControllerSpec:
+
+  // submitting stamps submittedAt from the clock, so this spec runs at the moment the test data was submitted
+  override protected def frozenInstant: Instant = tdAll.submittedAt
 
   private val path = "/agent-registration/apply/agent-declaration/confirm-declaration"
 

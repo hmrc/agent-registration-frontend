@@ -21,6 +21,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.ExpiryTransformations.*
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -35,7 +36,7 @@ extends ControllerSpec:
   object agentApplication:
 
     val afterContactDetailsComplete: AgentApplication = tdAll.agentApplicationLlp.afterContactDetailsComplete
-    val afterExpired: AgentApplication = tdAll.agentApplicationLlp.afterExpired
+    val afterExpired: AgentApplication = tdAll.agentApplicationLlp.afterStarted.makeOverdue.makeExpired
 
   private val path = s"/agent-registration/provide-details/match-application/${linkId.value}"
 
