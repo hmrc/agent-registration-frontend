@@ -313,7 +313,7 @@ extends FrontendController(mcc, actions):
       then
         Some(CompanyProfile(
           companyNumber = companyNumberForBusinessType(businessType),
-          companyName = "ABC Accounting",
+          companyName = companyNameForBusinessType(businessType),
           dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
           unsanitisedCHROAddress = Some(ChroAddress(
             address_line_1 = Some("23 Great Portland Street"),
@@ -344,3 +344,12 @@ extends FrontendController(mcc, actions):
       case LimitedPartnership => Crn("33333333")
       case ScottishLimitedPartnership => Crn("44444444")
       case _ => Crn("12345678") // we don't have a matching CH stub for any other business type so return the original default
+
+  private def companyNameForBusinessType(businessType: BusinessType): String =
+    val companyNameBase = "ABC Accounting"
+    businessType match
+      case LimitedCompany => companyNameBase + " LC"
+      case LimitedLiabilityPartnership => companyNameBase + " LLP"
+      case LimitedPartnership => companyNameBase + " LP"
+      case ScottishLimitedPartnership => companyNameBase + " SLP"
+      case _ => companyNameBase // we don't have a matching CH stub for any other business type so return the original default
