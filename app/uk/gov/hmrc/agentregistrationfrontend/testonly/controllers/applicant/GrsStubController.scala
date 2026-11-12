@@ -352,4 +352,6 @@ extends FrontendController(mcc, actions):
       case LimitedLiabilityPartnership => companyNameBase + " LLP"
       case LimitedPartnership => companyNameBase + " LP"
       case ScottishLimitedPartnership => companyNameBase + " SLP"
-      case _ => companyNameBase // we don't have a matching CH stub for any other business type so return the original default
+      case GeneralPartnership => companyNameBase + " GP" // This is never actually used and is only here for stubbing purposes
+      case ScottishPartnership => companyNameBase + " SP" // This is never actually used and is only here for stubbing purposes
+      case SoleTrader => "Joe Bloggs" // This is never actually used and is only here for stubbing purposes
