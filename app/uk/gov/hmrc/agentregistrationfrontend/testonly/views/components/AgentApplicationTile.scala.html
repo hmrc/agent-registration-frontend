@@ -270,9 +270,31 @@
                 <dd class="govuk-summary-list__value">@formatInstant(gracePeriodEndsAt)</dd>
             </div>
         }
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Expiry reminder email sent at</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.expiryReminderEmailSentAt.map(formatInstant).getOrElse("not sent")</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Expired email sent at</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.expiredEmailSentAt.map(formatInstant).getOrElse("not sent")</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Deletion email sent at</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.deletionEmailSentAt.map(formatInstant).getOrElse("not sent")</dd>
+        </div>
         <div class="govuk-summary-list__row" id="timers">
             <dt class="govuk-summary-list__key">Timers</dt>
             <dd class="govuk-summary-list__value">
+                <p class="govuk-hint govuk-!-margin-bottom-2">
+                    Emails go to the verified agent email, otherwise the verified applicant email; with neither the stage skips the application and the marker stays "not sent".
+                    Move the timers, then run the schedulers from the top bar.
+                </p>
+                @actionButton(
+                    label = "Move into expiry reminder window",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.moveIntoExpiryReminderWindow(agentApplication.applicationReference),
+                    enabled = agentApplication.applicationExpiresAt.isDefined,
+                    id = Some("move-into-expiry-reminder-window")
+                )
                 @actionButton(
                     label = "Expire application now",
                     url = AppRoutes.testOnly.applicant.TestOnlyController.expireApplicationNow(agentApplication.applicationReference),
@@ -284,6 +306,12 @@
                     url = AppRoutes.testOnly.applicant.TestOnlyController.endPostExpiryGracePeriodNow(agentApplication.applicationReference),
                     enabled = agentApplication.postExpiryGracePeriodEndsAt.isDefined,
                     id = Some("end-post-expiry-grace-period-now")
+                )
+                @actionButton(
+                    label = "Reset email markers",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.resetEmailMarkers(agentApplication.applicationReference),
+                    enabled = agentApplication.expiryReminderEmailSentAt.isDefined || agentApplication.expiredEmailSentAt.isDefined || agentApplication.deletionEmailSentAt.isDefined,
+                    id = Some("reset-email-markers")
                 )
             </dd>
         </div>
@@ -312,6 +340,17 @@
                     url = AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference),
                     hint = Some("populated once risking has fully completed for this application")
                 )
+                @compactLink(
+                    label = "View expiry emails (JSON)",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.showApplicationEmails(agentApplication.applicationReference),
+                    hint = Some("recipient and the exact send-email requests the expiry and deletion jobs would build for this application right now")
+                )
+                <p class="govuk-body govuk-!-margin-bottom-1">
+                    Preview as rendered by hmrc-email-renderer:
+                    <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.previewApplicationEmail(agentApplication.applicationReference, "agent_registration_application_expiry_reminder")">expiry reminder</a>,
+                    <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.previewApplicationEmail(agentApplication.applicationReference, "agent_registration_application_expired")">expired</a>,
+                    <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.previewApplicationEmail(agentApplication.applicationReference, "agent_registration_application_deleted")">deleted</a>
+                </p>
             </dd>
         </div>
         <div class="govuk-summary-list__row">
