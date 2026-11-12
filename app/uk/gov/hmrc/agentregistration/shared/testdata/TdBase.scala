@@ -117,7 +117,6 @@ trait TdBase { dependencies: (TdTime & TdAgentApplicationTime) =>
         case GeneralPartnership => generalPartnership
         case SoleTrader => soleTrader
 
-  def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def applicationReference: ApplicationReference = ApplicationReference("APPREF123")
   def personReference: PersonReference = PersonReference("1234567890")
   def applicantName: ApplicantName = ApplicantName(authorisedPersonName)
