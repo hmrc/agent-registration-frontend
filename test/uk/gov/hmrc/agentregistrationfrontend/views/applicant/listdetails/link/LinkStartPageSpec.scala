@@ -29,7 +29,7 @@ class LinkStartPageSpec
 extends ViewSpec:
 
   val viewTemplate: LinkStartPage = app.injector.instanceOf[LinkStartPage]
-  val applicationExpiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val applicationExpiryDate: LocalDate = tdAll.applicationExpiresAt.atZone(ZoneId.systemDefault()).toLocalDate
   val applicationExpiryDateDisplay: String = DisplayDate.displayDateForLang(Some(applicationExpiryDate))
   val doc: Document = Jsoup.parse(
     viewTemplate(

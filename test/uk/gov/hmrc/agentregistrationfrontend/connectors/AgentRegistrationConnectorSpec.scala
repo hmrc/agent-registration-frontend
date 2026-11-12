@@ -56,7 +56,7 @@ extends ISpec:
       val appender = attachListAppender()
       try
         val badApplication = tdAll.agentApplicationLlp.afterStarted.copy(
-          submittedAt = Some(tdAll.nowAsInstant)
+          submittedAt = Some(tdAll.now)
         )
 
         wm.stubFor(

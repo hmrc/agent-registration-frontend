@@ -24,9 +24,13 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EnrolmentStoreStubs
+import java.time.Instant
 
 class InitiateAgentApplicationControllerSpec
 extends ControllerSpec:
+
+  // this spec creates applications, so it runs at the moment the test data's applications were created
+  override protected def frozenInstant: Instant = tdAll.createdAt
 
   override def configOverrides: Map[String, Any] = Map[String, Any](
     "auditing.enabled" -> true

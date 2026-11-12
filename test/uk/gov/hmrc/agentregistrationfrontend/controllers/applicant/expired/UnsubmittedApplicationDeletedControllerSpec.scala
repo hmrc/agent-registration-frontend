@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.expired
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.ExpiryTransformations.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -34,7 +35,9 @@ extends ControllerSpec:
     val expiredAsUnsubmitted: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterExpired
+        .afterStarted
+        .makeOverdue
+        .makeExpired
 
     val stillInProgress: AgentApplicationLlp =
       tdAll

@@ -22,6 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.ExpiryTransformations.*
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNameSearchForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
@@ -42,7 +43,7 @@ extends ControllerSpec:
     .modify(_.applicationState)
     .setTo(ApplicationState.SentForRisking)
     .modify(_.submittedAt)
-    .setTo(Some(tdAll.nowAsInstant))
+    .setTo(Some(tdAll.now))
 
   object providedDetails:
     val providedDetails: IndividualProvidedDetails =
@@ -89,7 +90,7 @@ extends ControllerSpec:
     IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
-      agentApplication = tdAll.agentApplicationLlp.afterExpired
+      agentApplication = tdAll.agentApplicationLlp.afterStarted.makeOverdue.makeExpired
     )
     val response: WSResponse = get(path)
 

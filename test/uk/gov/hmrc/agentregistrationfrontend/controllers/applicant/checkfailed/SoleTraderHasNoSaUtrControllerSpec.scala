@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed
 
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.ExpiryTransformations.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -57,7 +58,7 @@ extends ControllerSpec:
 
   s"GET $path should redirect to the task list when the application has expired" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationSoleTrader.afterExpired)
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationSoleTrader.afterStarted.makeOverdue.makeExpired)
 
     val response: WSResponse = get(path)
 

@@ -25,9 +25,13 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersF
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
+import java.time.Instant
 
 class CompaniesHouseOfficersControllerSpec
 extends ControllerSpec:
+
+  // this spec creates individuals, so it runs at the moment the test data's individuals were created
+  override protected def frozenInstant: Instant = tdAll.individualCreatedAt
 
   private val getPath = "/agent-registration/apply/list-details/companies-house-officers"
   private val postFiveOrLessPath = "/agent-registration/apply/list-details/confirm-companies-house-officers"

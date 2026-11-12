@@ -161,7 +161,7 @@ extends ControllerSpec:
 
   s"GET $path for limited company after building the list of individuals to sign in should render correct status tags" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividuals(
-      application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
+      application = tdAll.agentApplicationLimitedCompany.afterConfirmTwoChOfficers,
       individuals = List(
         tdAll.providedDetails.precreated.copy(individualName = IndividualName("Steve Austin")),
         tdAll.providedDetails.precreated.copy(individualName = IndividualName("Beverly Hills"))
@@ -185,7 +185,7 @@ extends ControllerSpec:
 
   s"GET $path for limited company after ask individuals to sign in should render correct status tags" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividuals(
-      application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
+      application = tdAll.agentApplicationLimitedCompany.afterConfirmTwoChOfficers,
       individuals = List(
         tdAll.providedDetails.afterAccessConfirmed.copy(
           individualName = IndividualName("Steve Austin")
@@ -213,7 +213,7 @@ extends ControllerSpec:
 
   s"GET $path for limited company after all individuals provided details should render correct status tags" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividuals(
-      application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
+      application = tdAll.agentApplicationLimitedCompany.afterConfirmTwoChOfficers,
       individuals = List(
         tdAll.providedDetails.afterFinished.copy(
           individualName = IndividualName("Steve Austin")

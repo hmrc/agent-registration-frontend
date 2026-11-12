@@ -29,7 +29,7 @@ class SaveForLaterPageSpec
 extends ViewSpec:
 
   val viewTemplate: SaveForLaterPage = app.injector.instanceOf[SaveForLaterPage]
-  val expiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val expiryDate: LocalDate = tdAll.applicationExpiresAt.atZone(ZoneId.systemDefault()).toLocalDate
   val expiryDateDisplay: String = DisplayDate.displayDateForLang(Some(expiryDate))
   val doc: Document = Jsoup.parse(
     viewTemplate(expiryDateDisplay).body
