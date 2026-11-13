@@ -343,6 +343,18 @@ numberOfOfficialsWhoDealWithTax.error.invalid = Enter the number who are respons
 numberOfOfficialsWhoDealWithTax.label = How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
 numberOfOfficialsWhoDealWithTax.linkText = Read the guidance about relevant individuals
 
+numberOfPartnersResponsibleForTax.title = Partners who are also ‘relevant individuals’
+numberOfPartnersResponsibleForTax.p1 = We need to know which of the partners at {0} meet the legal definition of relevant individuals, as defined in <a href="{1}" class="govuk-link" target="_blank" rel="noopener noreferrer">Chapter 226(2) of the Finance Act 2026 (opens in a new tab)</a>.
+numberOfPartnersResponsibleForTax.h2 = The definition of relevant individuals
+numberOfPartnersResponsibleForTax.p2 = The definition of a ‘relevant individual’ depends on the size of the business.
+numberOfPartnersResponsibleForTax.p3 = For a business with 6 or more partners, someone is a relevant individual if they work for the business and play a significant role in:
+numberOfPartnersResponsibleForTax.li1 = making decisions about how the business manages or organises all of its tax adviser activities, or a substantial part of those activities
+numberOfPartnersResponsibleForTax.li2 = actually managing or organising all of the tax adviser activities for the business, or a substantial part of those activities
+numberOfPartnersResponsibleForTax.question = How many partners are also relevant individuals?
+numberOfPartnersResponsibleForTax.error.required = Enter how many partners are also relevant individuals
+numberOfPartnersResponsibleForTax.notANumber = Enter only numbers
+numberOfPartnersResponsibleForTax.error.invalid = Enter a number between 1 and 30
+
 individualName.label.first = What is the full name of the first partner?
 individualName.label.subsequent = What is the full name of the next partner?
 individualName.label.only = What is the full name of the partner?

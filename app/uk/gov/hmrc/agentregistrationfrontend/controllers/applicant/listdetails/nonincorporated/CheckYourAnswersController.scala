@@ -23,11 +23,13 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -45,7 +47,7 @@ extends FrontendController(mcc, actions):
   private type DataWithLists =
     List[
       IndividualProvidedDetails
-    ] *: NumberOfRequiredKeyIndividuals *: BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
+    ] *: NumberOfPartners *: BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
@@ -64,13 +66,28 @@ extends FrontendController(mcc, actions):
           case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
     .refine:
       implicit request =>
-        request.get[IsUnincorporatedPartnership].getNumberOfRequiredKeyIndividuals match
-          case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
+        request.get[IsUnincorporatedPartnership].getNumberOfPartners match
+          case Some(n: NumberOfPartners) => request.add(n)
           case None =>
             logger.debug(
               "Number of required key individuals not specified in application, redirecting to number of key individuals page"
             )
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url)
+    .ensure(
+      condition =
+        request =>
+          request.get[NumberOfPartners] match
+            case FiveOrLess(_: Int) => true
+            case SixOrMore(Some(_)) => true
+            case SixOrMore(None) => false // we are missing the number of key individuals responsible for tax matters, so we need to redirect to the page to get that information
+      ,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn(
+            "Number of required key individuals responsible for tax matters not specified in application, redirecting to number of key individuals responsible for tax matters page"
+          )
+          Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxController.show.url)
+    )
     .refine:
       implicit request =>
         val agentApplication: IsUnincorporatedPartnership = request.get
@@ -80,7 +97,7 @@ extends FrontendController(mcc, actions):
           ).map[RequestWithData[
             DataWithLists
           ] | Result]:
-            case Nil if request.get[NumberOfRequiredKeyIndividuals].totalListSize > 0 =>
+            case Nil if request.get[NumberOfPartners].totalListSize > 0 =>
               logger.warn(
                 "Number of required key individuals specified in application, but no individuals found, redirecting to number of enter key individual page"
               )
@@ -96,7 +113,7 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val application: IsUnincorporatedPartnership = request.get[IsUnincorporatedPartnership]
       Ok(view(
-        numberOfKeyIndividuals = application.getNumberOfRequiredKeyIndividuals.getOrThrowExpectedDataMissing("NumberOfRequiredKeyIndividuals"),
+        numberOfKeyIndividuals = application.getNumberOfPartners.getOrThrowExpectedDataMissing("NumberOfRequiredKeyIndividuals"),
         existingList = request.get[List[IndividualProvidedDetails]],
         entityName = request.get[BusinessPartnerRecordResponse].getEntityName
       ))

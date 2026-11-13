@@ -57,7 +57,7 @@ extends ViewSpec:
       caption = "Partners and other relevant individuals",
       numberOfKeyIndividualsLabel = "Number of partners",
       keyIndividualNamesLabel = "Partner names",
-      changeNumberHref = AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url,
+      changeNumberHref = AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url,
       changeNamesHref = AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
     ),
     BusinessTypeTestCase(
@@ -66,7 +66,7 @@ extends ViewSpec:
       caption = "Partners and other relevant individuals",
       numberOfKeyIndividualsLabel = "Number of partners",
       keyIndividualNamesLabel = "Partner names",
-      changeNumberHref = AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url,
+      changeNumberHref = AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url,
       changeNamesHref = AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
     )
   )

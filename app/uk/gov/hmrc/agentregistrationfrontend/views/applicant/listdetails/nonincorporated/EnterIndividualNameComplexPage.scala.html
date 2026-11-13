@@ -52,7 +52,7 @@
   if(paddingRequired > 0) messages(s"$key.complex.withPadding.title", entityName)
   else messages(s"$key.complex.title", entityName)
 }
-@numberOfKeyIndividuals = @{numberOfRequiredKeyIndividuals.numberOfKeyIndividualsResponsibleForTaxMatters}
+@numberOfKeyIndividuals = @{numberOfRequiredKeyIndividuals.getNumberOfPartnersResponsibleForTaxMatters}
 @paddingRequired = @{numberOfRequiredKeyIndividuals.requiredPadding}
 
 @layout(

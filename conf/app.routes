@@ -108,9 +108,11 @@ GET         /apply/list-details/sole-trader                         uk.gov.hmrc.
 GET         /apply/list-details/ask-sole-trader                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.AskOwnerToProveIdentityController.show
 POST        /apply/list-details/ask-sole-trader                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.AskOwnerToProveIdentityController.submit
 
-# Lists of key individuals
-GET         /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.show
-POST        /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit
+# Lists of partners
+GET         /apply/list-details/how-many-partners            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfPartnersController.show
+POST        /apply/list-details/how-many-partners            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfPartnersController.submit
+GET         /apply/list-details/how-many-partners-responsible-for-tax           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxController.show
+POST        /apply/list-details/how-many-partners-responsible-for-tax            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxController.submit
 GET         /apply/list-details/enter-key-individual                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.EnterKeyIndividualController.show
 POST        /apply/list-details/enter-key-individual                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.EnterKeyIndividualController.submit
 GET         /apply/list-details/change-key-individual/:individualProvidedDetailsId      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.ChangeKeyIndividualController.show(individualProvidedDetailsId: IndividualProvidedDetailsId)

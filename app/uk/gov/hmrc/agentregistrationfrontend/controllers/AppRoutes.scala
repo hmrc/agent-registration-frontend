@@ -118,7 +118,8 @@ object AppRoutes:
 
       object nonincorporated:
 
-        val NumberOfKeyIndividualsController = listdetailsNonIncorporatedRoutes.NumberOfKeyIndividualsController
+        val NumberOfPartnersController = listdetailsNonIncorporatedRoutes.NumberOfPartnersController
+        val NumberOfPartnersResponsibleForTaxController = listdetailsNonIncorporatedRoutes.NumberOfPartnersResponsibleForTaxController
         val EnterKeyIndividualController = listdetailsNonIncorporatedRoutes.EnterKeyIndividualController
         val ChangeKeyIndividualController = listdetailsNonIncorporatedRoutes.ChangeKeyIndividualController
         val RemoveKeyIndividualController = listdetailsNonIncorporatedRoutes.RemoveKeyIndividualController

@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
-@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
 
 @this(
         layout: Layout,
@@ -33,7 +33,7 @@
 )
 
 @(
-        numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals,
+        numberOfKeyIndividuals: NumberOfPartners,
         existingList: List[IndividualProvidedDetails],
         entityName: String
 )(implicit
@@ -71,7 +71,7 @@
   <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
   <h1 class="govuk-heading-l">@title</h1>
   <p class="govuk-body">
-    <a class="govuk-link" href="@{AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url}">
+    <a class="govuk-link" href="@{AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url}">
       @messages(s"$key.changeNumber")
     </a>
   </p>
