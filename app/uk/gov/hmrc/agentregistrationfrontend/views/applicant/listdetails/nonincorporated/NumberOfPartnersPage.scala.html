@@ -18,11 +18,12 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm.HowManyIndividualsOption
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm.HowManyIndividualsOption.*
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm.HowManyIndividualsOption
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm.HowManyIndividualsOption.*
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
@@ -42,7 +43,7 @@
 )
 
 @(
-        form: Form[NumberOfRequiredKeyIndividuals],
+        form: Form[NumberOfPartners],
         entityName: String,
         agentApplication: AgentApplication
 )(implicit
@@ -50,32 +51,18 @@
         messages: Messages
 )
 
-@key = @{NumberOfKeyIndividualsForm.howManyIndividualsOption}
-@exactNumberOfOfficialsKey = @{NumberOfKeyIndividualsForm.howManyIndividuals}
-@numberOfOfficialsWhoDealWithTaxKey = @{NumberOfKeyIndividualsForm.howManyIndividualsResponsibleForTaxMatters}
+@key = @{NumberOfPartnersForm.whichNumberType}
+@exactNumberOfPartnersKey = @{NumberOfPartnersForm.exactNumberOfPartners}
 @title = @{messages(s"$key.title.$businessTypeKey", entityName)}
-@exactNumberOfOfficialsInput = {
+@exactNumberOfPartnersInput = {
   @govukInput(Input(
     label = Label(
-      content = Text(messages(s"$exactNumberOfOfficialsKey.label"))
+      content = Text(messages(s"$exactNumberOfPartnersKey.label"))
     ),
     classes = "govuk-input--width-5"
-  ).withFormField(form(exactNumberOfOfficialsKey)))
+  ).withFormField(form(exactNumberOfPartnersKey)))
 }
-@numberOfOfficialsWhoDealWithTaxInput = {
-  @govukInput(Input(
-    label = Label(
-      content = Text(messages(s"$numberOfOfficialsWhoDealWithTaxKey.label"))
-    ),
-    hint = Some(Hint(
-      content = HtmlContent(hmrcNewTabLinkHelper(NewTabLinkHelper(
-          text = messages(s"$numberOfOfficialsWhoDealWithTaxKey.linkText"),
-          href = Some(appConfig.govukDefinitionOfRelevantIndividualsUrl),
-        )))
-    )),
-    classes = "govuk-input--width-5"
-  ).withFormField(form(numberOfOfficialsWhoDealWithTaxKey)))
-}
+
 @businessTypeKey = @{
   agentApplication match {
     case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
@@ -89,7 +76,7 @@
   maybeForm = Some(form)
 ) {
   <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
-  @formWithCSRF(action = AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit) {
+  @formWithCSRF(action = AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.submit) {
     @govukRadios(Radios(
       fieldset = Some(Fieldset(
         legend = Some(Legend(
@@ -101,16 +88,13 @@
       hint = Some(Hint(
         content = Text(messages(s"$key.hint.$businessTypeKey"))
       )),
-      items = HowManyIndividualsOption.values.toSeq.map: option =>
+      items = HowManyIndividualsOption.values.toSeq.map { option =>
         RadioItem(
           content = Text(messages(s"$key.$option")),
           value = Some(option.toString),
-          conditionalHtml = Some({
-            option match
-            case FiveOrLess => exactNumberOfOfficialsInput
-            case SixOrMore => numberOfOfficialsWhoDealWithTaxInput
-          })
+          conditionalHtml = if(option === FiveOrLess) Some(exactNumberOfPartnersInput) else None
         )
+      }
     ).withFormField(form(key)))
 
     @continueOrSaveForLater()

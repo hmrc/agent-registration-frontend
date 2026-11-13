@@ -263,6 +263,19 @@ numberOfOfficialsWhoDealWithTax.error.required=Nodwch y nifer sy’n gyfrifol am
 numberOfOfficialsWhoDealWithTax.error.invalid=Nodwch y nifer sy’n gyfrifol am faterion treth, er enghraifft 12 neu 3
 numberOfOfficialsWhoDealWithTax.label=Faint o’r rhain sy’n unigolion perthnasol sydd â rôl uwch wrth reoli neu drefnu gweithgareddau ymgynghorydd treth?
 numberOfOfficialsWhoDealWithTax.linkText=Darllenwch yr arweiniad ynghylch unigolion perthnasol
+
+numberOfPartnersResponsibleForTax.title = Partneriaid sydd hefyd yn unigolion perthnasol
+numberOfPartnersResponsibleForTax.p1 = Mae angen i ni wybod pa rai o’r partneriaid yn {0} sy’n bodloni’r diffiniad cyfreithiol o ‘unigolion perthnasol’, fel y’i diffinnir ym <a href="{1}" class="govuk-link" target="_blank" rel="noopener noreferrer">Mhennod 226(2) o Ddeddf Cyllid 2026 (yn agor tab newydd)</a>.
+numberOfPartnersResponsibleForTax.h2 = Diffiniad unigolion perthnasol
+numberOfPartnersResponsibleForTax.p2 = Mae’r diffiniad o ‘unigolyn perthnasol’ yn dibynnu ar faint y busnes.
+numberOfPartnersResponsibleForTax.p3 = Ar gyfer busnes sydd â 6 neu fwy o bartneriaid, mae rhywun yn unigolyn perthnasol os yw’n gweithio i’r busnes ac yn chwarae rhan sylweddol wrth wneud y canlynol:
+numberOfPartnersResponsibleForTax.li1 = gwneud penderfyniadau ynghylch sut mae’r busnes yn rheoli neu’n trefnu ei holl weithgareddau ymgynghorydd treth, neu ran sylweddol o’r gweithgareddau hynny
+numberOfPartnersResponsibleForTax.li2 = rheoli neu drefnu holl weithgareddau ymgynghorydd treth y busnes yn uniongyrchol, neu ran sylweddol o’r gweithgareddau hynny
+numberOfPartnersResponsibleForTax.question = Sawl partner sydd hefyd yn unigolyn perthnasol?
+numberOfPartnersResponsibleForTax.error.required = Nodwch sawl partner sydd hefyd yn unigolyn perthnasol
+numberOfPartnersResponsibleForTax.notANumber = Nodwch rifau’n unig
+numberOfPartnersResponsibleForTax.error.invalid = Nodwch rif rhwng 1 a 30
+
 individualName.label.first=Beth yw enw llawn y partner cyntaf?
 individualName.label.subsequent=Beth yw enw llawn y partner nesaf?
 individualName.label.only=Beth yw enw llawn y partner?

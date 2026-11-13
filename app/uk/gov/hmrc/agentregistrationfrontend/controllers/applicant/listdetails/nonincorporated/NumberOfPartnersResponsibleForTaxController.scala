@@ -20,30 +20,29 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersResponsibleForTaxForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NumberOfKeyIndividualsController @Inject() (
+class NumberOfPartnersResponsibleForTaxController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  numberOfKeyIndividualsPage: NumberOfKeyIndividualsPage,
+  numberOfPartnersResponsibleForTaxPage: NumberOfPartnersResponsibleForTaxPage,
   agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  type DataWithValidApplicationAndBpr = BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
+  private type DataWithSixOrMore = SixOrMore *: BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[
-    DataWithValidApplicationAndBpr
+    DataWithSixOrMore
   ] = actions
     .getApplicationInProgress
     .getBusinessPartnerRecord
@@ -59,62 +58,58 @@ extends FrontendController(mcc, actions):
             logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
+    .refine:
+      implicit request =>
+        val agentApplication: IsUnincorporatedPartnership = request.get
+        agentApplication.numberOfIndividuals match
+          case Some(a @ SixOrMore(_)) => request.add[SixOrMore](a)
+          case _ =>
+            logger.warn(
+              "Number of key individuals responsible for tax matters is only applicable to partnerships with six or more key individuals, redirecting to number of partners page to select the number type"
+            )
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val agentApplication: IsUnincorporatedPartnership = request.get
-      Ok(numberOfKeyIndividualsPage(
-        form = NumberOfKeyIndividualsForm.form
+      val sixOrMore: SixOrMore = request.get
+      Ok(numberOfPartnersResponsibleForTaxPage(
+        form = NumberOfPartnersResponsibleForTaxForm.form
           .fill:
-            agentApplication.getNumberOfRequiredKeyIndividuals
+            sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters
         ,
-        entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-        agentApplication = agentApplication
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName
       ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[NumberOfRequiredKeyIndividuals](
-        form = NumberOfKeyIndividualsForm.form,
+      .ensureValidFormAndRedirectIfSaveForLater[Int](
+        form = NumberOfPartnersResponsibleForTaxForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors =>
-              val agentApplication: IsUnincorporatedPartnership = request.get[IsUnincorporatedPartnership]
-              numberOfKeyIndividualsPage(
+              BadRequest(numberOfPartnersResponsibleForTaxPage(
                 form = formWithErrors,
-                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-                agentApplication = agentApplication
-              )
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+              ))
       )
       .async:
         implicit request =>
           val agentApplication: IsUnincorporatedPartnership = request.get
-          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get[NumberOfRequiredKeyIndividuals]
-
-          /** When zero key individuals (partners) has been specified then user must supply at least one other relevant individual, we infer Some(true) for
-            * hasOtherRelevantIndividuals in this case to ensure they are taken to the correct page to add other relevant individuals. We must also be careful
-            * to preserve any existing value if not zero key individuals as we don't want to override a user's answer
-            */
-          val requiresOtherRelevantIndividuals: Option[Boolean] =
-            if numberOfRequiredKeyIndividuals.numberOfIndividuals === 0
-            then Some(true)
-            else if agentApplication.hasOtherRelevantIndividuals.isDefined
-            then agentApplication.hasOtherRelevantIndividuals
-            else None
+          val numberOfPartners: Int = request.get
+          val sixOrMore: SixOrMore = request.get
+          val updatedSixOrMore: SixOrMore = sixOrMore.copy(
+            numberOfKeyIndividualsResponsibleForTaxMatters = Some(numberOfPartners)
+          )
           val updatedApplication: IsUnincorporatedPartnership =
             agentApplication match
               case application: AgentApplicationScottishPartnership =>
                 application
                   .modify(_.numberOfIndividuals)
-                  .setTo(Some(numberOfRequiredKeyIndividuals))
-                  .modify(_.hasOtherRelevantIndividuals)
-                  .setTo(requiresOtherRelevantIndividuals)
+                  .setTo(Some(updatedSixOrMore))
               case application: AgentApplicationGeneralPartnership =>
                 application
                   .modify(_.numberOfIndividuals)
-                  .setTo(Some(numberOfRequiredKeyIndividuals))
-                  .modify(_.hasOtherRelevantIndividuals)
-                  .setTo(requiresOtherRelevantIndividuals)
+                  .setTo(Some(updatedSixOrMore))
 
           agentApplicationService
             .upsert(updatedApplication)

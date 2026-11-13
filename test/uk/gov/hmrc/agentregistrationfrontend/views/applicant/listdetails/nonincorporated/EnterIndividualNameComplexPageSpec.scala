@@ -86,13 +86,13 @@ extends ViewSpec:
           ordinalKey = ordinal,
           numberOfRequiredKeyIndividuals = tdAll.sixOrMoreKeyIndividuals
             .modify(_.numberOfKeyIndividualsResponsibleForTaxMatters)
-            .setTo(n),
+            .setTo(Some(n)),
           expectedPaddingBullet1 = bullet1,
           expectedPaddingBullet2 = bullet2
         )
 
   testCases.foreach: testCase =>
-    val n: Int = testCase.numberOfRequiredKeyIndividuals.numberOfKeyIndividualsResponsibleForTaxMatters
+    val n: Int = testCase.numberOfRequiredKeyIndividuals.getNumberOfPartnersResponsibleForTaxMatters
     s"EnterIndividualNameComplexPage for $n individuals using ordinal key '${testCase.ordinalKey}'" should:
       val doc: Document = Jsoup.parse(viewTemplate(
         form = IndividualNameForm.form,

@@ -20,13 +20,13 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-class NumberOfKeyIndividualsControllerSpec
+class NumberOfPartnersControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/apply/list-details/how-many-key-individuals"
+  private val path = "/agent-registration/apply/list-details/how-many-partners"
   private val agencyName: String = tdAll.TdAgencyName.generalPartnership
 
   object agentApplication:
@@ -41,17 +41,22 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterHowManyKeyIndividuals
 
+    val afterSixOrMoreChosen: AgentApplicationGeneralPartnership =
+      tdAll
+        .agentApplicationGeneralPartnership
+        .afterSixOrMoreChosen
+
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit.url shouldBe
-      AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.submit.url shouldBe
+      AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersController.show.url
 
   s"GET $path should return 200, fetch the BPR and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterHowManyKeyIndividuals)
@@ -61,15 +66,30 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe s"How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST $path with valid amounts should save data and redirect to CYA for working out the next page" in:
+  s"POST $path with valid amounts for FiveOrLess should save data and redirect to CYA for working out the next page" in:
     ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
       application = agentApplication.beforeHowManyKeyIndividuals,
       updatedApplication = agentApplication.afterHowManyKeyIndividuals
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3")
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess"),
+        NumberOfPartnersForm.exactNumberOfPartners -> Seq("3")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+
+  s"POST $path with SixOrMore should save data and redirect to CYA for working out the next page" in:
+    ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
+      application = agentApplication.beforeHowManyKeyIndividuals,
+      updatedApplication = agentApplication.afterSixOrMoreChosen
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        NumberOfPartnersForm.whichNumberType -> Seq("SixOrMore")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -85,7 +105,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.howManyIndividualsOption}-error"
+      s"#${NumberOfPartnersForm.whichNumberType}-error"
     ).text() shouldBe "Error: Select how many partners there are"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -93,14 +113,14 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess")
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
+      s"#${NumberOfPartnersForm.exactNumberOfPartners}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -108,15 +128,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%")
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess"),
+        NumberOfPartnersForm.exactNumberOfPartners -> Seq("[[)(*%")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
+      s"#${NumberOfPartnersForm.exactNumberOfPartners}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -124,15 +144,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("25")
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess"),
+        NumberOfPartnersForm.exactNumberOfPartners -> Seq("25")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
+      s"#${NumberOfPartnersForm.exactNumberOfPartners}-error"
     ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -143,8 +163,8 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3"),
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess"),
+        NumberOfPartnersForm.exactNumberOfPartners -> Seq("3"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -157,8 +177,8 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%"),
+        NumberOfPartnersForm.whichNumberType -> Seq("FiveOrLess"),
+        NumberOfPartnersForm.exactNumberOfPartners -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

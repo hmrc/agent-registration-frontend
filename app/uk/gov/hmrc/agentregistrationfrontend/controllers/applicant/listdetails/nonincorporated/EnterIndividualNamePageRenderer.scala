@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -58,8 +58,8 @@ extends I18nSupport:
     formAction: Call
   )(using request: RequestWithData[DataWithUnincorporatedPartnershipKeyIndividuals]): Future[HtmlFormat.Appendable] =
     val existingList: List[IndividualProvidedDetails] = request.get
-    request.get[NumberOfRequiredKeyIndividuals] match
-      case sixOrMore: SixOrMore if existingList.isEmpty && sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters > 0 =>
+    request.get[NumberOfPartners] match
+      case sixOrMore: SixOrMore if existingList.isEmpty && sixOrMore.getNumberOfPartnersResponsibleForTaxMatters > 0 =>
         val agentApplication: IsUnincorporatedPartnership = request.get
         businessPartnerRecordService
           .getBusinessPartnerRecord(agentApplication.getUtr)
@@ -78,12 +78,12 @@ extends I18nSupport:
                 ),
               formAction = formAction
             )
-      case numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals =>
+      case numberOfPartners: NumberOfPartners =>
         Future.successful(enterIndividualNameSimplePage(
           form = form,
           ordinalKey = MessageKeys.ordinalKey(
             existingSize = existingList.size,
-            isOnlyOne = numberOfRequiredKeyIndividuals.numberOfIndividuals === 1
+            isOnlyOne = numberOfPartners.numberOfIndividuals === 1
           ),
           formAction = formAction
         ))
