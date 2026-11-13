@@ -22,7 +22,7 @@ import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.contactdetails.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec

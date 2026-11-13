@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.fixablefailures.ConfirmFixForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 

@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualTelephoneNumberPage
 

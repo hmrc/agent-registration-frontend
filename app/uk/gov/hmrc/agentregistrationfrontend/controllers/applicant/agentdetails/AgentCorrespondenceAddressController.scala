@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.agentdetails.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper.toValueString

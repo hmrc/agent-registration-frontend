@@ -20,8 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.ConfirmMatchToIndividualProvidedDetailsPage

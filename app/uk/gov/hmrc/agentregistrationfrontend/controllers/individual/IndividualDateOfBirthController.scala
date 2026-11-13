@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualDateOfBirthPage
 

@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec

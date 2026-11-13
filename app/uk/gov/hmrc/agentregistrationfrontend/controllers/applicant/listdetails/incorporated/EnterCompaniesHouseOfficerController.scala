@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.NameMatching

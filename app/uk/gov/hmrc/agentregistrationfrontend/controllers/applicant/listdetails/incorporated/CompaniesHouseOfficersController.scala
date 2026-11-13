@@ -28,8 +28,8 @@ import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.NumberCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
