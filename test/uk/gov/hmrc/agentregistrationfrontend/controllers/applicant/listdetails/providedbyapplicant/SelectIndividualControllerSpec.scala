@@ -23,11 +23,11 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import play.api.libs.ws.WSBodyReadables.readableAsString
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.SelectIndividualForm
 
 class SelectIndividualControllerSpec
 extends ControllerSpec:

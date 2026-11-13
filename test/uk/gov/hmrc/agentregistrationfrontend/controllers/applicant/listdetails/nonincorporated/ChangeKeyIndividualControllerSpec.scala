@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 

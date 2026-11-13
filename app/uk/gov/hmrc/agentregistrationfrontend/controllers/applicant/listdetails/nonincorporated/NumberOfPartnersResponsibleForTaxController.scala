@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPar
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersResponsibleForTaxForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxPage
 

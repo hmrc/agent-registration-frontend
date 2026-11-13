@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.agentdetails.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue

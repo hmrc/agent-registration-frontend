@@ -20,8 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.soletraderfailures.provideddetails.IndividualNinoPage

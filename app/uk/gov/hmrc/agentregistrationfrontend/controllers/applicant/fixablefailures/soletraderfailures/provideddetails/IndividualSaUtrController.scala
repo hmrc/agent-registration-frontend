@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.Individual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.soletraderfailures.provideddetails.IndividualSaUtrPage
 

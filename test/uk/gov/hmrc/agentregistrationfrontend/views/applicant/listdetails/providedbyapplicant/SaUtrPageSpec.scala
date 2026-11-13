@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.SaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue

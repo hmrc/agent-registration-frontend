@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.aboutyourbusiness
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.businessdetails.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.TypeOfSignInPage

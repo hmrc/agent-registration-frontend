@@ -21,7 +21,7 @@ import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
-import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.amls.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.AmlsRegistrationNumberPage

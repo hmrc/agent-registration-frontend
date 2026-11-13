@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.amls.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsRegistrationNumberPage
 

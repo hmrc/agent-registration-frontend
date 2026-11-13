@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.businessdetails.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.AgentTypePage
 
