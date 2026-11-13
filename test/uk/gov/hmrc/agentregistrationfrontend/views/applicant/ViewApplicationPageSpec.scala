@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
@@ -26,16 +25,18 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicatio
 class ViewApplicationPageSpec
 extends ViewSpec:
 
+  private val agencyName = tdAll.TdAgencyName.llp
+
   val viewTemplate: ViewApplicationPage = app.injector.instanceOf[ViewApplicationPage]
   implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication = tdAll
-      .agentApplicationLlp
-      .afterDeclarationSubmitted
-      .copy(agentDetails = Some(tdAll.completeAgentDetails.copy(businessName = AgentBusinessName("Test Partnership", None))))
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .afterDeclarationSubmitted
   )
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Partnership",
+      entityName = agencyName,
       agentApplication = agentApplicationRequest.agentApplication
     ).body
   )
@@ -45,7 +46,7 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |Application for Test Partnership
+           |Application for $agencyName
            |Application reference: ${agentApplicationRequest.agentApplication.applicationReference.value}
            |About your business
            |UK-based agent
@@ -55,7 +56,7 @@ extends ViewSpec:
            |Are you a member of the limited liability partnership?
            |No, but I’m authorised by them to set up this account
            |Company name
-           |Test Partnership
+           |$agencyName
            |Unique taxpayer reference
            |1234567895
            |Your contact details
@@ -67,7 +68,7 @@ extends ViewSpec:
            |user@test.com
            |Agency contact details
            |Name shown to clients
-           |Test Partnership
+           |$agencyName
            |Telephone number
            |(+44) 10794554342
            |Email address
@@ -90,7 +91,7 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "Application for Test Partnership - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe s"Application for $agencyName - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Application for Test Partnership"
+      doc.h1 shouldBe s"Application for $agencyName"

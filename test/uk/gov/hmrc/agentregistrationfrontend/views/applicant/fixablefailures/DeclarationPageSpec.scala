@@ -25,15 +25,18 @@ class DeclarationPageSpec
 extends ViewSpec:
 
   val viewTemplate: DeclarationPage = app.injector.instanceOf[DeclarationPage]
+
+  private val agencyName = tdAll.TdAgencyName.llp
+  private val soleTraderName = tdAll.fullName.toStringFull
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = agencyName,
       isSoleTraderOwner = false
     ).body
   )
   val soleTraderDoc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
+      entityName = soleTraderName,
       isSoleTraderOwner = true
     ).body
   )
@@ -42,12 +45,12 @@ extends ViewSpec:
 
     "have expected content when not a sole trader owner" in:
       doc.mainContent shouldContainContent
-        """
-          |Declaration
-          |I am authorised by Test Company Name to apply for an agent services account with HMRC.
-          |The information I have given in this application is accurate to the best of my knowledge.
-          |Accept and send
-          |"""
+        s"""
+           |Declaration
+           |I am authorised by $agencyName to apply for an agent services account with HMRC.
+           |The information I have given in this application is accurate to the best of my knowledge.
+           |Accept and send
+           |"""
           .stripMargin
 
     "have expected content when a sole trader owner" in:

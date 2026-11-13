@@ -30,6 +30,8 @@ extends ControllerSpec:
   private val viewApplicationPath: String = "/agent-registration/view-application"
   private val applicationDeletedPath: String = "/agent-registration/application-deleted"
 
+  private val agencyName: String = tdAll.TdAgencyName.llp
+
   object agentApplication:
 
     val submitted: AgentApplicationLlp =
@@ -66,7 +68,7 @@ extends ControllerSpec:
     val response: WSResponse = get(viewApplicationPath)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Application for Test Company Name - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe s"Application for $agencyName - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationDeletedPath should return OK when no application exists" in:

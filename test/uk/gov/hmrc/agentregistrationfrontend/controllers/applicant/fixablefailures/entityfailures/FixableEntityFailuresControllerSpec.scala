@@ -56,20 +56,22 @@ extends ControllerSpec:
     "EntityFix.8" -> "Select yes if all overdue liabilities have been paid or included in a payment plan"
   )
 
+  private val agencyName = tdAll.TdAgencyName.llp
+
   private val entityFixFailureCodeHeadings: Map[String, String] = Map(
-    "EntityFix.4.1" -> "Self Assessment returns for Test Company Name",
-    "EntityFix.4.2" -> "Company Tax returns for Test Company Name",
-    "EntityFix.4.3" -> "VAT returns for Test Company Name",
-    "EntityFix.4.4" -> "PAYE reports for Test Company Name",
-    "EntityFix.5.1" -> "Test Company Name has an overdue Self Assessment liability",
-    "EntityFix.5.2" -> "Test Company Name has an overdue Corporation Tax liability",
-    "EntityFix.5.3" -> "Test Company Name has an overdue VAT liability",
-    "EntityFix.5.4" -> "Test Company Name has an overdue PAYE liability",
-    "EntityFix.5.5" -> "Test Company Name has an overdue civil penalty liability",
-    "EntityFix.5.6" -> "Test Company Name has an overdue Stamp Duty liability",
-    "EntityFix.5.7" -> "Test Company Name has an overdue Capital Gains Tax liability",
-    "EntityFix.8.5" -> "Test Company Name has an overdue penalty liability",
-    "EntityFix.8.7" -> "Test Company Name has an overdue penalty liability"
+    "EntityFix.4.1" -> s"Self Assessment returns for $agencyName",
+    "EntityFix.4.2" -> s"Company Tax returns for $agencyName",
+    "EntityFix.4.3" -> s"VAT returns for $agencyName",
+    "EntityFix.4.4" -> s"PAYE reports for $agencyName",
+    "EntityFix.5.1" -> s"$agencyName has an overdue Self Assessment liability",
+    "EntityFix.5.2" -> s"$agencyName has an overdue Corporation Tax liability",
+    "EntityFix.5.3" -> s"$agencyName has an overdue VAT liability",
+    "EntityFix.5.4" -> s"$agencyName has an overdue PAYE liability",
+    "EntityFix.5.5" -> s"$agencyName has an overdue civil penalty liability",
+    "EntityFix.5.6" -> s"$agencyName has an overdue Stamp Duty liability",
+    "EntityFix.5.7" -> s"$agencyName has an overdue Capital Gains Tax liability",
+    "EntityFix.8.5" -> s"$agencyName has an overdue penalty liability",
+    "EntityFix.8.7" -> s"$agencyName has an overdue penalty liability"
   )
 
   private def pathForFailureCode(failureCode: String) = s"/agent-registration/conditions-not-yet-met/failure-details/$failureCode"

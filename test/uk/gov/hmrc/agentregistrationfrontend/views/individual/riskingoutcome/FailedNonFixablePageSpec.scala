@@ -37,7 +37,7 @@ extends ViewSpec:
   val doc: Document = Jsoup.parse(
     viewTemplate(
       nonFixableIndividual = riskedIndividualFailedNonFixable,
-      entityName = "Test Company Name"
+      entityName = "ABC Accounting"
     ).body
   )
 
@@ -48,7 +48,7 @@ extends ViewSpec:
           failures = Seq(IndividualFailure._6, IndividualFailure._7)
         ))
       ),
-      entityName = "Test Company Name"
+      entityName = "ABC Accounting"
     ).body
   )
 
@@ -60,7 +60,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Records show that you do not meet the registration conditions
-           |We have contacted Test Company Name to explain you have not met the registration conditions. This is because records indicate that you are actively disqualified on Companies House.
+           |We have contacted ABC Accounting to explain you have not met the registration conditions. This is because records indicate that you are actively disqualified on Companies House.
            |What you need to do
            |You should speak to the business about this decision
            |If the business disagrees with this decision, they can raise it with HMRC
@@ -73,7 +73,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Records show that you do not meet the registration conditions
-           |We have contacted Test Company Name to explain you have not met the registration conditions. This is because records indicate that:
+           |We have contacted ABC Accounting to explain you have not met the registration conditions. This is because records indicate that:
            |you are actively disqualified on Companies Houseyou are formally insolvent
            |What you need to do
            |You should speak to the business about this decision

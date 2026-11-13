@@ -57,7 +57,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -70,7 +70,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
+      responseBody = tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER

@@ -36,26 +36,26 @@ extends ViewSpec:
     "EntityFix.8" -> "Have all overdue liabilities been paid or included in a payment plan?"
   )
   private val entityFixFailureCodeHeadings: Map[String, String] = Map(
-    "EntityFix.4.1" -> "Self Assessment returns for Test Company Name",
-    "EntityFix.4.2" -> "Company Tax returns for Test Company Name",
-    "EntityFix.4.3" -> "VAT returns for Test Company Name",
-    "EntityFix.4.4" -> "PAYE reports for Test Company Name",
-    "EntityFix.5.1" -> "Test Company Name has an overdue Self Assessment liability",
-    "EntityFix.5.2" -> "Test Company Name has an overdue Corporation Tax liability",
-    "EntityFix.5.3" -> "Test Company Name has an overdue VAT liability",
-    "EntityFix.5.4" -> "Test Company Name has an overdue PAYE liability",
-    "EntityFix.5.5" -> "Test Company Name has an overdue civil penalty liability",
-    "EntityFix.5.6" -> "Test Company Name has an overdue Stamp Duty liability",
-    "EntityFix.5.7" -> "Test Company Name has an overdue Capital Gains Tax liability",
-    "EntityFix.8.5" -> "Test Company Name has an overdue penalty liability",
-    "EntityFix.8.7" -> "Test Company Name has an overdue penalty liability"
+    "EntityFix.4.1" -> "Self Assessment returns for ABC Accounting",
+    "EntityFix.4.2" -> "Company Tax returns for ABC Accounting",
+    "EntityFix.4.3" -> "VAT returns for ABC Accounting",
+    "EntityFix.4.4" -> "PAYE reports for ABC Accounting",
+    "EntityFix.5.1" -> "ABC Accounting has an overdue Self Assessment liability",
+    "EntityFix.5.2" -> "ABC Accounting has an overdue Corporation Tax liability",
+    "EntityFix.5.3" -> "ABC Accounting has an overdue VAT liability",
+    "EntityFix.5.4" -> "ABC Accounting has an overdue PAYE liability",
+    "EntityFix.5.5" -> "ABC Accounting has an overdue civil penalty liability",
+    "EntityFix.5.6" -> "ABC Accounting has an overdue Stamp Duty liability",
+    "EntityFix.5.7" -> "ABC Accounting has an overdue Capital Gains Tax liability",
+    "EntityFix.8.5" -> "ABC Accounting has an overdue penalty liability",
+    "EntityFix.8.7" -> "ABC Accounting has an overdue penalty liability"
   )
   private val entityFailureCodeContent: Map[String, String] = Map(
     "EntityFix.4.1" -> """
                          |Issues with the business
-                         |Self Assessment returns for Test Company Name
-                         |When we reviewed the application for Test Company Name, we found that one or more returns had not been filed.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |Self Assessment returns for ABC Accounting
+                         |When we reviewed the application for ABC Accounting, we found that one or more returns had not been filed.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue returns must now be filed and any resulting liabilities paid.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -69,9 +69,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.4.2" -> """
                          |Issues with the business
-                         |Company Tax returns for Test Company Name
-                         |When we reviewed the application for Test Company Name, we found that one or more returns had not been filed.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |Company Tax returns for ABC Accounting
+                         |When we reviewed the application for ABC Accounting, we found that one or more returns had not been filed.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue returns must now be filed and any resulting liabilities paid.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -85,9 +85,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.4.3" -> """
                          |Issues with the business
-                         |VAT returns for Test Company Name
-                         |When we reviewed the application for Test Company Name, we found that one or more returns had not been filed.
-                         |We cannot set up an agent services account for Test Company Name until this is resolved.
+                         |VAT returns for ABC Accounting
+                         |When we reviewed the application for ABC Accounting, we found that one or more returns had not been filed.
+                         |We cannot set up an agent services account for ABC Accounting until this is resolved.
                          |Take action on this issue
                          |All overdue returns must now be filed and any resulting liabilities paid.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -101,9 +101,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.4.4" -> """
                          |Issues with the business
-                         |PAYE reports for Test Company Name
-                         |When we reviewed the application for Test Company Name, we found that one or more reports had not been filed.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |PAYE reports for ABC Accounting
+                         |When we reviewed the application for ABC Accounting, we found that one or more reports had not been filed.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue reports must now be filed and any resulting liabilities paid.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -117,9 +117,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.1" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue Self Assessment liability
-                         |When we reviewed the application, we found that Test Company Name has an overdue Self Assessment liability.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue Self Assessment liability
+                         |When we reviewed the application, we found that ABC Accounting has an overdue Self Assessment liability.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -133,9 +133,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.2" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue Corporation Tax liability
-                         |When we reviewed the application, we found that Test Company Name has an overdue Corporation Tax liability.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue Corporation Tax liability
+                         |When we reviewed the application, we found that ABC Accounting has an overdue Corporation Tax liability.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -149,9 +149,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.3" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue VAT liability
-                         |When we reviewed the application, we found that Test Company Name has an overdue VAT liability.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue VAT liability
+                         |When we reviewed the application, we found that ABC Accounting has an overdue VAT liability.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -165,9 +165,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.4" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue PAYE liability
-                         |When we reviewed the application, we found that Test Company Name has an overdue PAYE liability.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue PAYE liability
+                         |When we reviewed the application, we found that ABC Accounting has an overdue PAYE liability.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -181,9 +181,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.5" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue civil penalty liability
-                         |When we reviewed the application, we found that Test Company Name owed an overdue amount relating to one or more civil penalties.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue civil penalty liability
+                         |When we reviewed the application, we found that ABC Accounting owed an overdue amount relating to one or more civil penalties.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -197,9 +197,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.6" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue Stamp Duty liability
-                         |When we reviewed the application, we found that Test Company Name owed an overdue amount relating to Stamp Duty.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue Stamp Duty liability
+                         |When we reviewed the application, we found that ABC Accounting owed an overdue amount relating to Stamp Duty.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -213,9 +213,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.5.7" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue Capital Gains Tax liability
-                         |When we reviewed the application, we found that Test Company Name owed an overdue amount relating to Capital Gains Tax.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue Capital Gains Tax liability
+                         |When we reviewed the application, we found that ABC Accounting owed an overdue amount relating to Capital Gains Tax.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -229,9 +229,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.8.5" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue penalty liability
-                         |When we reviewed the application, we found that Test Company Name owed an overdue amount relating to one or more relevant anti-avoidance penalties.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue penalty liability
+                         |When we reviewed the application, we found that ABC Accounting owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -245,9 +245,9 @@ extends ViewSpec:
       .stripMargin,
     "EntityFix.8.7" -> """
                          |Issues with the business
-                         |Test Company Name has an overdue penalty liability
-                         |When we reviewed the application, we found that Test Company Name owed an overdue amount relating to one or more relevant anti-avoidance penalties.
-                         |We cannot set up an agent services account for Test Company Name until this has been resolved.
+                         |ABC Accounting has an overdue penalty liability
+                         |When we reviewed the application, we found that ABC Accounting owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+                         |We cannot set up an agent services account for ABC Accounting until this has been resolved.
                          |Take action on this issue
                          |All overdue liabilities must now be paid in full or included in a payment plan.
                          |You need to confirm by 17 August 2026 that this has been done.
@@ -273,7 +273,7 @@ extends ViewSpec:
     ) =>
       val doc: Document = Jsoup.parse(
         viewTemplate(
-          entityName = "Test Company Name",
+          entityName = "ABC Accounting",
           failureCode = entityFixCode,
           correctiveActionExpiryDate = "17 August 2026",
           form = ConfirmFixForm.form(entityFixCode)
@@ -310,7 +310,7 @@ extends ViewSpec:
           .bind(Map.empty[String, String])
         val docWithError: Document = Jsoup.parse(
           viewTemplate(
-            entityName = "Test Company Name",
+            entityName = "ABC Accounting",
             failureCode = entityFixCode,
             correctiveActionExpiryDate = "17 August 2026",
             form = formWithError

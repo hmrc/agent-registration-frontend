@@ -40,7 +40,7 @@ extends ControllerSpec:
 
   object individualProvidedDetails:
 
-    val precreated: IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("ST Name ST Lastname"))
+    val precreated: IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Joe Bloggs"))
     val claimed: IndividualProvidedDetails = tdAll.providedDetails.afterAccessConfirmed
 
   "routes should have correct paths and methods" in:

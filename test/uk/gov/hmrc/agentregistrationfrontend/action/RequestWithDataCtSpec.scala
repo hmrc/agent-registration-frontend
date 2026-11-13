@@ -36,7 +36,7 @@ extends UnitSpec:
     val internalUserId: InternalUserId = TdAll.tdAll.internalUserId
     val groupId: GroupId = TdAll.tdAll.groupId
     val credentials: Credentials = TdAll.tdAll.credentials
-    val businessPartnerRecordResponse: BusinessPartnerRecordResponse = TdAll.tdAll.businessPartnerRecordResponse
+    val businessPartnerRecordResponse: BusinessPartnerRecordResponse = TdAll.tdAll.getBusinessPartnerRecordResponse(agentApplication.businessType)
     val maybeBusinessPartnerRecordResponse: Option[BusinessPartnerRecordResponse] = Some(businessPartnerRecordResponse)
 
     type ExampleData =

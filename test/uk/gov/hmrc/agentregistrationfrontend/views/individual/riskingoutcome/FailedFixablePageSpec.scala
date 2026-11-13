@@ -24,12 +24,14 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcom
 class FailedFixablePageSpec
 extends ViewSpec:
 
+  val agencyName: String = tdAll.TdAgencyName.generalPartnership
+
   val viewTemplate: FailedFixablePage = app.injector.instanceOf[FailedFixablePage]
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
       linkId = tdAll.linkId,
-      entityName = "Test Company Name",
+      entityName = agencyName,
       correctiveActionExpiryDate = "3 August 2026",
       actualDecisionDate = "4 June 2026"
     ).body
@@ -43,7 +45,7 @@ extends ViewSpec:
            |You do not meet the registration conditions yet
            |Date of decision: 4 June 2026
            |Our decision
-           |The application by Test Company Name for an agent services account cannot currently be approved.
+           |The application by $agencyName for an agent services account cannot currently be approved.
            |The application is refused under Section 230 (registration conditions) of the Finance Act 2026 (opens in a new tab).
            |This is because you, as a relevant individual to the application, have not met one or more conditions of registration.
            |However, you can still meet the registration conditions by taking action before 3 August 2026
@@ -52,11 +54,11 @@ extends ViewSpec:
            |View actions to take
            |Failure to meet the registration conditions
            |If you choose not to take action to meet the registration conditions:
-           |Test Company Name will not be given an agent services account on this occasion
+           |$agencyName will not be given an agent services account on this occasion
            |your application will be deleted on 3 August 2026 to comply with our data retention policy
            |Your right to review or appeal
-           |If you disagree with our decision, you should speak to Test Company Name.
-           |If Test Company Name disagrees with our decision to refuse their application, they can request a review or appeal the decision (opens in a new tab).
+           |If you disagree with our decision, you should speak to $agencyName.
+           |If $agencyName disagrees with our decision to refuse their application, they can request a review or appeal the decision (opens in a new tab).
            |Is this page not working properly? (opens in new tab)
            |"""
           .stripMargin

@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.agentdetails
 import org.jsoup.Jsoup
 import play.api.data.Form
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -33,17 +34,21 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.A
 class AgentCorrespondenceAddressPageSpec
 extends ViewSpec:
 
+  private val agentApplication: AgentApplication =
+    tdAll
+      .agentApplicationLlpSections
+      .sectionAgentDetails
+      .whenUsingExistingCompanyName
+      .afterVerifiedEmailAddressSelected
+
+  private val companyProfile = agentApplication.asLlpApplication.getBusinessDetails.companyProfile
+
   val viewTemplate: AgentCorrespondenceAddressPage = app.injector.instanceOf[AgentCorrespondenceAddressPage]
   implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationLlpSections
-        .sectionAgentDetails
-        .whenUsingExistingCompanyName
-        .afterVerifiedEmailAddressSelected
+    agentApplication = agentApplication
   )
   private val addressOptions = AddressOptions(
-    chroAddress = tdAll.companyProfile.unsanitisedCHROAddress,
+    chroAddress = companyProfile.unsanitisedCHROAddress,
     bprAddress = Some(tdAll.bprRegisteredAddress),
     otherAddress = None
   )

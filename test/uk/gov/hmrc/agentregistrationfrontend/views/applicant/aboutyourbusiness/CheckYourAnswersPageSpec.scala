@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ViewSelectors.*
@@ -29,6 +30,8 @@ class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
+
+  val agencyName: String = tdAll.TdAgencyName.llp
 
   object agentApplication:
     val complete: AgentApplicationLlp =
@@ -40,29 +43,29 @@ extends ViewSpec:
 
   "CheckYourAnswersPage for complete GRS details received" should:
     given agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
-    val bpr: BusinessPartnerRecordResponse = tdAll.businessPartnerRecordResponse
+    val bpr: BusinessPartnerRecordResponse = tdAll.getBusinessPartnerRecordResponse(LimitedLiabilityPartnership)
     val doc: Document = Jsoup.parse(viewTemplate(bpr, agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
-        """
-          |About your business
-          |Your business details
-          |The details you provided match your HMRC record.
-          |If you change any of these details you will need to start the application again.
-          |Business details
-          |Change (Business details)
-          |UK-based agent
-          |Yes
-          |Business type
-          |Limited liability partnership
-          |Are you a member of the limited liability partnership?
-          |No, but I’m authorised by them to set up this account
-          |Company name
-          |Test Partnership
-          |Unique taxpayer reference
-          |1234567895
-          |Return to task list
-          |Save and come back later
+        s"""
+           |About your business
+           |Your business details
+           |The details you provided match your HMRC record.
+           |If you change any of these details you will need to start the application again.
+           |Business details
+           |Change (Business details)
+           |UK-based agent
+           |Yes
+           |Business type
+           |Limited liability partnership
+           |Are you a member of the limited liability partnership?
+           |No, but I’m authorised by them to set up this account
+           |Company name
+           |$agencyName
+           |Unique taxpayer reference
+           |1234567895
+           |Return to task list
+           |Save and come back later
           """.stripMargin
 
     "have the correct title" in:
@@ -85,7 +88,7 @@ extends ViewSpec:
           ),
           TestReadOnlySummaryRow(
             key = "Company name",
-            value = "Test Partnership"
+            value = agencyName
           ),
           TestReadOnlySummaryRow(
             key = "Unique taxpayer reference",

@@ -36,6 +36,7 @@ extends ViewSpec:
         .whenUsingExistingCompanyName
         .afterBprAddressSelected
 
+  private val agencyName = tdAll.TdAgencyName.llp
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Agent Details" should:
@@ -44,25 +45,25 @@ extends ViewSpec:
     val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
-        """
-          |Account contact details
-          |Check your answers
-          |Name shown to clients
-          |Test Company Name
-          |Change Name shown to clients
-          |Telephone number
-          |(+44) 10794554342
-          |Change Telephone number
-          |Email address
-          |new@example.com
-          |Change Email address
-          |Correspondence address
-          |Registered Line 1
-          |Registered Line 2
-          |AB1 2CD
-          |GB
-          |Change Correspondence address
-          |Confirm and continue
+        s"""
+           |Account contact details
+           |Check your answers
+           |Name shown to clients
+           |$agencyName
+           |Change Name shown to clients
+           |Telephone number
+           |(+44) 10794554342
+           |Change Telephone number
+           |Email address
+           |new@example.com
+           |Change Email address
+           |Correspondence address
+           |Registered Line 1
+           |Registered Line 2
+           |AB1 2CD
+           |GB
+           |Change Correspondence address
+           |Confirm and continue
           """.stripMargin
 
     "have the correct title" in:
@@ -73,7 +74,7 @@ extends ViewSpec:
         List(
           TestSummaryRow(
             key = "Name shown to clients",
-            value = "Test Company Name",
+            value = agencyName,
             action = AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url,
             changeLinkAccessibleContent = "Change Name shown to clients"
           ),

@@ -40,7 +40,7 @@ extends ViewSpec:
         TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
         TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterFinished
       ),
-      entityName = "Test Company Name"
+      entityName = "ABC Accounting"
     ).body
   )
   val docWhenComplete: Document = Jsoup.parse(
@@ -51,7 +51,7 @@ extends ViewSpec:
         TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterFinished,
         TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterFinished
       ),
-      entityName = "Test Company Name"
+      entityName = "ABC Accounting"
     ).body
   )
 
@@ -75,7 +75,7 @@ extends ViewSpec:
            |What happens if someone cannot sign in?
            |Ideally, everyone on the list will sign in and provide personal details.
            |However, if there’s an exceptional reason why someone cannot sign in, we allow you to submit details on their behalf.
-           |This might affect how we assess the risk of providing Test Company Name with an agent services account.
+           |This might affect how we assess the risk of providing ABC Accounting with an agent services account.
            |If you accept this risk, you can provide us with information on someone else’s behalf.
            |Return to task list
            |Save and come back later

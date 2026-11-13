@@ -33,13 +33,13 @@ extends ViewSpec:
 
   val viewTemplate: EnterCompaniesHouseFirstIndividualNamePage = app.injector.instanceOf[EnterCompaniesHouseFirstIndividualNamePage]
 
-  private val entityName: String = tdAll.companyName
   private val sixOrMoreOfficers: SixOrMoreOfficers = tdAll.sixOrMoreCompaniesHouseOfficers
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit
 
   private def render(
     form: play.api.data.Form[CompaniesHouseNameQuery],
-    agentApplication: AgentApplication
+    agentApplication: AgentApplication,
+    entityName: String
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
@@ -49,6 +49,7 @@ extends ViewSpec:
 
   case class BusinessTypeTestCase(
     label: String,
+    entityName: String,
     agentApplication: AgentApplication,
     caption: String,
     headingEntityType: String,
@@ -59,6 +60,7 @@ extends ViewSpec:
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
+      entityName = tdAll.TdAgencyName.llp,
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals",
       headingEntityType = "LLP members",
@@ -67,6 +69,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
+      entityName = tdAll.TdAgencyName.limitedCompany,
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
       caption = "Directors and other relevant individuals",
       headingEntityType = "directors",
@@ -75,6 +78,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "Partnership",
+      entityName = tdAll.TdAgencyName.limitedPartnership,
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       headingEntityType = "partners",
@@ -86,8 +90,12 @@ extends ViewSpec:
   for testCase <- testCases do
     s"EnterCompaniesHouseFirstIndividualNamePage for ${testCase.label}" should:
 
-      val headingWithPadding = s"Tell us about 5 ${testCase.headingEntityType} at $entityName"
-      val doc: Document = render(CompaniesHouseNameQueryForm.form, testCase.agentApplication)
+      val headingWithPadding = s"Tell us about 5 ${testCase.headingEntityType} at ${testCase.entityName}"
+      val doc: Document = render(
+        CompaniesHouseNameQueryForm.form,
+        testCase.agentApplication,
+        testCase.entityName
+      )
 
       "have the correct caption" in:
         doc.mainContent.select(captionL).text() shouldBe testCase.caption
@@ -139,7 +147,11 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = CompaniesHouseNameQueryForm.firstNameKey,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(
+            formWithError,
+            testCase.agentApplication,
+            testCase.entityName
+          ),
           heading = headingWithPadding
         )
 
@@ -155,6 +167,10 @@ extends ViewSpec:
         behavesLikePageWithErrorHandling(
           field = CompaniesHouseNameQueryForm.lastNameKey,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(
+            formWithError,
+            testCase.agentApplication,
+            testCase.entityName
+          ),
           heading = headingWithPadding
         )

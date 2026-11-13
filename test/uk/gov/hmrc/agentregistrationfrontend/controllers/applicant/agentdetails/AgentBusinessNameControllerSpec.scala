@@ -27,6 +27,7 @@ class AgentBusinessNameControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/agent-details/business-name"
+  private val agencyName: String = tdAll.TdAgencyName.llp
 
   object agentApplication:
 
@@ -76,7 +77,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     val radioForExistingBusinessName = doc.mainContent.select(s"input#${AgentBusinessNameForm.key}")
-    radioForExistingBusinessName.attr("value") shouldBe "Test Company Name"
+    radioForExistingBusinessName.attr("value") shouldBe agencyName
     radioForExistingBusinessName.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -98,7 +99,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("Test Company Name")
+        AgentBusinessNameForm.key -> Seq(agencyName)
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -190,7 +191,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("Test Company Name"),
+        AgentBusinessNameForm.key -> Seq(agencyName),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

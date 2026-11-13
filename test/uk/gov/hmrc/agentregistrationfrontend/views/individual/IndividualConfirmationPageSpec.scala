@@ -35,8 +35,8 @@ extends ViewSpec:
 
   val soleTraderDoc: Document = Jsoup.parse(
     viewTemplate(
-      applicantName = "ST Name ST Surname",
-      entityName = "ST Name ST Surname",
+      applicantName = "Joe Bloggs",
+      entityName = "Joe Bloggs",
       isSoleTraderOwner = true
     ).body
   )
