@@ -20,7 +20,10 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
@@ -29,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.no
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class NumberOfPartnersController @Inject() (
@@ -89,19 +93,34 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val agentApplication: IsUnincorporatedPartnership = request.get
           val numberOfPartners: NumberOfPartners = request.get[NumberOfPartners]
-          val updatedApplication: IsUnincorporatedPartnership =
-            agentApplication match
-              case application: AgentApplicationScottishPartnership =>
-                application
-                  .modify(_.numberOfIndividuals)
-                  .setTo(Some(numberOfPartners))
-              case application: AgentApplicationGeneralPartnership =>
-                application
-                  .modify(_.numberOfIndividuals)
-                  .setTo(Some(numberOfPartners))
 
-          agentApplicationService
-            .upsert(updatedApplication)
-            .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
+          (numberOfPartners, agentApplication.numberOfIndividuals) match
+            case (_: SixOrMore, Some(SixOrMore(_))) =>
+              /** When [[SixOrMore]] is submitted as the choice it will not include the inner value for the number of partners. We need to check if the previous
+                * value was also [[SixOrMore]] and, if so, not overwrite the existing inner value with the default None. We redirect to where the inner
+                * [[SixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters]] can be edited as the CYA link only goes to this page and there is no other link
+                * to edit this.
+                */
+              Future.successful(Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfPartnersResponsibleForTaxController.show.url))
+            case (FiveOrLess(a), Some(FiveOrLess(b))) if a === b =>
+              /** When [[FiveOrLess]] is submitted as the choice it must include the value for [[FiveOrLess.numberOfKeyIndividuals]]. We need to check if the
+                * previous value was identical and, if so, not overwrite the existing value.
+                */
+              Future.successful(Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url))
+            case _ =>
+              val updatedApplication: IsUnincorporatedPartnership =
+                agentApplication match
+                  case application: AgentApplicationScottishPartnership =>
+                    application
+                      .modify(_.numberOfIndividuals)
+                      .setTo(Some(numberOfPartners))
+                  case application: AgentApplicationGeneralPartnership =>
+                    application
+                      .modify(_.numberOfIndividuals)
+                      .setTo(Some(numberOfPartners))
+
+              agentApplicationService
+                .upsert(updatedApplication)
+                .map: _ =>
+                  Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
