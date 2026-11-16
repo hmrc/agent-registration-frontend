@@ -93,7 +93,7 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val errorMessage: String = "Select how many partners there are"
+      val errorMessage: String = "Select how many partners your business has"
       val formWithError: Form[NumberOfPartners] = NumberOfPartnersForm
         .form
         .bind(Map.empty[String, String])
