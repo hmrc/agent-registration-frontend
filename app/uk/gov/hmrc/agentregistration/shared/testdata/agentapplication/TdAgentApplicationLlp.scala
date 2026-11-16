@@ -76,67 +76,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdTime & TdAgentApplicatio
       applicationState = GrsDataReceived
     ).assertDataIntegrity()
 
-    val afterStartedExpired: AgentApplicationLlp = afterStarted.copy(
-      applicationExpiresAt = Some(dependencies.nowAsInstant.minusSeconds(60))
-    ).assertDataIntegrity()
-
-    val afterStartedExpiredLongAfterCreation: AgentApplicationLlp = afterStarted.copy(
-      createdAt = dependencies.createdLongBeforeExpiryAsInstant,
-      applicationExpiresAt = Some(dependencies.createdLongBeforeExpiryAsInstant.plus(Duration.ofDays(73)))
-    ).assertDataIntegrity()
-
-    val afterStartedExpiryReminderEmailSent: AgentApplicationLlp = afterStarted.copy(
-      expiryReminderEmailSentAt = Some(dependencies.expiryReminderEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterStartedDueForExpiryReminder: AgentApplicationLlp = afterStarted.copy(
-      applicationExpiresAt = Some(dependencies.applicationExpiresAtWithinReminderPeriodAsInstant)
-    ).assertDataIntegrity()
-
-    val afterStartedDueForExpiryReminderEmailSent: AgentApplicationLlp = afterStartedDueForExpiryReminder.copy(
-      expiryReminderEmailSentAt = Some(dependencies.expiryReminderEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterGrsDataReceivedDueForExpiryReminder: AgentApplicationLlp = afterGrsDataReceived.copy(
-      applicationExpiresAt = Some(dependencies.applicationExpiresAtWithinReminderPeriodAsInstant)
-    ).assertDataIntegrity()
-
-    val afterGrsDataReceivedExpired: AgentApplicationLlp = afterGrsDataReceived.copy(
-      applicationExpiresAt = Some(dependencies.nowAsInstant.minusSeconds(60))
-    ).assertDataIntegrity()
-
-    val afterExpired: AgentApplicationLlp = afterStartedExpired.copy(
-      applicationState = ApplicationState.Expired,
-      applicationExpiresAt = None,
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndsAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterExpiredEmailSent: AgentApplicationLlp = afterExpired.copy(
-      expiredEmailSentAt = Some(dependencies.expiredEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterExpiredLongAfterCreation: AgentApplicationLlp = afterStartedExpiredLongAfterCreation.copy(
-      applicationState = ApplicationState.Expired,
-      applicationExpiresAt = None,
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndsAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterExpiredPostExpiryGracePeriodEnded: AgentApplicationLlp = afterExpired.copy(
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndedAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtForPostExpiryGracePeriodEndedAsInstant)
-    ).assertDataIntegrity()
-
-    val afterExpiredPostExpiryGracePeriodEndedDeletionEmailSent: AgentApplicationLlp = afterExpiredPostExpiryGracePeriodEnded.copy(
-      expiredEmailSentAt = Some(dependencies.expiredAtForPostExpiryGracePeriodEndedAsInstant),
-      deletionEmailSentAt = Some(dependencies.deletionEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterExpiredWithAmlsEvidencePostExpiryGracePeriodEnded: AgentApplicationLlp = afterExpiredPostExpiryGracePeriodEnded.copy(
-      amlsDetails = Some(dependencies.completeAmlsDetailsAtt)
-    ).assertDataIntegrity()
-
     val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     ).assertDataIntegrity()
@@ -167,54 +106,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdTime & TdAgentApplicatio
       applicantContactDetails = Some(dependencies.applicantContactDetails)
     ).assertDataIntegrity()
 
-    val afterContactDetailsCompleteDueForExpiryReminder: AgentApplicationLlp = afterContactDetailsComplete.copy(
-      applicationExpiresAt = Some(dependencies.applicationExpiresAtWithinReminderPeriodAsInstant)
-    ).assertDataIntegrity()
-
-    val afterContactDetailsCompleteDueForExpiryReminderEmailSent: AgentApplicationLlp = afterContactDetailsCompleteDueForExpiryReminder.copy(
-      expiryReminderEmailSentAt = Some(dependencies.expiryReminderEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterContactDetailsCompleteExpired: AgentApplicationLlp = afterContactDetailsComplete.copy(
-      applicationState = ApplicationState.Expired,
-      applicationExpiresAt = None,
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndsAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterContactDetailsCompleteExpiredEmailSent: AgentApplicationLlp = afterContactDetailsCompleteExpired.copy(
-      expiredEmailSentAt = Some(dependencies.expiredEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterContactDetailsCompleteExpiredPostExpiryGracePeriodEnded: AgentApplicationLlp = afterContactDetailsCompleteExpired.copy(
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndedAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtForPostExpiryGracePeriodEndedAsInstant),
-      expiredEmailSentAt = Some(dependencies.expiredAtForPostExpiryGracePeriodEndedAsInstant)
-    ).assertDataIntegrity()
-
-    val afterContactDetailsCompleteExpiredPostExpiryGracePeriodEndedDeletionEmailSent: AgentApplicationLlp =
-      afterContactDetailsCompleteExpiredPostExpiryGracePeriodEnded.copy(
-        deletionEmailSentAt = Some(dependencies.deletionEmailSentAtAsInstant)
-      ).assertDataIntegrity()
-
-    val afterAgentDetailsCompleteWithOtherAgentEmail: AgentApplicationLlp = afterContactDetailsComplete.copy(
-      agentDetails = Some(dependencies.completeAgentDetails.copy(agentEmailAddress = Some(dependencies.agentVerifiedEmailAddressWithOtherEmail)))
-    ).assertDataIntegrity()
-
-    val afterAgentDetailsCompleteWithOtherAgentEmailExpired: AgentApplicationLlp = afterAgentDetailsCompleteWithOtherAgentEmail.copy(
-      applicationState = ApplicationState.Expired,
-      applicationExpiresAt = None,
-      postExpiryGracePeriodEndsAt = Some(dependencies.postExpiryGracePeriodEndsAtAsInstant),
-      expiredAt = Some(dependencies.expiredAtAsInstant)
-    ).assertDataIntegrity()
-
-    val afterAgentDetailsCompleteWithOtherAgentEmailExpiredEmailSent: AgentApplicationLlp = afterAgentDetailsCompleteWithOtherAgentEmailExpired.copy(
-      expiredEmailSentAt = Some(dependencies.expiredEmailSentAtAsInstant)
-    ).assertDataIntegrity()
-
     val afterContactDetailsWithUnverifiedEmail: AgentApplicationLlp = afterGlobalAsaEnrolmentCheckPass.copy(
-      applicantContactDetails = Some(dependencies.applicantContactDetailsWithUnverifiedEmail),
-      agentDetails = None
+      applicantContactDetails = Some(dependencies.applicantContactDetailsWithUnverifiedEmail)
     ).assertDataIntegrity()
 
     val afterAgentDetailsComplete: AgentApplicationLlp = afterContactDetailsComplete.copy(
@@ -222,7 +115,19 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdTime & TdAgentApplicatio
     ).assertDataIntegrity()
 
     val afterAgentDetailsWithUnverifiedEmail: AgentApplicationLlp = afterContactDetailsComplete.copy(
-      agentDetails = Some(dependencies.completeAgentDetails.copy(agentEmailAddress = Some(dependencies.agentUnverifiedEmailAddress)))
+      agentDetails = Some(
+        dependencies
+          .getCompleteAgentDetails(LimitedLiabilityPartnership)
+          .copy(agentEmailAddress = Some(dependencies.agentUnverifiedEmailAddress))
+      )
+    ).assertDataIntegrity()
+
+    val afterAgentDetailsCompleteWithOtherAgentEmail: AgentApplicationLlp = afterContactDetailsComplete.copy(
+      agentDetails = Some(
+        dependencies
+          .getCompleteAgentDetails(LimitedLiabilityPartnership)
+          .copy(agentEmailAddress = Some(dependencies.agentVerifiedEmailAddressWithOtherEmail))
+      )
     ).assertDataIntegrity()
 
     val afterAmlsComplete: AgentApplicationLlp = afterAgentDetailsComplete.copy(
