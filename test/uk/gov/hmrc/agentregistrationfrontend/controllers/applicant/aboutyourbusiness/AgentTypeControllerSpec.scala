@@ -19,8 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbus
 import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.businessdetails.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AgentTypeControllerSpec

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class IndividualSaUtrControllerSpec

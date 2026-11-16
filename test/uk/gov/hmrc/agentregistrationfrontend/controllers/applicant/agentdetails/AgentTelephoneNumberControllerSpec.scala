@@ -20,7 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.agentdetails.AgentTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AgentTelephoneNumberControllerSpec

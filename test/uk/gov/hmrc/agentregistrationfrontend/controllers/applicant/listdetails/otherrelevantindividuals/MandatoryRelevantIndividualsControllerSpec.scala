@@ -21,7 +21,7 @@ import play.api.http.HeaderNames
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.otherrelevantindividuals.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.amls.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec

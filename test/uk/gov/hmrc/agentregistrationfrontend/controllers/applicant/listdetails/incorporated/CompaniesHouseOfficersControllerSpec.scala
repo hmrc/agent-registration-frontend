@@ -20,8 +20,8 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.incorporated.NumberCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs

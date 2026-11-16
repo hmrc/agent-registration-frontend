@@ -20,7 +20,7 @@ import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.businessdetails.PartnershipTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 

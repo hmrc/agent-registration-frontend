@@ -21,9 +21,9 @@
 @import uk.gov.hmrc.agentregistration.shared.lists.NumberOfPartners
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm.HowManyIndividualsOption
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfPartnersForm.HowManyIndividualsOption.*
+@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.nonincorporated.NumberOfPartnersForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.nonincorporated.NumberOfPartnersForm.*
+@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.listdetails.nonincorporated.NumberOfPartnersForm.HowManyIndividualsOption
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
@@ -92,7 +92,7 @@
         RadioItem(
           content = Text(messages(s"$key.$option")),
           value = Some(option.toString),
-          conditionalHtml = if(option === FiveOrLess) Some(exactNumberOfPartnersInput) else None
+          conditionalHtml = if(option === HowManyIndividualsOption.FiveOrLess) Some(exactNumberOfPartnersInput) else None
         )
       }
     ).withFormField(form(key)))

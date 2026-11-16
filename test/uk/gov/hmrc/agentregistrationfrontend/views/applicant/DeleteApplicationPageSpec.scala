@@ -19,8 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmDeleteApplicationForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ConfirmDeleteApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeleteApplicationPage
 

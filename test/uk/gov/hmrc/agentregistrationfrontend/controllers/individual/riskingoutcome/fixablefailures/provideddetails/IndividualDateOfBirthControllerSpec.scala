@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualDateOfBirthForm
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 class IndividualDateOfBirthControllerSpec

@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.Individual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.provideddetails.IndividualNinoPage
 
