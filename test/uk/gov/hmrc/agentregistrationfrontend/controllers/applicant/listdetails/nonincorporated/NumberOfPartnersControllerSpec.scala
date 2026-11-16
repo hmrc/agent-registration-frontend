@@ -106,7 +106,7 @@ extends ControllerSpec:
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfPartnersForm.whichNumberType}-error"
-    ).text() shouldBe "Error: Select how many partners there are"
+    ).text() shouldBe "Error: Select how many partners your business has"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of FiveOrLess and blank field for amount should return 400" in:
@@ -121,7 +121,7 @@ extends ControllerSpec:
     doc.title() shouldBe s"Error: How many partners are there at $agencyName? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfPartnersForm.exactNumberOfPartners}-error"
-    ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
+    ).text() shouldBe "Error: Enter the exact number of partners"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and invalid characters should return 400" in:
