@@ -288,7 +288,7 @@ extends FrontendController(mcc, actions):
       registrationStatus = GrsRegistered,
       registeredBusinessPartnerId = Some(SafeIdGenerator.generateSafeId())
     ),
-    fullName = if businessType === SoleTrader then Some(FullName("Test", "User")) else None,
+    fullName = if businessType === SoleTrader then Some(FullName("Joe", "Bloggs")) else None,
     dateOfBirth = if businessType === SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
     nino = if businessType === SoleTrader then Some(randomNino()) else None,
     trn = None,
