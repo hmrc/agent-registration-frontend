@@ -17,12 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock as wm
+import com.github.tomakehurst.wiremock.http.Body
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
+import uk.gov.hmrc.objectstore.client.play.Md5HashUtils
 
 import java.time.Instant
 
@@ -97,4 +99,21 @@ object ObjectStoreStubs:
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlEqualTo(s"/object-store/ops/presigned-url"),
     count = count
+  )
+
+  def stubObjectStoreGetObject(
+    fileUploadReference: FileUploadReference,
+    fileName: String,
+    fileContent: Array[Byte]
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/object-store/object/agent-registration-frontend/${fileUploadReference.value}/$fileName"),
+    responseStatus = 200,
+    responseBody = new Body(fileContent),
+    responseHeaders = Seq(
+      "Content-Type" -> "application/octet-stream",
+      "Content-Length" -> fileContent.length.toString,
+      "Content-MD5" -> Md5HashUtils.fromBytes(fileContent).value,
+      "Last-Modified" -> "Thu, 26 Nov 2026 10:03:22 GMT"
+    )
   )

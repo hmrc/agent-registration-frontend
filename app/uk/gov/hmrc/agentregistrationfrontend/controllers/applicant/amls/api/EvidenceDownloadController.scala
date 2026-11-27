@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api
 
-import play.api.libs.json.Json
+import play.api.http.HeaderNames
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -25,20 +25,21 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
-import uk.gov.hmrc.auth.core.AuthProviders
-import uk.gov.hmrc.auth.core.AuthorisationException
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.auth.core.Enrolment
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.auth.core.AuthorisationException
+import uk.gov.hmrc.auth.core.AuthProviders
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import javax.inject.Inject
+import java.time.ZoneOffset.UTC
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
+import javax.inject.Inject
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class EvidenceDownloadUrlController @Inject() (
+class EvidenceDownloadController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   objectStoreService: ObjectStoreService,
@@ -48,16 +49,22 @@ class EvidenceDownloadUrlController @Inject() (
 extends FrontendController(mcc, actions)
 with RequestAwareLogging:
 
-  // Returns a signed upscan download URL for the given fileReference
-  def evidenceDownloadUrl(fileReference: FileUploadReference): Action[AnyContent] = Action.async:
+  def evidenceDownload(fileReference: FileUploadReference): Action[AnyContent] = Action.async:
     implicit request =>
       given HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-      af.authorised((Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu)) and AuthProviders(PrivilegedApplication)).apply:
-        objectStoreService.getEvidenceDownloadUrl(fileReference).map {
-          case Some(url) => Ok(Json.obj("downloadUrl" -> url.downloadUrl.toString))
-          case None => NoContent
-        }
-      .recoverWith:
-        case e: AuthorisationException =>
-          logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-          Future.successful(Forbidden)
+      af.authorised(Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu) and AuthProviders(PrivilegedApplication))
+        .apply:
+          objectStoreService.getEvidenceFile(fileReference).map:
+            case None => NotFound
+            case Some(file) =>
+              Ok.streamed(
+                content = file.content,
+                contentLength = Some(file.metadata.contentLength),
+                contentType = Some(file.metadata.contentType)
+              )
+                .withHeaders(HeaderNames.CONTENT_MD5 -> file.metadata.contentMd5.value)
+                .withDateHeaders(HeaderNames.LAST_MODIFIED -> file.metadata.lastModified.atZone(UTC))
+        .recoverWith:
+          case e: AuthorisationException =>
+            logger.info(s"Unauthorised because of '${e.reason}', $e", e)
+            Future.successful(Forbidden)
