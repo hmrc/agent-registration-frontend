@@ -85,7 +85,7 @@ object AppRoutes:
       object api:
 
         val NotificationFromUpscanController = amlsApiRoutes.NotificationFromUpscanController
-        val EvidenceDownloadUrlController = amlsApiRoutes.EvidenceDownloadUrlController
+        val EvidenceDownloadController = amlsApiRoutes.EvidenceDownloadController
 
       val CheckYourAnswersController = amlsRoutes.CheckYourAnswersController
       val AmlsSupervisorController = amlsRoutes.AmlsSupervisorController

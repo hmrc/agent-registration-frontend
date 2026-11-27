@@ -16,22 +16,27 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
 import play.api.mvc.RequestHeader
 import sttp.model.Uri
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-import uk.gov.hmrc.objectstore.client.Path
-import uk.gov.hmrc.objectstore.client.PresignedDownloadUrl
-import uk.gov.hmrc.objectstore.client.RetentionPeriod
-import uk.gov.hmrc.objectstore.client.Sha256Checksum
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.objectstore
+import uk.gov.hmrc.objectstore.client.play.Implicits.*
 import uk.gov.hmrc.objectstore.client.play.PlayObjectStoreClient
+import uk.gov.hmrc.objectstore.client.Sha256Checksum
+import uk.gov.hmrc.objectstore.client.RetentionPeriod
+import uk.gov.hmrc.objectstore.client.Path
 
-import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
+import javax.inject.Inject
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ObjectStoreService @Inject() (
@@ -39,14 +44,16 @@ class ObjectStoreService @Inject() (
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def getEvidenceDownloadUrl(fileReference: FileUploadReference)(using request: RequestHeader): Future[Option[PresignedDownloadUrl]] =
+  private type FileStream = objectstore.client.Object[Source[ByteString, NotUsed]]
+
+  def getEvidenceFile(fileReference: FileUploadReference)(using request: HeaderCarrier): Future[Option[FileStream]] =
     for
       objects <- playObjectStoreClient.listObjects(AmlsEvidence.objectStoreDirectory(fileReference))
       url <-
         objects.objectSummaries.headOption match
           case Some(objectListing) =>
             val path = AmlsEvidence.objectStoreDirectory(fileReference).file(objectListing.location.fileName)
-            playObjectStoreClient.presignedDownloadUrl(path).map(Some(_))
+            playObjectStoreClient.getObject(path)
           case None => Future.successful(None)
     yield url
 

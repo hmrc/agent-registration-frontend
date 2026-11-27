@@ -16,57 +16,60 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 
+import org.apache.pekko.util.ByteString
+import play.api.http.HeaderNames
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.ObjectStoreStubs
 
-class EvidenceDownloadUrlControllerISpec
+class EvidenceDownloadControllerISpec
 extends ControllerSpec:
 
   override val baseUrl: String = "/api"
   val fileReference: FileUploadReference = tdAll.fileUploadReference
-  val downloadUrl: String = "https://object-store/download-url"
-  val endpoint: String = s"/api/amls/evidence-download-url/${fileReference.value}"
+  val evidenceDownloadRoute: String = s"/api/amls/evidence/${fileReference.value}"
   val fileName = "test.pdf"
 
-  "routes should have correct paths and methods" in:
-    AppRoutes.apply.amls.api.EvidenceDownloadUrlController.evidenceDownloadUrl(fileReference) shouldBe Call(
-      method = "GET",
-      url = endpoint
-    )
+  s"GET $evidenceDownloadRoute" should:
+    "have correct path and method" in:
+      AppRoutes.apply.amls.api.EvidenceDownloadController.evidenceDownload(fileReference) shouldBe Call(
+        method = "GET",
+        url = evidenceDownloadRoute
+      )
 
-  s"GET $endpoint" should:
-    "return OK and download url when evidence exists" in:
+    "return OK and return file when evidence exists" in:
       AuthStubs.stubStrideAuth
       ObjectStoreStubs.stubObjectStoreListObjects(
         fileUploadReference = fileReference,
         fileName = fileName
       )
-      ObjectStoreStubs.stubObjectStorePresignedDownloadUrl(
-        downloadUrl = downloadUrl
+      ObjectStoreStubs.stubObjectStoreGetObject(
+        fileUploadReference = fileReference,
+        fileName = fileName,
+        fileContent = "test content".getBytes
       )
 
-      val response: WSResponse = get(endpoint)
+      val response: WSResponse = get(evidenceDownloadRoute)
       response.status shouldBe Status.OK
-      (response.json \ "downloadUrl").as[String] shouldBe downloadUrl
-      ObjectStoreStubs.verifyObjectStoreListObjects(fileUploadReference = fileReference)
-      ObjectStoreStubs.verifyObjectStorePresignedDownloadUrl()
+      response.bodyAsBytes shouldBe ByteString("test content")
+      response.header(HeaderNames.CONTENT_MD5).value shouldBe "lHP90NiApDwht3eNNIchVw=="
+      response.header(HeaderNames.CONTENT_TYPE).value shouldBe "application/octet-stream"
+      response.header(HeaderNames.LAST_MODIFIED).value shouldBe "Thu, 26 Nov 2026 10:03:22 GMT"
+      response.header(HeaderNames.CONTENT_LENGTH).value shouldBe "12"
 
     "return NOT_FOUND when evidence does not exist" in:
       AuthStubs.stubStrideAuth
       ObjectStoreStubs.stubObjectStoreListObjectsNotFound(fileUploadReference = fileReference)
 
-      val response: WSResponse = get(endpoint)
-      response.status shouldBe Status.NO_CONTENT
+      val response: WSResponse = get(evidenceDownloadRoute)
+      response.status shouldBe Status.NOT_FOUND
       ObjectStoreStubs.verifyObjectStoreListObjects(fileUploadReference = fileReference)
-      ObjectStoreStubs.verifyObjectStorePresignedDownloadUrl(count = 0)
 
     "return FORBIDDEN when user is not authenticated" in:
       AuthStubs.stubUnauthorized()
 
-      val response: WSResponse = get(endpoint)
+      val response: WSResponse = get(evidenceDownloadRoute)
       response.status shouldBe Status.FORBIDDEN
       ObjectStoreStubs.verifyObjectStoreListObjects(fileUploadReference = fileReference, count = 0)
-      ObjectStoreStubs.verifyObjectStorePresignedDownloadUrl(count = 0)

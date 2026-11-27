@@ -18,17 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder
 import com.github.tomakehurst.wiremock.client.WireMock as wm
-import com.github.tomakehurst.wiremock.http.HttpHeader
 import com.github.tomakehurst.wiremock.http.HttpHeaders
-import com.github.tomakehurst.wiremock.matching.ContentPattern
-import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
-import com.github.tomakehurst.wiremock.matching.StringValuePattern
+import com.github.tomakehurst.wiremock.http.HttpHeader
+import com.github.tomakehurst.wiremock.http.Body
 import com.github.tomakehurst.wiremock.matching.UrlPattern
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
+import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
+import com.github.tomakehurst.wiremock.matching.ContentPattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 
-import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.jdk.CollectionConverters.SeqHasAsJava
+import scala.jdk.CollectionConverters.MapHasAsJava
 
 object StubMaker:
 
@@ -45,7 +46,7 @@ object StubMaker:
     queryParams: Map[String, StringValuePattern] = Map.empty,
     requestHeaders: Seq[(String, StringValuePattern)] = Nil,
     requestBody: Option[ContentPattern[?]] = None, // for example equalToJson(Json.prettyPrint(Json.toJson(caseClass)))
-    responseBody: String = "",
+    responseBody: String | Body = "",
     responseStatus: Int = Status.OK,
     responseHeaders: Seq[(String, String)] = Nil,
     atPriority: Option[Integer] = None
@@ -67,7 +68,9 @@ object StubMaker:
     val withResponse = withPriority.willReturn(
       wm.aResponse()
         .withStatus(responseStatus)
-        .withBody(responseBody)
+        .withResponseBody(responseBody match
+          case s: String => new Body(s)
+          case b: Body => b)
         .withHeaders(new HttpHeaders(responseHeaders.map(t => new HttpHeader(t._1, t._2)).asJava))
     )
 
